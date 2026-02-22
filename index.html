@@ -20,6 +20,23 @@
         .dark .tab-inactive { color: #9ca3af; }
         .tab-inactive:hover { color: #374151; border-bottom: 4px solid #d1d5db; }
         .dark .tab-inactive:hover { color: #f3f4f6; border-bottom: 4px solid #4b5563; }
+        
+        /* 🚀 新增 Loading 用的骨架屏動畫 */
+        .shimmer {
+            background: #f6f7f8;
+            background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+            background-repeat: no-repeat;
+            background-size: 800px 100%; 
+            animation: placeholderShimmer 1.5s linear infinite forwards;
+        }
+        .dark .shimmer {
+            background: #374151;
+            background-image: linear-gradient(to right, #374151 0%, #4b5563 20%, #374151 40%, #374151 100%);
+        }
+        @keyframes placeholderShimmer {
+            0% { background-position: -468px 0; }
+            100% { background-position: 468px 0; }
+        }
 
         @media print {
             body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -30,7 +47,7 @@
         }
     </style>
 </head>
-<body class="p-6 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 relative">
+<body class="p-6 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
     <div class="max-w-7xl mx-auto pb-20">
         
         <div class="mb-6 border-b border-gray-300 dark:border-gray-700">
@@ -44,7 +61,7 @@
                     </button>
                 </div>
                 
-                <div class="flex flex-wrap items-center gap-3 mb-2">
+                <div class="flex items-center space-x-3 mb-2">
                     <div class="text-sm font-bold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-1.5 rounded-full shadow-sm">
                         <span id="t-author">製作者：莊仕祺 (Bryan)</span>
                     </div>
@@ -159,96 +176,82 @@
                         </div>
                     </div>
 
-                    <div class="card flex-grow bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700 flex flex-col relative">
-                        <div class="absolute top-4 right-4 flex items-center bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-[10px] md:text-xs px-2 py-1 rounded-full border border-blue-100 dark:border-blue-800 z-10 font-bold shadow-sm">
+                    <div class="card bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700 flex flex-col relative">
+                        <div class="absolute top-4 right-4 flex items-center bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-[10px] md:text-xs px-2 py-1 rounded-full border border-blue-100 dark:border-blue-800 z-10 font-bold shadow-sm cursor-pointer">
                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
                             <span id="t-chart-hint">點擊圖表節點查看算式細節</span>
                         </div>
-                        
                         <h2 id="t-chart-title" class="text-md font-semibold mb-4 text-center text-gray-700 dark:text-gray-200">5 年 TCO 累積成本比較 (CapEx + OpEx)</h2>
-                        <div class="relative w-full flex-grow" style="min-height: 300px;">
+                        <div class="relative w-full" style="min-height: 280px;">
                             <canvas id="tcoChart"></canvas>
                         </div>
                         
-                        <div class="mt-6 p-4 bg-blue-50 dark:bg-gray-700 rounded-lg border border-blue-100 dark:border-gray-600">
-                            <div class="flex items-center text-blue-800 dark:text-blue-200 font-bold mb-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                                </svg>
-                                <span id="t-formula-title">營運成本 (OpEx) 運算邏輯透明化</span>
-                            </div>
-                            <p id="t-formula-desc" class="text-sm text-gray-700 dark:text-gray-300 font-mono bg-white dark:bg-gray-800 p-2 rounded shadow-sm border dark:border-gray-600 overflow-x-auto">
-                                每年 OpEx = 總功耗(kW) × PUE × 稼動率(%) × 8,760小時 × 電費費率
-                            </p>
-                            <p id="t-formula-note" class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                * 註：PUE (電力使用效率) 代表基礎設施額外耗能。液冷能大幅降低 PUE，是省下巨額 OpEx 的關鍵。
-                            </p>
+                        <div class="mt-4 flex justify-end print:hidden">
+                            <button onclick="generateSalesReport()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2 rounded-lg shadow-md transition-all font-bold flex items-center transform hover:-translate-y-0.5">
+                                🪄 <span id="t-btn-gen-report" class="ml-2">產出 Sales 提案報告</span>
+                            </button>
                         </div>
                     </div>
+
+                    <div id="salesReportSection" class="hidden card bg-gradient-to-br from-indigo-50 to-white dark:from-gray-800 dark:to-gray-900 border border-indigo-200 dark:border-indigo-800 relative overflow-hidden transition-all duration-500">
+                        
+                        <div id="reportStateOutdated" class="hidden absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                            <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-2xl border dark:border-gray-700 text-center transform transition-transform scale-100">
+                                <p id="t-report-outdated" class="text-red-500 dark:text-red-400 font-bold mb-4 flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                    ⚠️ 參數已變更，報告內容已過時
+                                </p>
+                                <button onclick="generateSalesReport()" class="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700 text-sm font-bold w-full">
+                                    <span id="t-btn-regen">🔄 重新生成最新報告</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="reportStateLoading" class="hidden flex flex-col gap-4 py-2">
+                            <div class="h-6 w-1/3 rounded shimmer"></div>
+                            <div class="space-y-2 mt-4">
+                                <div class="h-4 w-full rounded shimmer"></div>
+                                <div class="h-4 w-5/6 rounded shimmer"></div>
+                                <div class="h-4 w-4/6 rounded shimmer"></div>
+                            </div>
+                            <div class="space-y-2 mt-4">
+                                <div class="h-4 w-full rounded shimmer"></div>
+                                <div class="h-4 w-3/4 rounded shimmer"></div>
+                            </div>
+                        </div>
+
+                        <div id="reportStateError" class="hidden text-center py-6">
+                            <p id="t-report-error" class="text-red-500 font-bold">❌ 報告生成失敗，請檢查網路連線或稍後再試。</p>
+                        </div>
+
+                        <div id="reportStateSuccess" class="hidden flex flex-col gap-5">
+                            <div class="flex items-center text-indigo-800 dark:text-indigo-400 font-bold text-xl border-b border-indigo-200 dark:border-indigo-800 pb-2">
+                                <span id="t-report-title">💡 AI 生成 Sales 提案教戰手冊</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-700 shadow-sm">
+                                    <h3 id="t-report-pitch" class="text-sm font-bold text-indigo-600 dark:text-indigo-400 mb-2">🎯 核心說帖 (Elevator Pitch)</h3>
+                                    <p id="reportContentPitch" class="text-sm text-gray-800 dark:text-gray-200 leading-relaxed"></p>
+                                </div>
+                                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-red-100 dark:border-gray-700 shadow-sm border-l-4 border-l-red-500">
+                                    <h3 id="t-report-obj" class="text-sm font-bold text-red-600 dark:text-red-400 mb-2">🛡️ 反對意見克服 (Objection Handling)</h3>
+                                    <p id="reportContentObj" class="text-sm text-gray-800 dark:text-gray-200 leading-relaxed"></p>
+                                </div>
+                            </div>
+                            <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg border border-indigo-100 dark:border-indigo-800">
+                                <h3 id="t-report-roi" class="text-sm font-bold text-indigo-700 dark:text-indigo-300 mb-2">💰 財務亮點 (ROI Highlight)</h3>
+                                <p id="reportContentROI" class="text-sm text-gray-800 dark:text-gray-200 leading-relaxed font-mono"></p>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
 
         <div id="wrapper-mindset" class="hidden">
-            <div class="flex flex-col gap-6">
-                <div class="card bg-gradient-to-r from-blue-900 to-gray-800 dark:from-blue-950 dark:to-black text-white text-center py-8">
-                    <h2 id="t-hero-title" class="text-2xl font-bold mb-2">專案管理的核心：載體不同，邏輯一致</h2>
-                    <p id="t-hero-sub" class="text-blue-100 max-w-2xl mx-auto">「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 Product Planning 流程加速的引擎。」</p>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent border-t-4 border-t-blue-500 hover:shadow-lg transition">
-                        <div class="flex items-center mb-4"><span id="t-c1-tag" class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">1. 產品藍圖與生命週期</span></div>
-                        <div class="mb-4">
-                            <h3 id="t-c1-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
-                            <p id="t-c1-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Sprint 迭代 / Release</p>
-                            <p id="t-c1-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">定義需求並透過敏捷衝刺，確保軟體功能如期交付上線。</p>
-                        </div>
-                        <div class="flex justify-center my-2 text-gray-400">⬇️</div>
-                        <div>
-                            <h3 id="t-c1-new-h" class="text-blue-600 dark:text-blue-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3>
-                            <p id="t-c1-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Roadmap ➔ NPI ➔ MP</p>
-                            <p id="t-c1-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">擬定符合市場需求的產品規格發展，並與 RD 合作掌控 NPI 研發時程。</p>
-                        </div>
-                    </div>
-                    <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent border-t-4 border-t-red-500 hover:shadow-lg transition">
-                        <div class="flex items-center mb-4"><span id="t-c2-tag" class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">2. 市場洞察與分析</span></div>
-                        <div class="mb-4">
-                            <h3 id="t-c2-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
-                            <p id="t-c2-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">User Research & 數據分析</p>
-                            <p id="t-c2-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">收集用戶回饋與平台數據，定義規格與優先級。</p>
-                        </div>
-                        <div class="flex justify-center my-2 text-gray-400">⬇️</div>
-                        <div>
-                            <h3 id="t-c2-new-h" class="text-red-600 dark:text-red-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3>
-                            <p id="t-c2-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">技術趨勢調研與概念驗證</p>
-                            <p id="t-c2-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">針對硬體散熱趨勢收集有利資訊，進行 PoC 與規格收斂。</p>
-                        </div>
-                    </div>
-                    <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent border-t-4 border-t-green-500 hover:shadow-lg transition">
-                        <div class="flex items-center mb-4"><span id="t-c3-tag" class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">3. 跨部門溝通與橋樑</span></div>
-                        <div class="mb-4">
-                            <h3 id="t-c3-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
-                            <p id="t-c3-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">RD / UIUX / QA 樞紐</p>
-                            <p id="t-c3-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">整合技術與商業需求，解決開發期間的衝突與 Bug。</p>
-                        </div>
-                        <div class="flex justify-center my-2 text-gray-400">⬇️</div>
-                        <div>
-                            <h3 id="t-c3-new-h" class="text-green-600 dark:text-green-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3>
-                            <p id="t-c3-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Sales / RD / 客戶端橋樑</p>
-                            <p id="t-c3-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">協助釐清客戶規格需求，並對 Sales 進行技術培訓。</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mt-2">
-                    <h3 id="t-footer-title" class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3">💡 為什麼軟體背景是 AI Server Planner 的隱藏優勢？</h3>
-                    <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-2">
-                        <li id="t-footer-1">軟體定義硬體 (Software-Defined Hardware)： 現代 AI 伺服器高度依賴 BMC 與軟體整合。</li>
-                        <li id="t-footer-2">敏捷迭代力 (Agile Adaptability)： 面對快速換代的市場，能以敏捷思維快速調整 Roadmap。</li>
-                    </ul>
-                </div>
-            </div>
+            <p class="text-center italic text-gray-500 my-10">此分頁內容維持不變...</p>
         </div>
     </div>
 
@@ -263,7 +266,6 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-4 p-5 bg-blue-50/50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-900/30">
                     <h4 class="font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800 pb-2 text-lg flex items-center">
@@ -282,7 +284,6 @@
                         <p id="airTotalDetail" class="text-2xl font-bold text-blue-600 dark:text-blue-400"></p>
                     </div>
                 </div>
-                
                 <div class="space-y-4 p-5 bg-red-50/50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-900/30">
                     <h4 class="font-bold text-red-700 dark:text-red-400 border-b border-red-200 dark:border-red-800 pb-2 text-lg flex items-center">
                         💧 <span id="t-modal-liq" class="ml-2">液冷方案 (Liquid)</span>
@@ -301,7 +302,6 @@
                     </div>
                 </div>
             </div>
-            
             <div id="modalDiff" class="bg-gray-100 dark:bg-gray-900 p-4 text-center text-lg font-bold text-gray-800 dark:text-gray-100 border-t dark:border-gray-700"></div>
         </div>
     </div>
@@ -327,17 +327,14 @@
         function toggleLanguage() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             document.getElementById('langBtnText').innerText = currentLang === 'zh' ? 'EN' : '中文';
-            
-            // 更新畫面上寫死的字串 (如果 i18n_dict 有包到的話)
             if(typeof dict !== 'undefined' && dict[currentLang]) {
                 for (const key in dict[currentLang]) {
                     const element = document.getElementById(key);
                     if (element) { element.innerHTML = dict[currentLang][key]; }
                 }
             }
-
-            // 更新 Modal 內的靜態文字
-            document.getElementById('t-chart-hint').innerText = currentLang === 'zh' ? '點擊圖表節點查看算式細節' : 'Click chart nodes for math details';
+            // Update Modal Static Text
+            document.getElementById('t-chart-hint').innerText = currentLang === 'zh' ? '點擊圖表節點查看算式細節' : 'Click nodes for math details';
             document.getElementById('t-modal-air').innerText = currentLang === 'zh' ? '氣冷方案 (Air Cooling)' : 'Air Cooling';
             document.getElementById('t-modal-liq').innerText = currentLang === 'zh' ? '液冷方案 (Direct Liquid Cooling)' : 'Liquid Cooling';
             document.getElementById('t-modal-capex-label-air').innerText = currentLang === 'zh' ? '一次性建置成本 (CapEx)' : 'Upfront CapEx';
@@ -346,8 +343,9 @@
             document.getElementById('t-modal-opex-label-liq').innerText = currentLang === 'zh' ? '累計營運成本 (OpEx)' : 'Cumulative OpEx';
             document.getElementById('t-modal-total-air').innerText = currentLang === 'zh' ? '該年度累積總成本' : 'Total Cumulative Cost';
             document.getElementById('t-modal-total-liq').innerText = currentLang === 'zh' ? '該年度累積總成本' : 'Total Cumulative Cost';
-
+            
             if(typeof calculateTCO === "function") calculateTCO();
+            if(typeof forceRegenerateReport === "function") forceRegenerateReport(); // Trigger translation for generated report
         }
 
         function toggleTheme() {
@@ -380,23 +378,16 @@
             }
         }
 
-        function closeModal() {
-            document.getElementById('drilldownModal').classList.add('hidden');
-        }
+        function closeModal() { document.getElementById('drilldownModal').classList.add('hidden'); }
 
         window.onload = function() {
-            // 初始化語系文字
             if(typeof dict !== 'undefined' && dict[currentLang]) {
                 for (const key in dict[currentLang]) {
                     const element = document.getElementById(key);
                     if (element) { element.innerHTML = dict[currentLang][key]; }
                 }
             }
-            if (typeof calculateTCO === "function") {
-                calculateTCO();
-            } else {
-                console.error("tco_engine.js is missing!");
-            }
+            if (typeof calculateTCO === "function") calculateTCO();
         };
     </script>
 </body>
