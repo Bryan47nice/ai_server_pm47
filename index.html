@@ -60,7 +60,6 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="card col-span-1 flex flex-col gap-4 bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700">
                     <h2 id="t-basic-settings" class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2">基礎參數設定</h2>
-                    
                     <div>
                         <label id="t-chip-model" class="block text-sm font-medium text-gray-700 dark:text-gray-300">AI 伺服器型號</label>
                         <select id="chipType" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
@@ -68,7 +67,6 @@
                             <option id="t-opt-gb200" value="1.2">NVIDIA GB200 NVL72 (單台約 1.2kW)</option>
                         </select>
                     </div>
-
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label id="t-total-servers" class="block text-sm font-medium text-gray-700 dark:text-gray-300">總伺服器數量 (台)</label>
@@ -79,30 +77,14 @@
                             <input type="number" id="powerCost" step="0.01" min="0" value="0.10" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
                         </div>
                     </div>
-
                     <div class="relative">
                         <div class="flex items-center justify-between">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
                                 <span id="t-servers-per-rack">單機櫃伺服器數量</span> 
                             </label>
-                            <div class="group relative ml-2 flex items-center print:hidden">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 cursor-help hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block w-72 p-3 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-xl z-50">
-                                    <strong id="t-tt-title" class="block mb-1 text-blue-300">為什麼上限設定為 72 台 (節點)？</strong>
-                                    <ul class="list-decimal pl-4 space-y-1 text-gray-200">
-                                        <li><b>空間極限：</b>機櫃需容納運算匣與水冷設備，已達空間飽和。</li>
-                                        <li><b>訊號極限：</b>GPU 間透過銅線傳輸，72 節點高度是訊號極限。</li>
-                                        <li><b>設施極限：</b>單櫃功耗達 100-120kW，觸及機房供電天花板。</li>
-                                    </ul>
-                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
-                                </div>
-                            </div>
                             <input type="number" id="rackValInput" value="32" min="10" max="72" class="w-16 px-2 py-0.5 text-blue-600 dark:text-blue-400 font-bold border rounded-md dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 text-center" onchange="updateSliderFromInput(); calculateTCO()">
                         </div>
                         <input type="range" id="serversPerRack" min="10" max="72" value="32" class="w-full mt-2" oninput="updateInputFromSlider(); calculateTCO()">
-                        
                         <div class="flex justify-between items-center mt-1">
                             <p class="text-xs text-gray-500 dark:text-gray-400"><span id="t-power-per-rack">單機櫃功耗:</span> <span id="kwPerRack" class="font-bold text-red-500 dark:text-red-400">32</span> kW/Rack</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded"><span id="t-total-racks">預估機櫃總數:</span> <span id="totalRacksDisplay" class="font-bold text-gray-800 dark:text-gray-200">4</span> Racks</p>
@@ -231,10 +213,10 @@
                     </div>
                 </div>
                 <div class="card bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mt-2">
-                    <h3 id="t-footer-title" class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3">💡 為什麼軟體背景是 AI Server Planner 的優勢？</h3>
+                    <h3 id="t-footer-title" class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3">💡 為什麼軟體背景是 AI Server Planner 的隱藏優勢？</h3>
                     <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-2">
-                        <li id="t-footer-1">**軟體定義硬體：** 現代 AI 伺服器高度依賴 BMC 與軟體整合。</li>
-                        <li id="t-footer-2">**敏捷迭代力：** 面對快速換代的市場，能快速調整 Roadmap 與策略。</li>
+                        <li id="t-footer-1">**軟體定義硬體 (Software-Defined Hardware)：** 現代 AI 伺服器高度依賴 BMC (遠端管理晶片) 與軟體整合，具備軟體敏銳度更能掌握系統層級的技術架構。</li>
+                        <li id="t-footer-2">**敏捷迭代力 (Agile Adaptability)：** 面對 AI 晶片快速換代的市場，能以敏捷思維快速調整產品 Roadmap 與 Go-to-Market 策略。</li>
                     </ul>
                 </div>
             </div>
@@ -257,13 +239,11 @@
         function formatYearsInput(el) { let val = parseFloat(el.value); if(isNaN(val) || val < 1) val = 1; el.value = val.toFixed(1); }
         function formatUtilInput(el) { let val = parseInt(el.value); if(isNaN(val) || val < 1) val = 1; if(val > 100) val = 100; el.value = val; }
 
-        // Language Management
         let currentLang = 'zh';
 
         function toggleLanguage() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             document.getElementById('langBtnText').innerText = currentLang === 'zh' ? 'EN' : '中文';
-            // dict is sourced from i18n_dict.js
             for (const key in dict[currentLang]) {
                 const element = document.getElementById(key);
                 if (element) { element.innerHTML = dict[currentLang][key]; }
@@ -282,23 +262,34 @@
             calculateTCO();
         }
 
+        // 🚀 修正後的 Tab 切換邏輯：使用 classList 避免樣式衝突
         function switchTab(tabName) {
             const btnTco = document.getElementById('btn-tab-tco');
             const btnMindset = document.getElementById('btn-tab-mindset');
             const wrapperTco = document.getElementById('wrapper-tco');
             const wrapperMindset = document.getElementById('wrapper-mindset');
+
             if (tabName === 'tco') {
+                // 按鈕樣式
                 btnTco.className = 'tab-active pb-3 text-base md:text-lg transition-colors duration-200';
                 btnMindset.className = 'tab-inactive pb-3 text-base md:text-lg transition-colors duration-200';
-                wrapperTco.className = 'block'; wrapperMindset.className = 'hidden';
+                // 區塊顯示
+                wrapperTco.classList.remove('hidden');
+                wrapperTco.classList.add('block');
+                wrapperMindset.classList.remove('block');
+                wrapperMindset.classList.add('hidden');
             } else {
+                // 按鈕樣式
                 btnMindset.className = 'tab-active pb-3 text-base md:text-lg transition-colors duration-200';
                 btnTco.className = 'tab-inactive pb-3 text-base md:text-lg transition-colors duration-200';
-                wrapperMindset.className = 'block'; wrapperMindset.className = 'hidden';
+                // 區塊顯示
+                wrapperMindset.classList.remove('hidden');
+                wrapperMindset.classList.add('block');
+                wrapperTco.classList.remove('block');
+                wrapperTco.classList.add('hidden');
             }
         }
 
-        // TCO Calculation Engine
         let tcoChartInstance = null;
 
         function calculateTCO() {
@@ -315,54 +306,36 @@
 
             const kwPerRack = serversPerRack * chipPower;
             const totalRacks = Math.ceil(totalServers / serversPerRack);
-            
             document.getElementById('kwPerRack').innerText = kwPerRack.toFixed(1);
             document.getElementById('totalRacksDisplay').innerText = totalRacks;
 
-            const textSavingsTitle = currentLang === 'zh' ? `${evalYears}年總節省成本 (USD)` : `${evalYears}-Year TCO Savings (USD)`;
-            const textChartTitle = currentLang === 'zh' ? `${evalYears} 年 TCO 累積成本比較 (CapEx + OpEx)` : `${evalYears}-Year TCO Comparison (CapEx + OpEx)`;
-            document.getElementById('t-savings-title').innerText = textSavingsTitle;
-            document.getElementById('t-chart-title').innerText = textChartTitle;
-
-            const totalKw = totalServers * chipPower;
-            const hoursPerYear = 8760;
             const totalAirCapEx = totalRacks * airCapExPerRack;
             const totalLiqCapEx = totalRacks * liqCapExPerRack;
-            
             document.getElementById('airTotalCapexDisplay').innerText = totalAirCapEx.toLocaleString();
             document.getElementById('liqTotalCapexDisplay').innerText = totalLiqCapEx.toLocaleString();
 
-            const airOpExPerYear = totalKw * airPUE * utilRate * hoursPerYear * powerCost;
-            const liqOpExPerYear = totalKw * liqPUE * utilRate * hoursPerYear * powerCost;
+            const totalKw = totalServers * chipPower;
+            const hoursPerYear = 8760;
+            const airOpEx = totalKw * airPUE * utilRate * hoursPerYear * powerCost;
+            const liqOpEx = totalKw * liqPUE * utilRate * hoursPerYear * powerCost;
 
             let airData = []; let liqData = []; let labels = [];
-            const maxIntYear = Math.floor(evalYears);
-
-            for (let i = 0; i <= maxIntYear; i++) {
-                labels.push(i === 0 ? (currentLang === 'zh' ? 'Y0' : 'Y0') : `Y${i}`);
-                airData.push(totalAirCapEx + (airOpExPerYear * i));
-                liqData.push(totalLiqCapEx + (liqOpExPerYear * i));
+            for (let i = 0; i <= Math.floor(evalYears); i++) {
+                labels.push('Y' + i);
+                airData.push(totalAirCapEx + (airOpEx * i));
+                liqData.push(totalLiqCapEx + (liqOpEx * i));
             }
             if (evalYears % 1 !== 0) {
-                labels.push(`Y${evalYears}`);
-                airData.push(totalAirCapEx + (airOpExPerYear * evalYears));
-                liqData.push(totalLiqCapEx + (liqOpExPerYear * evalYears));
+                labels.push('Y' + evalYears);
+                airData.push(totalAirCapEx + (airOpEx * evalYears));
+                liqData.push(totalLiqCapEx + (liqOpEx * evalYears));
             }
 
-            const finalAirCost = totalAirCapEx + (airOpExPerYear * evalYears);
-            const finalLiqCost = totalLiqCapEx + (liqOpExPerYear * evalYears);
-            const totalSavings = finalAirCost - finalLiqCost;
-
-            if (totalSavings > 0) {
-                document.getElementById('savings').innerText = "+$" + totalSavings.toLocaleString(undefined, {maximumFractionDigits: 0});
-                document.getElementById('savings').className = "text-lg md:text-xl font-bold text-green-600 dark:text-green-400 mt-1";
-                const beYear = (totalLiqCapEx - totalAirCapEx) / (airOpExPerYear - liqOpExPerYear);
-                document.getElementById('breakeven').innerText = beYear > evalYears ? "N/A" : beYear.toFixed(1) + "Y";
-            } else {
-                document.getElementById('savings').innerText = "-$" + Math.abs(totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0});
-                document.getElementById('savings').className = "text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
-                document.getElementById('breakeven').innerText = "N/A";
-            }
+            const savings = (totalAirCapEx + airOpEx * evalYears) - (totalLiqCapEx + liqOpEx * evalYears);
+            document.getElementById('savings').innerText = (savings > 0 ? "+$" : "-$") + Math.abs(savings).toLocaleString(undefined, {maximumFractionDigits: 0});
+            
+            const beYear = (totalLiqCapEx - totalAirCapEx) / (airOpEx - liqOpEx);
+            document.getElementById('breakeven').innerText = (beYear > 0 && beYear <= evalYears) ? beYear.toFixed(1) + "Y" : "N/A";
 
             const recEl = document.getElementById('recommendation');
             if (kwPerRack < 30) { recEl.innerText = currentLang === 'zh' ? "氣冷方案" : "Air Cooling"; recEl.className = "text-lg font-bold text-green-600"; }
@@ -374,23 +347,22 @@
         function drawChart(labels, airData, liqData) {
             const ctx = document.getElementById('tcoChart').getContext('2d');
             const isDark = document.documentElement.classList.contains('dark');
-            const textColor = isDark ? '#e5e7eb' : '#374151';
             if (tcoChartInstance) tcoChartInstance.destroy();
             tcoChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Air TCO', data: airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1 },
-                        { label: 'Liquid TCO', data: liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1 }
+                        { label: 'Air TCO', data: airData, borderColor: '#3b82f6', fill: false, tension: 0.1 },
+                        { label: 'Liquid TCO', data: liqData, borderColor: '#ef4444', fill: false, tension: 0.1 }
                     ]
                 },
                 options: { 
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: textColor } } },
+                    plugins: { legend: { labels: { color: isDark ? '#fff' : '#000' } } },
                     scales: { 
-                        x: { ticks: { color: textColor } },
-                        y: { ticks: { color: textColor }, title: { display: true, text: 'USD ($)', color: textColor } } 
+                        x: { ticks: { color: isDark ? '#ccc' : '#333' } },
+                        y: { ticks: { color: isDark ? '#ccc' : '#333' } } 
                     } 
                 }
             });
