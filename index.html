@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh-TW" class="dark"> <head>
+<html lang="zh-TW" class="dark">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bryan's Portfolio | AI Server PM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // 設定 Tailwind 支援 class 基礎的深色模式切換
-        tailwind.config = {
-            darkMode: 'class',
-        }
+        tailwind.config = { darkMode: 'class' }
     </script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -20,28 +18,11 @@
         .tab-inactive:hover { color: #374151; border-bottom: 4px solid #d1d5db; }
         .dark .tab-inactive:hover { color: #f3f4f6; border-bottom: 4px solid #4b5563; }
 
-        /* --- 列印專用 CSS (解決跑版問題) --- */
         @media print {
-            body { 
-                background-color: white !important; 
-                -webkit-print-color-adjust: exact; 
-                print-color-adjust: exact; 
-            }
-            .card { 
-                break-inside: avoid; /* 避免卡片被切成兩半 */
-                border: 1px solid #d1d5db !important; 
-                box-shadow: none !important; 
-                margin-bottom: 1rem;
-            }
-            /* 強制將左右兩欄轉為垂直堆疊，給圖表 100% 的寬度 */
-            .lg\:grid-cols-3 { 
-                display: flex !important; 
-                flex-direction: column !important; 
-            }
-            .lg\:col-span-2, .col-span-1 { 
-                width: 100% !important; 
-                max-width: 100% !important; 
-            }
+            body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .card { break-inside: avoid; border: 1px solid #d1d5db !important; box-shadow: none !important; margin-bottom: 1rem; }
+            .lg\:grid-cols-3 { display: flex !important; flex-direction: column !important; }
+            .lg\:col-span-2, .col-span-1 { width: 100% !important; max-width: 100% !important; }
         }
     </style>
 </head>
@@ -49,21 +30,25 @@
     <div class="max-w-7xl mx-auto">
         
         <div class="mb-6 border-b border-gray-300 dark:border-gray-700">
-            <div class="flex justify-between items-end pb-2">
-                <div class="flex space-x-8">
-                    <button id="tab-tco" onclick="switchTab('tco')" class="tab-active pb-3 text-lg transition-colors duration-200">
-                        📊 AI 伺服器 TCO 評估儀表板
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end pb-2 gap-4">
+                <div class="flex space-x-6 md:space-x-8">
+                    <button id="btn-tab-tco" onclick="switchTab('tco')" class="tab-active pb-3 text-base md:text-lg transition-colors duration-200">
+                        📊 <span id="t-tab-tco">AI 伺服器 TCO 評估儀表板</span>
                     </button>
-                    <button id="tab-mindset" onclick="switchTab('mindset')" class="tab-inactive pb-3 text-lg transition-colors duration-200">
-                        🧠 軟體轉硬體 NPI：專案管理思維對照
+                    <button id="btn-tab-mindset" onclick="switchTab('mindset')" class="tab-inactive pb-3 text-base md:text-lg transition-colors duration-200">
+                        🧠 <span id="t-tab-mindset">產品企劃：專案管理思維對照</span>
                     </button>
                 </div>
-                <div class="flex items-center space-x-4 mb-2">
-                    <div class="text-sm font-bold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full shadow-sm">
-                        製作者：莊仕祺
+                
+                <div class="flex items-center space-x-3 mb-2">
+                    <div class="text-sm font-bold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-1.5 rounded-full shadow-sm">
+                        <span id="t-author">製作者：莊仕祺 (Bryan)</span>
                     </div>
-                    <button onclick="window.print()" class="print:hidden bg-gray-800 dark:bg-gray-700 text-white px-4 py-1.5 rounded shadow hover:bg-gray-900 dark:hover:bg-gray-600 transition text-sm">
-                        匯出 PDF
+                    <button onclick="toggleLanguage()" class="print:hidden bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-3 py-1.5 rounded shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm font-bold flex items-center">
+                        🌐 <span id="langBtnText" class="ml-1">EN</span>
+                    </button>
+                    <button onclick="window.print()" class="print:hidden bg-gray-800 dark:bg-gray-600 text-white px-4 py-1.5 rounded shadow hover:bg-gray-900 dark:hover:bg-gray-500 transition text-sm font-bold">
+                        📄 <span id="t-export">匯出 PDF</span>
                     </button>
                 </div>
             </div>
@@ -72,31 +57,31 @@
         <div id="wrapper-tco" class="block">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="card col-span-1 flex flex-col gap-4 bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700">
-                    <h2 class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2">基礎參數設定</h2>
+                    <h2 id="t-basic-settings" class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2">基礎參數設定</h2>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">AI 伺服器型號</label>
+                        <label id="t-chip-model" class="block text-sm font-medium text-gray-700 dark:text-gray-300">AI 伺服器型號</label>
                         <select id="chipType" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
-                            <option value="1">NVIDIA H100 (單台約 1kW)</option>
-                            <option value="1.2">NVIDIA GB200 NVL72 (單台約 1.2kW)</option>
+                            <option id="t-opt-h100" value="1">NVIDIA H100 (單台約 1kW)</option>
+                            <option id="t-opt-gb200" value="1.2">NVIDIA GB200 NVL72 (單台約 1.2kW)</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">總伺服器數量 (台)</label>
+                        <label id="t-total-servers" class="block text-sm font-medium text-gray-700 dark:text-gray-300">總伺服器數量 (台)</label>
                         <input type="number" id="totalServers" value="100" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">單機櫃伺服器數量 <span id="rackVal" class="text-blue-600 dark:text-blue-400 font-bold">32</span> 台</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"><span id="t-servers-per-rack">單機櫃伺服器數量</span> <span id="rackVal" class="text-blue-600 dark:text-blue-400 font-bold">32</span></label>
                         <input type="range" id="serversPerRack" min="10" max="72" value="32" class="w-full mt-2" oninput="updateSlider(); calculateTCO()">
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">單機櫃功耗: <span id="kwPerRack" class="font-bold text-red-500 dark:text-red-400">32</span> kW/Rack</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1"><span id="t-power-per-rack">單機櫃功耗:</span> <span id="kwPerRack" class="font-bold text-red-500 dark:text-red-400">32</span> kW/Rack</p>
                     </div>
 
-                    <h2 class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mt-4">進階環境設定</h2>
+                    <h2 id="t-adv-settings" class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mt-4">進階環境設定</h2>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">電費費率 (USD/kWh)</label>
+                        <label id="t-power-rate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">電費費率 (USD/kWh)</label>
                         <input type="number" id="powerCost" step="0.01" value="0.10" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
                     </div>
                 </div>
@@ -104,21 +89,21 @@
                 <div class="col-span-1 lg:grid-cols-2 lg:col-span-2 flex flex-col gap-6">
                     <div class="grid grid-cols-3 gap-4">
                         <div class="card text-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                            <p class="text-sm text-gray-500 dark:text-gray-400">系統強烈建議</p>
-                            <p id="recommendation" class="text-xl font-bold text-green-600 dark:text-green-400 mt-1">氣冷方案</p>
+                            <p id="t-rec-title" class="text-sm text-gray-500 dark:text-gray-400">系統強烈建議</p>
+                            <p id="recommendation" class="text-lg md:text-xl font-bold text-green-600 dark:text-green-400 mt-1">氣冷方案</p>
                         </div>
                         <div class="card text-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                            <p class="text-sm text-gray-500 dark:text-gray-400">5年總節省成本 (USD)</p>
-                            <p id="savings" class="text-xl font-bold text-blue-600 dark:text-blue-400 mt-1">$0</p>
+                            <p id="t-savings-title" class="text-sm text-gray-500 dark:text-gray-400">5年總節省成本 (USD)</p>
+                            <p id="savings" class="text-lg md:text-xl font-bold text-blue-600 dark:text-blue-400 mt-1">$0</p>
                         </div>
                         <div class="card text-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                            <p class="text-sm text-gray-500 dark:text-gray-400">黃金交叉點</p>
-                            <p id="breakeven" class="text-xl font-bold text-purple-600 dark:text-purple-400 mt-1">N/A</p>
+                            <p id="t-breakeven-title" class="text-sm text-gray-500 dark:text-gray-400">黃金交叉點</p>
+                            <p id="breakeven" class="text-lg md:text-xl font-bold text-purple-600 dark:text-purple-400 mt-1">N/A</p>
                         </div>
                     </div>
 
                     <div class="card flex-grow bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700">
-                        <h2 class="text-md font-semibold mb-4 text-center text-gray-700 dark:text-gray-200">5 年 TCO 累積成本比較 (CapEx + OpEx)</h2>
+                        <h2 id="t-chart-title" class="text-md font-semibold mb-4 text-center text-gray-700 dark:text-gray-200">5 年 TCO 累積成本比較 (CapEx + OpEx)</h2>
                         <div class="relative w-full" style="height: 350px;">
                             <canvas id="tcoChart"></canvas>
                         </div>
@@ -130,70 +115,70 @@
         <div id="wrapper-mindset" class="hidden">
             <div class="flex flex-col gap-6">
                 <div class="card bg-gradient-to-r from-blue-900 to-gray-800 dark:from-blue-950 dark:to-black text-white text-center py-8">
-                    <h2 class="text-2xl font-bold mb-2">專案管理的核心：載體不同，邏輯一致</h2>
-                    <p class="text-blue-100 max-w-2xl mx-auto">
-                        「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 NPI 流程加速的引擎。」
+                    <h2 id="t-hero-title" class="text-2xl font-bold mb-2">專案管理的核心：載體不同，邏輯一致</h2>
+                    <p id="t-hero-sub" class="text-blue-100 max-w-2xl mx-auto">
+                        「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 Product Planning 流程加速的引擎。」
                     </p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent border-t-4 border-t-blue-500 hover:shadow-lg transition">
                         <div class="flex items-center mb-4">
-                            <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">1. 時程控管與生命週期</span>
+                            <span id="t-c1-tag" class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">1. 產品藍圖與生命週期</span>
                         </div>
                         <div class="mb-4">
-                            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
-                            <p class="text-lg font-semibold text-gray-800 dark:text-gray-100">Sprint 迭代 / Release Cycle</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">每兩週衝刺，確保功能如期交付並上線。</p>
+                            <h3 id="t-c1-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
+                            <p id="t-c1-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Sprint 迭代 / Release</p>
+                            <p id="t-c1-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">定義需求並透過敏捷衝刺，確保軟體功能如期交付上線。</p>
                         </div>
                         <div class="flex justify-center my-2 text-gray-400">⬇️</div>
                         <div>
-                            <h3 class="text-blue-600 dark:text-blue-400 text-sm font-bold">【現在】硬體 NPI 流程</h3>
-                            <p class="text-lg font-semibold text-gray-800 dark:text-gray-100">EVT ➔ DVT ➔ PVT ➔ MP</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">定義各階段的 Gate Review 條件，確保從工程驗證到量產的良率與達標率。</p>
+                            <h3 id="t-c1-new-h" class="text-blue-600 dark:text-blue-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3>
+                            <p id="t-c1-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Roadmap ➔ NPI ➔ MP</p>
+                            <p id="t-c1-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">擬定符合市場需求的產品規格發展，並與 RD 合作掌控 NPI 研發時程。</p>
                         </div>
                     </div>
 
                     <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent border-t-4 border-t-red-500 hover:shadow-lg transition">
                         <div class="flex items-center mb-4">
-                            <span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">2. 風險意識與問題解決</span>
+                            <span id="t-c2-tag" class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">2. 市場洞察與分析</span>
                         </div>
                         <div class="mb-4">
-                            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
-                            <p class="text-lg font-semibold text-gray-800 dark:text-gray-100">Bug Tracking (Jira)</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">追蹤系統錯誤，判斷嚴重等級並排定修復優先序。</p>
+                            <h3 id="t-c2-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
+                            <p id="t-c2-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">User Research & 數據分析</p>
+                            <p id="t-c2-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">收集用戶回饋與平台數據，定義產品規格與功能優先級。</p>
                         </div>
                         <div class="flex justify-center my-2 text-gray-400">⬇️</div>
                         <div>
-                            <h3 class="text-red-600 dark:text-red-400 text-sm font-bold">【現在】硬體 NPI 流程</h3>
-                            <p class="text-lg font-semibold text-gray-800 dark:text-gray-100">Issue List 追蹤與 RCA</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">運用 Root Cause Analysis 找出真因，押定 Action Item 與負責人，確保閉環。</p>
+                            <h3 id="t-c2-new-h" class="text-red-600 dark:text-red-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3>
+                            <p id="t-c2-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">技術趨勢調研與概念驗證</p>
+                            <p id="t-c2-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">針對硬體散熱趨勢(Air/Liquid)收集有利資訊，進行概念驗證與規格收斂。</p>
                         </div>
                     </div>
 
                     <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent border-t-4 border-t-green-500 hover:shadow-lg transition">
                         <div class="flex items-center mb-4">
-                            <span class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">3. 跨部門溝通與協作</span>
+                            <span id="t-c3-tag" class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">3. 跨部門溝通與橋樑</span>
                         </div>
                         <div class="mb-4">
-                            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
-                            <p class="text-lg font-semibold text-gray-800 dark:text-gray-100">RD / UIUX / QA</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">整合技術、設計與商業需求，擔任團隊中的溝通樞紐。</p>
+                            <h3 id="t-c3-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
+                            <p id="t-c3-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">RD / UIUX / QA 樞紐</p>
+                            <p id="t-c3-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">整合技術、設計與商業需求，解決開發期間的衝突與 Bug。</p>
                         </div>
                         <div class="flex justify-center my-2 text-gray-400">⬇️</div>
                         <div>
-                            <h3 class="text-green-600 dark:text-green-400 text-sm font-bold">【現在】硬體 NPI 流程</h3>
-                            <p class="text-lg font-semibold text-gray-800 dark:text-gray-100">EE/ME / 工廠 / 供應鏈</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">協調研發解 Bug、催促採購追料、對齊工廠產能，精準同步給客戶。</p>
+                            <h3 id="t-c3-new-h" class="text-green-600 dark:text-green-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3>
+                            <p id="t-c3-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Sales / RD / 客戶端橋樑</p>
+                            <p id="t-c3-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">協助釐清客戶規格需求，並對 Sales 團隊進行新產品上市的技術培訓。</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="card bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mt-2">
-                    <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3">💡 為什麼軟體背景是 AI 伺服器 PM 的隱藏優勢？</h3>
+                    <h3 id="t-footer-title" class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3">💡 為什麼軟體背景是 AI Server Planner 的隱藏優勢？</h3>
                     <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-2">
-                        <li>**軟體定義硬體 (Software-Defined Hardware)：** 現代 AI 伺服器高度依賴 BMC (遠端管理晶片) 的韌體整合，具備軟體敏銳度更能掌握底層控制邏輯的風險。</li>
-                        <li>**敏捷彈性：** 在應對北美 CSP 客戶頻繁的 Spec 變更時，能將軟體的迭代思維帶入傳統製造流程中，加速反應時間。</li>
+                        <li id="t-footer-1">**軟體定義硬體 (Software-Defined Hardware)：** 現代 AI 伺服器高度依賴 BMC (遠端管理晶片) 與軟體整合，具備軟體敏銳度更能掌握系統層級的技術架構。</li>
+                        <li id="t-footer-2">**敏捷迭代力 (Agile Adaptability)：** 面對 AI 晶片快速換代的市場，能以敏捷思維快速調整產品 Roadmap 與 Go-to-Market 策略。</li>
                     </ul>
                 </div>
             </div>
@@ -205,39 +190,97 @@
     </button>
 
     <script>
+        // --- 雙語詞典 (Dictionary) ---
+        const dict = {
+            zh: {
+                "t-tab-tco": "AI 伺服器 TCO 評估儀表板", "t-tab-mindset": "產品企劃：專案管理思維對照",
+                "t-author": "製作者：莊仕祺 (Bryan)", "t-export": "匯出 PDF",
+                "t-basic-settings": "基礎參數設定", "t-chip-model": "AI 伺服器型號",
+                "t-opt-h100": "NVIDIA H100 (單台約 1kW)", "t-opt-gb200": "NVIDIA GB200 NVL72 (單台約 1.2kW)",
+                "t-total-servers": "總伺服器數量 (台)", "t-servers-per-rack": "單機櫃伺服器數量",
+                "t-power-per-rack": "單機櫃功耗:", "t-adv-settings": "進階環境設定",
+                "t-power-rate": "電費費率 (USD/kWh)", "t-rec-title": "系統強烈建議",
+                "t-savings-title": "5年總節省成本 (USD)", "t-breakeven-title": "黃金交叉點",
+                "t-chart-title": "5 年 TCO 累積成本比較 (CapEx + OpEx)",
+                "t-hero-title": "專案管理的核心：載體不同，邏輯一致",
+                "t-hero-sub": "「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 Product Planning 流程加速的引擎。」",
+                "t-c1-tag": "1. 產品藍圖與生命週期", "t-c1-old-h": "【過去】軟體產品開發", "t-c1-old-v": "Sprint 迭代 / Release", "t-c1-old-d": "定義需求並透過敏捷衝刺，確保軟體功能如期交付上線。",
+                "t-c1-new-h": "【現在】雲端伺服器產品企劃", "t-c1-new-v": "Roadmap ➔ NPI ➔ MP", "t-c1-new-d": "擬定符合市場需求的產品規格發展，並與 RD 合作掌控 NPI 研發時程。",
+                "t-c2-tag": "2. 市場洞察與分析", "t-c2-old-h": "【過去】軟體產品開發", "t-c2-old-v": "User Research & 數據分析", "t-c2-old-d": "收集用戶回饋與平台數據，定義產品規格與功能優先級。",
+                "t-c2-new-h": "【現在】雲端伺服器產品企劃", "t-c2-new-v": "技術趨勢調研與概念驗證", "t-c2-new-d": "針對硬體散熱趨勢(Air/Liquid)收集有利資訊，進行概念驗證與規格收斂。",
+                "t-c3-tag": "3. 跨部門溝通與橋樑", "t-c3-old-h": "【過去】軟體產品開發", "t-c3-old-v": "RD / UIUX / QA 樞紐", "t-c3-old-d": "整合技術、設計與商業需求，解決開發期間的衝突與 Bug。",
+                "t-c3-new-h": "【現在】雲端伺服器產品企劃", "t-c3-new-v": "Sales / RD / 客戶端橋樑", "t-c3-new-d": "協助釐清客戶規格需求，並對 Sales 團隊進行新產品上市的技術培訓。",
+                "t-footer-title": "💡 為什麼軟體背景是 AI Server Planner 的隱藏優勢？",
+                "t-footer-1": "**軟體定義硬體 (Software-Defined Hardware)：** 現代 AI 伺服器高度依賴 BMC (遠端管理晶片) 與軟體整合，具備軟體敏銳度更能掌握系統層級的技術架構。",
+                "t-footer-2": "**敏捷迭代力 (Agile Adaptability)：** 面對 AI 晶片快速換代的市場，能以敏捷思維快速調整產品 Roadmap 與 Go-to-Market 策略。"
+            },
+            en: {
+                "t-tab-tco": "AI Server TCO Dashboard", "t-tab-mindset": "Product Planning & PM Mindset",
+                "t-author": "Created by: Bryan Jhuang", "t-export": "Export PDF",
+                "t-basic-settings": "Basic Configurations", "t-chip-model": "AI Server Model",
+                "t-opt-h100": "NVIDIA H100 (~1kW per node)", "t-opt-gb200": "NVIDIA GB200 NVL72 (~1.2kW per node)",
+                "t-total-servers": "Total Servers (Nodes)", "t-servers-per-rack": "Servers per Rack",
+                "t-power-per-rack": "Power per Rack:", "t-adv-settings": "Advanced Settings",
+                "t-power-rate": "Power Rate (USD/kWh)", "t-rec-title": "System Recommendation",
+                "t-savings-title": "5-Year TCO Savings (USD)", "t-breakeven-title": "Break-even Point",
+                "t-chart-title": "5-Year TCO Comparison (CapEx + OpEx)",
+                "t-hero-title": "Core Project Management: Different Medium, Same Logic",
+                "t-hero-sub": "\"Transforming the agile mindset of leading software teams into an engine that accelerates AI Server Product Planning and NPI processes.\"",
+                "t-c1-tag": "1. Product Roadmap & Lifecycle", "t-c1-old-h": "[Past] Software Development", "t-c1-old-v": "Sprint Iteration / Release", "t-c1-old-d": "Define requirements and ensure on-time delivery through agile sprints.",
+                "t-c1-new-h": "[Now] Cloud Server Product Planning", "t-c1-new-v": "Roadmap ➔ NPI ➔ MP", "t-c1-new-d": "Formulate product roadmaps aligned with market demands and track NPI schedules with RD.",
+                "t-c2-tag": "2. Market Insight & Analysis", "t-c2-old-h": "[Past] Software Development", "t-c2-old-v": "User Research & Data Analytics", "t-c2-old-d": "Gather user feedback and platform data to prioritize product specifications.",
+                "t-c2-new-h": "[Now] Cloud Server Product Planning", "t-c2-new-v": "Tech Trend Research & PoC", "t-c2-new-d": "Gather intelligence on cooling trends (Air/Liquid) for Proof of Concept and spec definition.",
+                "t-c3-tag": "3. Cross-functional Bridge", "t-c3-old-h": "[Past] Software Development", "t-c3-old-v": "RD / UIUX / QA Hub", "t-c3-old-d": "Integrate tech, design, and business needs to resolve conflicts and bugs.",
+                "t-c3-new-h": "[Now] Cloud Server Product Planning", "t-c3-new-v": "Sales / RD / Client Bridge", "t-c3-new-d": "Clarify client spec requirements and provide technical sales training for Go-to-Market strategies.",
+                "t-footer-title": "💡 Why is a Software Background a Hidden Advantage for an AI Server Planner?",
+                "t-footer-1": "**Software-Defined Hardware:** Modern AI servers heavily rely on BMC and software integration. A software mindset helps grasp system-level architectures.",
+                "t-footer-2": "**Agile Adaptability:** In a market with rapid AI chip iterations, agile thinking allows for quick adjustments to Product Roadmaps and GTM strategies."
+            }
+        };
+
+        let currentLang = 'zh';
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            document.getElementById('langBtnText').innerText = currentLang === 'zh' ? 'EN' : '中文';
+            
+            // 更新所有靜態文字
+            for (const key in dict[currentLang]) {
+                if (document.getElementById(key)) {
+                    document.getElementById(key).innerText = dict[currentLang][key];
+                }
+            }
+            // 觸發重新計算以更新動態文字與圖表標籤
+            calculateTCO();
+        }
+
         // --- 深色模式切換邏輯 ---
         function toggleTheme() {
             const htmlElement = document.documentElement;
             const themeIcon = document.getElementById('themeIcon');
-            
             if (htmlElement.classList.contains('dark')) {
-                htmlElement.classList.remove('dark');
-                themeIcon.innerText = '🌙'; 
+                htmlElement.classList.remove('dark'); themeIcon.innerText = '🌙'; 
             } else {
-                htmlElement.classList.add('dark');
-                themeIcon.innerText = '☀️'; 
+                htmlElement.classList.add('dark'); themeIcon.innerText = '☀️'; 
             }
-            
             calculateTCO();
         }
 
         // --- 切頁邏輯 ---
         function switchTab(tabName) {
-            const tcoTab = document.getElementById('tab-tco');
-            const mindsetTab = document.getElementById('tab-mindset');
+            const btnTco = document.getElementById('btn-tab-tco');
+            const btnMindset = document.getElementById('btn-tab-mindset');
             const wrapperTco = document.getElementById('wrapper-tco');
             const wrapperMindset = document.getElementById('wrapper-mindset');
 
             if (tabName === 'tco') {
-                tcoTab.className = 'tab-active pb-3 text-lg transition-colors duration-200';
-                mindsetTab.className = 'tab-inactive pb-3 text-lg transition-colors duration-200';
-                wrapperTco.className = 'block';
-                wrapperMindset.className = 'hidden';
+                btnTco.className = 'tab-active pb-3 text-base md:text-lg transition-colors duration-200';
+                btnMindset.className = 'tab-inactive pb-3 text-base md:text-lg transition-colors duration-200';
+                wrapperTco.className = 'block'; wrapperMindset.className = 'hidden';
             } else {
-                mindsetTab.className = 'tab-active pb-3 text-lg transition-colors duration-200';
-                tcoTab.className = 'tab-inactive pb-3 text-lg transition-colors duration-200';
-                wrapperMindset.className = 'block';
-                wrapperTco.className = 'hidden';
+                btnMindset.className = 'tab-active pb-3 text-base md:text-lg transition-colors duration-200';
+                btnTco.className = 'tab-inactive pb-3 text-base md:text-lg transition-colors duration-200';
+                wrapperMindset.className = 'block'; wrapperTco.className = 'hidden';
             }
         }
 
@@ -258,23 +301,27 @@
             const totalRacks = Math.ceil(totalServers / serversPerRack);
             document.getElementById('kwPerRack').innerText = kwPerRack.toFixed(1);
 
+            // 雙語動態字串
+            const textAir = currentLang === 'zh' ? "氣冷方案 (Air Cooling)" : "Air Cooling";
+            const textEval = currentLang === 'zh' ? "評估液冷 (Evaluate DLC)" : "Evaluate DLC";
+            const textLiquid = currentLang === 'zh' ? "液冷方案 (Liquid Cooling)" : "Direct Liquid Cooling";
+            const textNoBreakeven = currentLang === 'zh' ? "無法回本 (氣冷勝)" : "N/A (Air Wins)";
+            const textYear = currentLang === 'zh' ? "第 {y} 年" : "Year {y}";
+
             const recEl = document.getElementById('recommendation');
             if (kwPerRack < 30) {
-                recEl.innerText = "氣冷方案 (Air Cooling)";
-                recEl.className = "text-xl font-bold text-green-600 dark:text-green-400 mt-1";
+                recEl.innerText = textAir;
+                recEl.className = "text-lg md:text-xl font-bold text-green-600 dark:text-green-400 mt-1";
             } else if (kwPerRack <= 50) {
-                recEl.innerText = "評估液冷 (Evaluate DLC)";
-                recEl.className = "text-xl font-bold text-yellow-600 dark:text-yellow-400 mt-1";
+                recEl.innerText = textEval;
+                recEl.className = "text-lg md:text-xl font-bold text-yellow-600 dark:text-yellow-400 mt-1";
             } else {
-                recEl.innerText = "液冷方案 (Liquid Cooling)";
-                recEl.className = "text-xl font-bold text-red-600 dark:text-red-400 mt-1";
+                recEl.innerText = textLiquid;
+                recEl.className = "text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
             }
 
-            const airPUE = 1.4;
-            const liqPUE = 1.15;
-            const airCapExPerRack = 15000; 
-            const liqCapExPerRack = 45000;
-
+            const airPUE = 1.4; const liqPUE = 1.15;
+            const airCapExPerRack = 15000; const liqCapExPerRack = 45000;
             const totalAirCapEx = totalRacks * airCapExPerRack;
             const totalLiqCapEx = totalRacks * liqCapExPerRack;
             const totalKw = totalServers * chipPower;
@@ -283,9 +330,10 @@
             const airOpExPerYear = totalKw * airPUE * hoursPerYear * powerCost;
             const liqOpExPerYear = totalKw * liqPUE * hoursPerYear * powerCost;
 
-            let airData = [];
-            let liqData = [];
-            let labels = ['Year 0 (CapEx)', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'];
+            let airData = []; let liqData = [];
+            let labels = currentLang === 'zh' ? 
+                ['第0年 (CapEx)', '第1年', '第2年', '第3年', '第4年', '第5年'] : 
+                ['Year 0 (CapEx)', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'];
 
             for (let i = 0; i <= 5; i++) {
                 airData.push(totalAirCapEx + (airOpExPerYear * i));
@@ -295,16 +343,16 @@
             const year5Savings = airData[5] - liqData[5];
             if (year5Savings > 0) {
                 document.getElementById('savings').innerText = "+$" + year5Savings.toLocaleString(undefined, {maximumFractionDigits: 0});
-                document.getElementById('savings').className = "text-xl font-bold text-green-600 dark:text-green-400 mt-1";
+                document.getElementById('savings').className = "text-lg md:text-xl font-bold text-green-600 dark:text-green-400 mt-1";
                 
                 const capexDiff = totalLiqCapEx - totalAirCapEx;
                 const opexSavingsPerYear = airOpExPerYear - liqOpExPerYear;
                 const breakevenYear = capexDiff / opexSavingsPerYear;
-                document.getElementById('breakeven').innerText = "第 " + breakevenYear.toFixed(1) + " 年";
+                document.getElementById('breakeven').innerText = textYear.replace('{y}', breakevenYear.toFixed(1));
             } else {
                 document.getElementById('savings').innerText = "-$" + Math.abs(year5Savings).toLocaleString(undefined, {maximumFractionDigits: 0});
-                document.getElementById('savings').className = "text-xl font-bold text-red-600 dark:text-red-400 mt-1";
-                document.getElementById('breakeven').innerText = "無法回本 (氣冷勝)";
+                document.getElementById('savings').className = "text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
+                document.getElementById('breakeven').innerText = textNoBreakeven;
             }
 
             drawChart(labels, airData, liqData);
@@ -312,47 +360,35 @@
 
         function drawChart(labels, airData, liqData) {
             const ctx = document.getElementById('tcoChart').getContext('2d');
-            
             const isDarkMode = document.documentElement.classList.contains('dark');
             const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
             const textColor = isDarkMode ? '#e5e7eb' : '#374151';
 
-            if (tcoChartInstance) {
-                tcoChartInstance.destroy();
-            }
+            const labelAir = currentLang === 'zh' ? '氣冷累積成本 (Air)' : 'Air Cooling TCO';
+            const labelLiq = currentLang === 'zh' ? '液冷累積成本 (Liquid)' : 'Liquid Cooling TCO';
+
+            if (tcoChartInstance) tcoChartInstance.destroy();
+            
             tcoChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: '氣冷累積成本 (Air Cooling)', data: airData, borderColor: 'rgba(54, 162, 235, 1)', backgroundColor: 'rgba(54, 162, 235, 0.1)', borderWidth: 2, fill: true, tension: 0.1 },
-                        { label: '液冷累積成本 (Liquid Cooling)', data: liqData, borderColor: 'rgba(255, 99, 132, 1)', backgroundColor: 'rgba(255, 99, 132, 0.1)', borderWidth: 2, fill: true, tension: 0.1 }
+                        { label: labelAir, data: airData, borderColor: 'rgba(54, 162, 235, 1)', backgroundColor: 'rgba(54, 162, 235, 0.1)', borderWidth: 2, fill: true, tension: 0.1 },
+                        { label: labelLiq, data: liqData, borderColor: 'rgba(255, 99, 132, 1)', backgroundColor: 'rgba(255, 99, 132, 0.1)', borderWidth: 2, fill: true, tension: 0.1 }
                     ]
                 },
                 options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    interaction: { mode: 'index', intersect: false }, 
-                    plugins: {
-                        legend: { labels: { color: textColor } }
-                    },
+                    responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, 
+                    plugins: { legend: { labels: { color: textColor } } },
                     scales: { 
-                        x: { 
-                            ticks: { color: textColor },
-                            grid: { color: gridColor }
-                        },
-                        y: { 
-                            beginAtZero: false, 
-                            title: { display: true, text: 'USD ($)', color: textColor },
-                            ticks: { color: textColor },
-                            grid: { color: gridColor }
-                        } 
+                        x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                        y: { beginAtZero: false, title: { display: true, text: 'USD ($)', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } } 
                     } 
                 }
             });
         }
 
-        // Initialize on load
         window.onload = calculateTCO;
     </script>
 </body>
