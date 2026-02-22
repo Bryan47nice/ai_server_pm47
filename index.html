@@ -9,9 +9,9 @@
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
+    
     <script src="i18n_dict.js"></script>
-
-    <style>
+    <script src="tco_engine.js"></script> <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .card { border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 1.5rem; }
         .tab-active { border-bottom: 4px solid #3b82f6; color: #3b82f6; font-weight: bold; }
@@ -173,6 +173,9 @@
                             <p id="t-formula-desc" class="text-sm text-gray-700 dark:text-gray-300 font-mono bg-white dark:bg-gray-800 p-2 rounded shadow-sm border dark:border-gray-600 overflow-x-auto">
                                 每年 OpEx = 總功耗(kW) × PUE × 稼動率(%) × 8,760小時 × 電費費率
                             </p>
+                            <p id="t-formula-note" class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                * 註：PUE (電力使用效率) 代表基礎設施額外耗能。液冷能大幅降低 PUE，是省下巨額 OpEx 的關鍵。
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -258,6 +261,7 @@
         function formatYearsInput(el) { let val = parseFloat(el.value); if(isNaN(val) || val < 1) val = 1; el.value = val.toFixed(1); }
         function formatUtilInput(el) { let val = parseInt(el.value); if(isNaN(val) || val < 1) val = 1; if(val > 100) val = 100; el.value = val; }
 
+        // Language State Management
         let currentLang = 'zh';
 
         function toggleLanguage() {
@@ -281,7 +285,7 @@
             calculateTCO();
         }
 
-        // 穩定的 Tab 切換邏輯
+        // Tab Switching Logic (Using classList)
         function switchTab(tabName) {
             const btnTco = document.getElementById('btn-tab-tco');
             const btnMindset = document.getElementById('btn-tab-mindset');
@@ -305,98 +309,14 @@
             }
         }
 
-        // TCO Calculation Engine
-        let tcoChartInstance = null;
-
-        function calculateTCO() {
-            const chipPower = parseFloat(document.getElementById('chipType').value);
-            const totalServers = parseInt(document.getElementById('totalServers').value);
-            const serversPerRack = parseInt(document.getElementById('rackValInput').value);
-            const powerCost = parseFloat(document.getElementById('powerCost').value);
-            const evalYears = parseFloat(document.getElementById('evalYears').value) || 5; 
-            const utilRate = parseFloat(document.getElementById('utilRate').value) / 100 || 0.8;
-            const airPUE = parseFloat(document.getElementById('airPue').value);
-            const liqPUE = parseFloat(document.getElementById('liqPue').value);
-            const airCapExPerRack = parseFloat(document.getElementById('airCapex').value);
-            const liqCapExPerRack = parseFloat(document.getElementById('liqCapex').value);
-
-            const kwPerRack = serversPerRack * chipPower;
-            const totalRacks = Math.ceil(totalServers / serversPerRack);
-            document.getElementById('kwPerRack').innerText = kwPerRack.toFixed(1);
-            document.getElementById('totalRacksDisplay').innerText = totalRacks;
-
-            const totalKw = totalServers * chipPower;
-            const hoursPerYear = 8760;
-            const totalAirCapEx = totalRacks * airCapExPerRack;
-            const totalLiqCapEx = totalRacks * liqCapExPerRack;
-            
-            document.getElementById('airTotalCapexDisplay').innerText = totalAirCapEx.toLocaleString();
-            document.getElementById('liqTotalCapexDisplay').innerText = totalLiqCapEx.toLocaleString();
-
-            const airOpExPerYear = totalKw * airPUE * utilRate * hoursPerYear * powerCost;
-            const liqOpExPerYear = totalKw * liqPUE * utilRate * hoursPerYear * powerCost;
-
-            let airData = []; let liqData = []; let labels = [];
-            const maxIntYear = Math.floor(evalYears);
-
-            for (let i = 0; i <= maxIntYear; i++) {
-                labels.push(i === 0 ? 'Y0' : `Y${i}`);
-                airData.push(totalAirCapEx + (airOpExPerYear * i));
-                liqData.push(totalLiqCapEx + (liqOpExPerYear * i));
-            }
-            if (evalYears % 1 !== 0) {
-                labels.push(`Y${evalYears}`);
-                airData.push(totalAirCapEx + (airOpExPerYear * evalYears));
-                liqData.push(totalLiqCapEx + (liqOpExPerYear * evalYears));
-            }
-
-            const finalAirCost = totalAirCapEx + (airOpExPerYear * evalYears);
-            const finalLiqCost = totalLiqCapEx + (liqOpExPerYear * evalYears);
-            const totalSavings = finalAirCost - finalLiqCost;
-
-            if (totalSavings > 0) {
-                document.getElementById('savings').innerText = "+$" + totalSavings.toLocaleString(undefined, {maximumFractionDigits: 0});
-                document.getElementById('savings').className = "text-lg md:text-xl font-bold text-green-600 dark:text-green-400 mt-1";
-                const beYear = (totalLiqCapEx - totalAirCapEx) / (airOpExPerYear - liqOpExPerYear);
-                document.getElementById('breakeven').innerText = beYear > evalYears ? "N/A" : beYear.toFixed(1) + "Y";
+        // TCO Calculation Engine is now loaded via <script src="tco_engine.js">
+        window.onload = function() {
+            if (typeof calculateTCO === "function") {
+                calculateTCO();
             } else {
-                document.getElementById('savings').innerText = "-$" + Math.abs(totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0});
-                document.getElementById('savings').className = "text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
-                document.getElementById('breakeven').innerText = "N/A";
+                console.error("calculateTCO function not found. Please ensure tco_engine.js is loaded correctly.");
             }
-
-            const recEl = document.getElementById('recommendation');
-            if (kwPerRack < 30) { recEl.innerText = currentLang === 'zh' ? "氣冷方案" : "Air Cooling"; recEl.className = "text-lg font-bold text-green-600"; }
-            else { recEl.innerText = currentLang === 'zh' ? "液冷方案" : "Liquid Cooling"; recEl.className = "text-lg font-bold text-red-600"; }
-
-            drawChart(labels, airData, liqData);
-        }
-
-        function drawChart(labels, airData, liqData) {
-            const ctx = document.getElementById('tcoChart').getContext('2d');
-            const isDark = document.documentElement.classList.contains('dark');
-            const textColor = isDark ? '#e5e7eb' : '#374151';
-            if (tcoChartInstance) tcoChartInstance.destroy();
-            tcoChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Air TCO', data: airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1 },
-                        { label: 'Liquid TCO', data: liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1 }
-                    ]
-                },
-                options: { 
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: textColor } } },
-                    scales: { 
-                        x: { ticks: { color: textColor } },
-                        y: { ticks: { color: textColor }, title: { display: true, text: 'USD ($)', color: textColor } } 
-                    } 
-                }
-            });
-        }
-        window.onload = calculateTCO;
+        };
     </script>
 </body>
 </html>
