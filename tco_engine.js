@@ -1,9 +1,12 @@
 // ==========================================
-// TCO Calculation Engine & Chart Controller
+// TCO Calculation Engine & Sales Report State
 // ==========================================
 
 let tcoChartInstance = null;
-let latestCalcData = {}; // 🚀 用來暫存最新的計算結果給 Modal 使用
+let latestCalcData = {}; 
+
+// 🚀 Sales Report 狀態機變數
+let isReportGenerated = false;
 
 function calculateTCO() {
     const chipPower = parseFloat(document.getElementById('chipType').value);
@@ -16,6 +19,11 @@ function calculateTCO() {
     const liqPUE = parseFloat(document.getElementById('liqPue').value);
     const airCapExPerRack = parseFloat(document.getElementById('airCapex').value);
     const liqCapExPerRack = parseFloat(document.getElementById('liqCapex').value);
+
+    // 🚀 當參數變更且報告已產生時，觸發 Outdated 狀態 (Dirty State)
+    if (isReportGenerated) {
+        document.getElementById('reportStateOutdated').classList.remove('hidden');
+    }
 
     const kwPerRack = serversPerRack * chipPower;
     const totalRacks = Math.ceil(totalServers / serversPerRack);
@@ -32,7 +40,6 @@ function calculateTCO() {
     const airOpExPerYear = totalKw * airPUE * utilRate * hoursPerYear * powerCost;
     const liqOpExPerYear = totalKw * liqPUE * utilRate * hoursPerYear * powerCost;
 
-    // 動態更新 Dashboard 標題
     const textSavingsTitle = currentLang === 'zh' ? `${evalYears}年總節省成本 (USD)` : `${evalYears}-Year TCO Savings (USD)`;
     const textChartTitle = currentLang === 'zh' ? `${evalYears} 年 TCO 累積成本比較 (CapEx + OpEx)` : `${evalYears}-Year TCO Comparison (CapEx + OpEx)`;
     document.getElementById('t-savings-title').innerText = textSavingsTitle;
@@ -42,7 +49,6 @@ function calculateTCO() {
     const maxIntYear = Math.floor(evalYears);
 
     for (let i = 0; i <= maxIntYear; i++) {
-        // 🚀 圖例在中文時顯示「第 X 年」
         if (i === 0) {
             labels.push(currentLang === 'zh' ? '第0年 (建置期)' : 'Year 0 (CapEx)');
         } else {
@@ -61,17 +67,19 @@ function calculateTCO() {
     const finalAirCost = totalAirCapEx + (airOpExPerYear * evalYears);
     const finalLiqCost = totalLiqCapEx + (liqOpExPerYear * evalYears);
     const totalSavings = finalAirCost - finalLiqCost;
+    const beYearRaw = (totalLiqCapEx - totalAirCapEx) / (airOpExPerYear - liqOpExPerYear);
 
     if (totalSavings > 0) {
         document.getElementById('savings').innerText = "+$" + totalSavings.toLocaleString(undefined, {maximumFractionDigits: 0});
         document.getElementById('savings').className = "text-lg md:text-xl font-bold text-green-600 dark:text-green-400 mt-1";
-        const beYear = (totalLiqCapEx - totalAirCapEx) / (airOpExPerYear - liqOpExPerYear);
-        document.getElementById('breakeven').innerText = beYear > evalYears ? "N/A" : beYear.toFixed(1) + "Y";
+        document.getElementById('breakeven').innerText = beYearRaw > evalYears ? "N/A" : beYearRaw.toFixed(1) + "Y";
     } else {
         document.getElementById('savings').innerText = "-$" + Math.abs(totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0});
         document.getElementById('savings').className = "text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
         document.getElementById('breakeven').innerText = "N/A";
     }
+
+    let winnerStr = kwPerRack < 30 ? "air" : "liquid";
 
     const recEl = document.getElementById('recommendation');
     if (kwPerRack < 30) { 
@@ -85,34 +93,97 @@ function calculateTCO() {
         recEl.className = "text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mt-1"; 
     }
 
-    // 🚀 將資料存入全域變數，供 Modal 讀取
     latestCalcData = {
-        evalYears, utilRate, totalRacks, totalKw, powerCost, airPUE, liqPUE,
+        evalYears, utilRate, totalRacks, totalKw, powerCost, airPUE, liqPUE, kwPerRack,
         airCapExPerRack, liqCapExPerRack, totalAirCapEx, totalLiqCapEx,
-        airOpExPerYear, liqOpExPerYear, labelsCount: labels.length
+        airOpExPerYear, liqOpExPerYear, labelsCount: labels.length,
+        breakevenYear: beYearRaw, totalSavings, winnerStr
     };
 
     drawChart(labels, airData, liqData);
 }
 
-// 🚀 負責打開下鑽彈窗並渲染算式
+// 🚀 生成業務教戰報告邏輯
+function generateSalesReport() {
+    const section = document.getElementById('salesReportSection');
+    const outdated = document.getElementById('reportStateOutdated');
+    const loading = document.getElementById('reportStateLoading');
+    const error = document.getElementById('reportStateError');
+    const success = document.getElementById('reportStateSuccess');
+
+    // 切換 UI 狀態至 Loading
+    section.classList.remove('hidden');
+    outdated.classList.add('hidden');
+    error.classList.add('hidden');
+    success.classList.add('hidden');
+    loading.classList.remove('hidden');
+    
+    // 模擬 AI 生成時間 (延遲 800ms)
+    setTimeout(() => {
+        try {
+            const d = latestCalcData;
+            let pitch, obj, roi;
+
+            if (d.winnerStr === "air") {
+                pitch = currentLang === 'zh' 
+                    ? `客戶您好，根據您 ${d.totalKw}kW 的總運算需求，我們強烈建議採用成熟的「傳統氣冷方案」。這不僅能確保與您現有機房設施 100% 相容，更省下了龐大的液冷硬體建置溢價。` 
+                    : `Based on your ${d.totalKw}kW requirement, we recommend the Air Cooling solution. It ensures 100% compatibility with your existing facilities and avoids the hefty premium of liquid cooling hardware.`;
+                
+                obj = currentLang === 'zh'
+                    ? `若客戶詢問：「現在不都改用液冷了嗎？」\n👉 回覆策略：液冷是趨勢，但在單櫃功耗 ${d.kwPerRack.toFixed(1)}kW 的配置下，密度不足以彌補初期 CapEx 的巨大差異。氣冷是目前 ROI 最高的選擇。`
+                    : `If client asks: "Isn't liquid the future?"\n👉 Strategy: It is, but at ${d.kwPerRack.toFixed(1)}kW per rack, the density doesn't justify the initial CapEx. Air cooling currently offers the best ROI.`;
+            } else {
+                const beText = (d.breakevenYear > 0 && d.breakevenYear <= d.evalYears) ? d.breakevenYear.toFixed(1) : ">" + d.evalYears;
+                pitch = currentLang === 'zh'
+                    ? `客戶您好，您的高密度算力需求（單櫃 ${d.kwPerRack.toFixed(1)}kW）已逼近氣冷解熱極限。導入「直接液冷 (DLC) 方案」，PUE 可由 ${d.airPUE} 降至 ${d.liqPUE}，讓您的晶片滿血運作不降頻。`
+                    : `With a high density of ${d.kwPerRack.toFixed(1)}kW/rack, you're approaching the limit of air cooling. Adopting DLC drops your PUE from ${d.airPUE} to ${d.liqPUE}, ensuring your GPUs run without thermal throttling.`;
+                
+                obj = currentLang === 'zh'
+                    ? `若客戶嫌貴：「初期建置要多花幾千萬太貴了。」\n👉 回覆策略：沒錯，但液冷每年能為您省下龐大電費！這筆投資預計在第 ${beText} 年就會達到黃金交叉回本，之後每年都是淨賺。`
+                    : `If client objects: "The upfront cost is too high."\n👉 Strategy: True, but it saves massive electricity bills annually. You will break even in Year ${beText}, after which every year is pure profit.`;
+            }
+
+            roi = currentLang === 'zh'
+                ? `▪️ 評估期：${d.evalYears} 年\n▪️ 預設稼動率：${d.utilRate * 100}%\n▪️ 累積 ${d.evalYears} 年，最佳方案預計可節省總額：$${Math.abs(d.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})} USD`
+                : `▪️ Eval Period: ${d.evalYears} Years\n▪️ Utilization: ${d.utilRate * 100}%\n▪️ Over ${d.evalYears} years, the best solution saves you: $${Math.abs(d.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})} USD`;
+
+            document.getElementById('reportContentPitch').innerText = pitch;
+            document.getElementById('reportContentObj').innerText = obj;
+            document.getElementById('reportContentROI').innerText = roi;
+
+            // 切換至 Success
+            loading.classList.add('hidden');
+            success.classList.remove('hidden');
+            isReportGenerated = true;
+
+        } catch (e) {
+            // 切換至 Error
+            loading.classList.add('hidden');
+            error.classList.remove('hidden');
+            console.error("Report Generation Failed:", e);
+        }
+    }, 800);
+}
+
+// 供多語系切換時重新渲染
+function forceRegenerateReport() {
+    if (isReportGenerated) generateSalesReport();
+}
+
+// ==========================================
+// 以下保留 Drilldown Modal 及 drawChart 邏輯
+// ==========================================
 function openDrilldownModal(dataIndex, labelStr) {
     const modal = document.getElementById('drilldownModal');
     const d = latestCalcData;
     
-    // 判斷當前點擊的是第幾年
     let actualYear = dataIndex; 
-    if (dataIndex === d.labelsCount - 1 && d.evalYears % 1 !== 0) {
-        actualYear = d.evalYears;
-    }
+    if (dataIndex === d.labelsCount - 1 && d.evalYears % 1 !== 0) { actualYear = d.evalYears; }
     
-    // 更新標題
     const titlePrefix = currentLang === 'zh' ? '成本結構拆解：' : 'Cost Breakdown: ';
     document.getElementById('modalYearLabel').innerText = titlePrefix + labelStr;
     
-    // 氣冷算式組裝
-    const airOpex = d.airOpExPerYear * actualYear; 
-    const airTotal = d.totalAirCapEx + airOpex;
+    const airOpex = d.airOpExPerYear * actualYear; const airTotal = d.totalAirCapEx + airOpex;
     document.getElementById('airCapexDetail').innerText = `${d.totalRacks} Racks × $${d.airCapExPerRack.toLocaleString()}`;
     if (actualYear === 0) {
         document.getElementById('airOpexDetail').innerText = currentLang === 'zh' ? "建置初期，尚無營運電費產生。" : "No OpEx in Year 0.";
@@ -121,9 +192,7 @@ function openDrilldownModal(dataIndex, labelStr) {
     }
     document.getElementById('airTotalDetail').innerText = "$" + airTotal.toLocaleString(undefined, {maximumFractionDigits: 0});
     
-    // 液冷算式組裝
-    const liqOpex = d.liqOpExPerYear * actualYear; 
-    const liqTotal = d.totalLiqCapEx + liqOpex;
+    const liqOpex = d.liqOpExPerYear * actualYear; const liqTotal = d.totalLiqCapEx + liqOpex;
     document.getElementById('liqCapexDetail').innerText = `${d.totalRacks} Racks × $${d.liqCapExPerRack.toLocaleString()}`;
     if (actualYear === 0) {
         document.getElementById('liqOpexDetail').innerText = currentLang === 'zh' ? "建置初期，尚無營運電費產生。" : "No OpEx in Year 0.";
@@ -132,9 +201,7 @@ function openDrilldownModal(dataIndex, labelStr) {
     }
     document.getElementById('liqTotalDetail').innerText = "$" + liqTotal.toLocaleString(undefined, {maximumFractionDigits: 0});
     
-    // 結論算式
-    const diff = Math.abs(airTotal - liqTotal);
-    let winnerText = "";
+    const diff = Math.abs(airTotal - liqTotal); let winnerText = "";
     if (airTotal < liqTotal) {
         winnerText = currentLang === 'zh' ? `🏆 氣冷勝出 (節省 $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})` : `🏆 Air Wins (Save $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})`;
         document.getElementById('modalDiff').className = "bg-blue-100 dark:bg-blue-900/40 p-4 text-center text-lg font-bold text-blue-800 dark:text-blue-300 border-t border-blue-200 dark:border-blue-800";
@@ -146,9 +213,7 @@ function openDrilldownModal(dataIndex, labelStr) {
         document.getElementById('modalDiff').className = "bg-gray-100 dark:bg-gray-900 p-4 text-center text-lg font-bold text-gray-800 dark:text-gray-100 border-t dark:border-gray-700";
     }
     document.getElementById('modalDiff').innerText = winnerText;
-
-    // 顯示 Modal
-    modal.classList.remove('hidden');
+    document.getElementById('drilldownModal').classList.remove('hidden');
 }
 
 function drawChart(labels, airData, liqData) {
@@ -156,7 +221,6 @@ function drawChart(labels, airData, liqData) {
     const isDark = document.documentElement.classList.contains('dark');
     const textColor = isDark ? '#e5e7eb' : '#374151';
     
-    // 🚀 圖表標籤多語系處理
     const labelAir = currentLang === 'zh' ? '氣冷累積成本 (Air)' : 'Air Cooling TCO';
     const labelLiq = currentLang === 'zh' ? '液冷累積成本 (Liquid)' : 'Liquid Cooling TCO';
 
@@ -173,7 +237,6 @@ function drawChart(labels, airData, liqData) {
         },
         options: { 
             responsive: true, maintainAspectRatio: false,
-            // 🚀 綁定點擊事件，呼叫彈窗
             onClick: (event) => {
                 const points = tcoChartInstance.getElementsAtEventForMode(event, 'index', { intersect: false }, true);
                 if (points.length) {
@@ -182,7 +245,7 @@ function drawChart(labels, airData, liqData) {
                     openDrilldownModal(dataIndex, labelStr);
                 }
             },
-            interaction: { mode: 'index', intersect: false }, // 讓游標停在 X 軸上就會顯示 Tooltip
+            interaction: { mode: 'index', intersect: false },
             plugins: { legend: { labels: { color: textColor } }, tooltip: { bodyFont: { size: 14 } } },
             scales: { 
                 x: { ticks: { color: textColor } },
