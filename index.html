@@ -78,8 +78,27 @@
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"><span id="t-servers-per-rack">單機櫃伺服器數量</span> <span id="rackVal" class="text-blue-600 dark:text-blue-400 font-bold">32</span></label>
+                    <div class="relative">
+                        <div class="flex items-center">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
+                                <span id="t-servers-per-rack">單機櫃伺服器數量</span> 
+                                <span id="rackVal" class="text-blue-600 dark:text-blue-400 font-bold ml-1">32</span>
+                            </label>
+                            <div class="group relative ml-2 flex items-center print:hidden">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 cursor-help hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block w-72 p-3 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-xl z-50">
+                                    <strong id="t-tt-title" class="block mb-1 text-blue-300">為什麼上限設定為 72 台 (節點)？</strong>
+                                    <ul class="list-decimal pl-4 space-y-1 text-gray-200">
+                                        <li id="t-tt-1"><b>空間極限：</b>42U-48U 機櫃需容納運算匣、交換器與水冷設備，已達空間飽和。</li>
+                                        <li id="t-tt-2"><b>訊號極限：</b>GPU 間透過銅線 (NVLink) 傳輸，72 節點高度是訊號不衰減的物理極限。</li>
+                                        <li id="t-tt-3"><b>設施極限：</b>單櫃功耗達 100-120kW，已觸及多數先進機房供電與散熱天花板。</li>
+                                    </ul>
+                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                                </div>
+                            </div>
+                        </div>
                         <input type="range" id="serversPerRack" min="10" max="72" value="32" class="w-full mt-2" oninput="updateSlider(); calculateTCO()">
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1"><span id="t-power-per-rack">單機櫃功耗:</span> <span id="kwPerRack" class="font-bold text-red-500 dark:text-red-400">32</span> kW/Rack</p>
                     </div>
@@ -224,6 +243,10 @@
                 "t-air-capex": "氣冷單機櫃 CapEx ($)", "t-liq-capex": "液冷單機櫃 CapEx ($)",
                 "t-rec-title": "系統強烈建議", "t-savings-title": "5年總節省成本 (USD)", "t-breakeven-title": "黃金交叉點",
                 "t-chart-title": "5 年 TCO 累積成本比較 (CapEx + OpEx)",
+                "t-tt-title": "為什麼上限設定為 72 台 (節點)？",
+                "t-tt-1": "<b>空間極限：</b>42U-48U 機櫃需容納運算匣、交換器與水冷設備，已達空間飽和。",
+                "t-tt-2": "<b>訊號極限：</b>GPU 間透過銅線 (NVLink) 傳輸，72 節點高度是訊號不衰減的物理極限。",
+                "t-tt-3": "<b>設施極限：</b>單櫃功耗達 100-120kW，已觸及多數先進機房供電與散熱天花板。",
                 "t-hero-title": "專案管理的核心：載體不同，邏輯一致",
                 "t-hero-sub": "「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 Product Planning 流程加速的引擎。」",
                 "t-c1-tag": "1. 產品藍圖與生命週期", "t-c1-old-h": "【過去】軟體產品開發", "t-c1-old-v": "Sprint 迭代 / Release", "t-c1-old-d": "定義需求並透過敏捷衝刺，確保軟體功能如期交付上線。",
@@ -248,6 +271,10 @@
                 "t-air-capex": "Air Rack CapEx ($)", "t-liq-capex": "Liquid Rack CapEx ($)",
                 "t-rec-title": "System Recommendation", "t-savings-title": "5-Year TCO Savings (USD)", "t-breakeven-title": "Break-even Point",
                 "t-chart-title": "5-Year TCO Comparison (CapEx + OpEx)",
+                "t-tt-title": "Why is the limit set to 72 nodes?",
+                "t-tt-1": "<b>Space Limit:</b> A 42U-48U rack is fully packed with compute trays, switches, and cooling manifolds.",
+                "t-tt-2": "<b>Signal Limit:</b> GPUs communicate via copper cables (NVLink); 72 nodes span the max vertical distance before signal degrades.",
+                "t-tt-3": "<b>Infra Limit:</b> Total power reaches 100-120kW per rack, hitting the ceiling of current advanced data center designs.",
                 "t-hero-title": "Core Project Management: Different Medium, Same Logic",
                 "t-hero-sub": "\"Transforming the agile mindset of leading software teams into an engine that accelerates AI Server Product Planning and NPI processes.\"",
                 "t-c1-tag": "1. Product Roadmap & Lifecycle", "t-c1-old-h": "[Past] Software Development", "t-c1-old-v": "Sprint Iteration / Release", "t-c1-old-d": "Define requirements and ensure on-time delivery through agile sprints.",
@@ -270,7 +297,7 @@
             
             for (const key in dict[currentLang]) {
                 if (document.getElementById(key)) {
-                    document.getElementById(key).innerText = dict[currentLang][key];
+                    document.getElementById(key).innerHTML = dict[currentLang][key]; // 用 innerHTML 支援粗體標籤
                 }
             }
             calculateTCO();
@@ -314,7 +341,6 @@
         }
 
         function calculateTCO() {
-            // 從 UI 獲取所有參數
             const chipPower = parseFloat(document.getElementById('chipType').value);
             const totalServers = parseInt(document.getElementById('totalServers').value);
             const serversPerRack = parseInt(document.getElementById('serversPerRack').value);
