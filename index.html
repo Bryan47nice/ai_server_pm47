@@ -67,9 +67,15 @@
                         </select>
                     </div>
 
-                    <div>
-                        <label id="t-total-servers" class="block text-sm font-medium text-gray-700 dark:text-gray-300">總伺服器數量 (台)</label>
-                        <input type="number" id="totalServers" value="100" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label id="t-total-servers" class="block text-sm font-medium text-gray-700 dark:text-gray-300">總伺服器數量 (台)</label>
+                            <input type="number" id="totalServers" value="100" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
+                        </div>
+                        <div>
+                            <label id="t-power-rate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">電費費率 (USD/kWh)</label>
+                            <input type="number" id="powerCost" step="0.01" value="0.10" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
+                        </div>
                     </div>
 
                     <div>
@@ -78,11 +84,25 @@
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1"><span id="t-power-per-rack">單機櫃功耗:</span> <span id="kwPerRack" class="font-bold text-red-500 dark:text-red-400">32</span> kW/Rack</p>
                     </div>
 
-                    <h2 id="t-adv-settings" class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mt-4">進階環境設定</h2>
+                    <h2 id="t-adv-settings" class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mt-4">進階環境設定 (Advanced)</h2>
                     
-                    <div>
-                        <label id="t-power-rate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">電費費率 (USD/kWh)</label>
-                        <input type="number" id="powerCost" step="0.01" value="0.10" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label id="t-air-pue" class="block text-sm font-medium text-gray-700 dark:text-gray-300">氣冷 PUE</label>
+                            <input type="number" id="airPue" step="0.01" value="1.40" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
+                        </div>
+                        <div>
+                            <label id="t-liq-pue" class="block text-sm font-medium text-gray-700 dark:text-gray-300">液冷 PUE</label>
+                            <input type="number" id="liqPue" step="0.01" value="1.15" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
+                        </div>
+                        <div>
+                            <label id="t-air-capex" class="block text-sm font-medium text-gray-700 dark:text-gray-300">氣冷單機櫃 CapEx ($)</label>
+                            <input type="number" id="airCapex" step="1000" value="15000" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
+                        </div>
+                        <div>
+                            <label id="t-liq-capex" class="block text-sm font-medium text-gray-700 dark:text-gray-300">液冷單機櫃 CapEx ($)</label>
+                            <input type="number" id="liqCapex" step="1000" value="45000" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
+                        </div>
                     </div>
                 </div>
 
@@ -197,10 +217,12 @@
                 "t-author": "製作者：莊仕祺 (Bryan)", "t-export": "匯出 PDF",
                 "t-basic-settings": "基礎參數設定", "t-chip-model": "AI 伺服器型號",
                 "t-opt-h100": "NVIDIA H100 (單台約 1kW)", "t-opt-gb200": "NVIDIA GB200 NVL72 (單台約 1.2kW)",
-                "t-total-servers": "總伺服器數量 (台)", "t-servers-per-rack": "單機櫃伺服器數量",
-                "t-power-per-rack": "單機櫃功耗:", "t-adv-settings": "進階環境設定",
-                "t-power-rate": "電費費率 (USD/kWh)", "t-rec-title": "系統強烈建議",
-                "t-savings-title": "5年總節省成本 (USD)", "t-breakeven-title": "黃金交叉點",
+                "t-total-servers": "總伺服器數量 (台)", "t-power-rate": "電費費率 (USD/kWh)",
+                "t-servers-per-rack": "單機櫃伺服器數量", "t-power-per-rack": "單機櫃功耗:", 
+                "t-adv-settings": "進階環境設定 (Advanced)",
+                "t-air-pue": "氣冷 PUE", "t-liq-pue": "液冷 PUE",
+                "t-air-capex": "氣冷單機櫃 CapEx ($)", "t-liq-capex": "液冷單機櫃 CapEx ($)",
+                "t-rec-title": "系統強烈建議", "t-savings-title": "5年總節省成本 (USD)", "t-breakeven-title": "黃金交叉點",
                 "t-chart-title": "5 年 TCO 累積成本比較 (CapEx + OpEx)",
                 "t-hero-title": "專案管理的核心：載體不同，邏輯一致",
                 "t-hero-sub": "「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 Product Planning 流程加速的引擎。」",
@@ -215,14 +237,16 @@
                 "t-footer-2": "**敏捷迭代力 (Agile Adaptability)：** 面對 AI 晶片快速換代的市場，能以敏捷思維快速調整產品 Roadmap 與 Go-to-Market 策略。"
             },
             en: {
-                "t-tab-tco": "AI Server TCO Dashboard", "t-tab-mindset": "Product Planning & PM Mindset",
+                "t-tab-tco": "AI Server TCO Dashboard", "t-tab-mindset": "Product Planning Mindset",
                 "t-author": "Created by: Bryan Jhuang", "t-export": "Export PDF",
                 "t-basic-settings": "Basic Configurations", "t-chip-model": "AI Server Model",
                 "t-opt-h100": "NVIDIA H100 (~1kW per node)", "t-opt-gb200": "NVIDIA GB200 NVL72 (~1.2kW per node)",
-                "t-total-servers": "Total Servers (Nodes)", "t-servers-per-rack": "Servers per Rack",
-                "t-power-per-rack": "Power per Rack:", "t-adv-settings": "Advanced Settings",
-                "t-power-rate": "Power Rate (USD/kWh)", "t-rec-title": "System Recommendation",
-                "t-savings-title": "5-Year TCO Savings (USD)", "t-breakeven-title": "Break-even Point",
+                "t-total-servers": "Total Servers (Nodes)", "t-power-rate": "Power Rate (USD/kWh)",
+                "t-servers-per-rack": "Servers per Rack", "t-power-per-rack": "Power per Rack:", 
+                "t-adv-settings": "Advanced Settings",
+                "t-air-pue": "Air Cooling PUE", "t-liq-pue": "Liquid Cooling PUE",
+                "t-air-capex": "Air Rack CapEx ($)", "t-liq-capex": "Liquid Rack CapEx ($)",
+                "t-rec-title": "System Recommendation", "t-savings-title": "5-Year TCO Savings (USD)", "t-breakeven-title": "Break-even Point",
                 "t-chart-title": "5-Year TCO Comparison (CapEx + OpEx)",
                 "t-hero-title": "Core Project Management: Different Medium, Same Logic",
                 "t-hero-sub": "\"Transforming the agile mindset of leading software teams into an engine that accelerates AI Server Product Planning and NPI processes.\"",
@@ -244,13 +268,11 @@
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             document.getElementById('langBtnText').innerText = currentLang === 'zh' ? 'EN' : '中文';
             
-            // 更新所有靜態文字
             for (const key in dict[currentLang]) {
                 if (document.getElementById(key)) {
                     document.getElementById(key).innerText = dict[currentLang][key];
                 }
             }
-            // 觸發重新計算以更新動態文字與圖表標籤
             calculateTCO();
         }
 
@@ -292,16 +314,21 @@
         }
 
         function calculateTCO() {
+            // 從 UI 獲取所有參數
             const chipPower = parseFloat(document.getElementById('chipType').value);
             const totalServers = parseInt(document.getElementById('totalServers').value);
             const serversPerRack = parseInt(document.getElementById('serversPerRack').value);
             const powerCost = parseFloat(document.getElementById('powerCost').value);
+            
+            const airPUE = parseFloat(document.getElementById('airPue').value);
+            const liqPUE = parseFloat(document.getElementById('liqPue').value);
+            const airCapExPerRack = parseFloat(document.getElementById('airCapex').value);
+            const liqCapExPerRack = parseFloat(document.getElementById('liqCapex').value);
 
             const kwPerRack = serversPerRack * chipPower;
             const totalRacks = Math.ceil(totalServers / serversPerRack);
             document.getElementById('kwPerRack').innerText = kwPerRack.toFixed(1);
 
-            // 雙語動態字串
             const textAir = currentLang === 'zh' ? "氣冷方案 (Air Cooling)" : "Air Cooling";
             const textEval = currentLang === 'zh' ? "評估液冷 (Evaluate DLC)" : "Evaluate DLC";
             const textLiquid = currentLang === 'zh' ? "液冷方案 (Liquid Cooling)" : "Direct Liquid Cooling";
@@ -320,8 +347,6 @@
                 recEl.className = "text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
             }
 
-            const airPUE = 1.4; const liqPUE = 1.15;
-            const airCapExPerRack = 15000; const liqCapExPerRack = 45000;
             const totalAirCapEx = totalRacks * airCapExPerRack;
             const totalLiqCapEx = totalRacks * liqCapExPerRack;
             const totalKw = totalServers * chipPower;
