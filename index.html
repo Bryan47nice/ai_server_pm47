@@ -112,7 +112,7 @@
                     <h2 id="t-adv-settings" class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mt-4">進階環境設定 (Advanced)</h2>
                     
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-2">
+                        <div class="col-span-1">
                             <div class="flex items-center mb-1">
                                 <label id="t-eval-years" class="block text-sm font-medium text-gray-700 dark:text-gray-300">評估年限 (Years)</label>
                                 <div class="group relative ml-2 flex items-center print:hidden">
@@ -127,6 +127,23 @@
                                 </div>
                             </div>
                             <input type="number" id="evalYears" step="0.1" min="1" max="20" value="5" class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="formatYearsInput(this); calculateTCO()">
+                        </div>
+                        
+                        <div class="col-span-1">
+                            <div class="flex items-center mb-1">
+                                <label id="t-util-rate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">伺服器稼動率 (%)</label>
+                                <div class="group relative ml-2 flex items-center print:hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 cursor-help hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div class="absolute bottom-full right-0 mb-2 hidden group-hover:block w-64 p-3 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-xl z-50">
+                                        <strong id="t-tt-util-title" class="block mb-1 text-blue-300">什麼是稼動率 (Utilization Rate)？</strong>
+                                        <p id="t-tt-util-desc" class="text-gray-200 leading-relaxed">現實中伺服器不會 24 小時皆處於 100% 滿載運作。設定實際的平均負載率（如 80%），能讓耗電量與營運成本的估算更貼近資料中心真實營運狀況。</p>
+                                        <div class="absolute top-full right-4 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="number" id="utilRate" min="1" max="100" value="80" class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="formatUtilInput(this); calculateTCO()">
                         </div>
 
                         <div>
@@ -167,10 +184,25 @@
                         </div>
                     </div>
 
-                    <div class="card flex-grow bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700">
+                    <div class="card flex-grow bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700 flex flex-col">
                         <h2 id="t-chart-title" class="text-md font-semibold mb-4 text-center text-gray-700 dark:text-gray-200">5 年 TCO 累積成本比較 (CapEx + OpEx)</h2>
-                        <div class="relative w-full" style="height: 350px;">
+                        <div class="relative w-full flex-grow" style="min-height: 300px;">
                             <canvas id="tcoChart"></canvas>
+                        </div>
+                        
+                        <div class="mt-6 p-4 bg-blue-50 dark:bg-gray-700 rounded-lg border border-blue-100 dark:border-gray-600">
+                            <div class="flex items-center text-blue-800 dark:text-blue-200 font-bold mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                </svg>
+                                <span id="t-formula-title">營運成本 (OpEx) 運算邏輯透明化</span>
+                            </div>
+                            <p id="t-formula-desc" class="text-sm text-gray-700 dark:text-gray-300 font-mono bg-white dark:bg-gray-800 p-2 rounded shadow-sm border dark:border-gray-600 overflow-x-auto">
+                                每年 OpEx = 總功耗(kW) × PUE × 稼動率(%) × 8,760小時 × 電費費率
+                            </p>
+                            <p id="t-formula-note" class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                * 註：PUE (電力使用效率) 代表機房冷卻等基礎設施的額外耗能比例。液冷能大幅降低 PUE，是省下巨額 OpEx 的關鍵。
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -181,64 +213,28 @@
             <div class="flex flex-col gap-6">
                 <div class="card bg-gradient-to-r from-blue-900 to-gray-800 dark:from-blue-950 dark:to-black text-white text-center py-8">
                     <h2 id="t-hero-title" class="text-2xl font-bold mb-2">專案管理的核心：載體不同，邏輯一致</h2>
-                    <p id="t-hero-sub" class="text-blue-100 max-w-2xl mx-auto">
-                        「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 Product Planning 流程加速的引擎。」
-                    </p>
+                    <p id="t-hero-sub" class="text-blue-100 max-w-2xl mx-auto">「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 Product Planning 流程加速的引擎。」</p>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent border-t-4 border-t-blue-500 hover:shadow-lg transition">
-                        <div class="flex items-center mb-4">
-                            <span id="t-c1-tag" class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">1. 產品藍圖與生命週期</span>
-                        </div>
-                        <div class="mb-4">
-                            <h3 id="t-c1-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
-                            <p id="t-c1-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Sprint 迭代 / Release</p>
-                            <p id="t-c1-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">定義需求並透過敏捷衝刺，確保軟體功能如期交付上線。</p>
-                        </div>
+                        <div class="flex items-center mb-4"><span id="t-c1-tag" class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">1. 產品藍圖與生命週期</span></div>
+                        <div class="mb-4"><h3 id="t-c1-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3><p id="t-c1-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Sprint 迭代 / Release</p><p id="t-c1-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">定義需求並透過敏捷衝刺，確保軟體功能如期交付上線。</p></div>
                         <div class="flex justify-center my-2 text-gray-400">⬇️</div>
-                        <div>
-                            <h3 id="t-c1-new-h" class="text-blue-600 dark:text-blue-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3>
-                            <p id="t-c1-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Roadmap ➔ NPI ➔ MP</p>
-                            <p id="t-c1-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">擬定符合市場需求的產品規格發展，並與 RD 合作掌控 NPI 研發時程。</p>
-                        </div>
+                        <div><h3 id="t-c1-new-h" class="text-blue-600 dark:text-blue-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3><p id="t-c1-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Roadmap ➔ NPI ➔ MP</p><p id="t-c1-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">擬定符合市場需求的產品規格發展，並與 RD 合作掌控 NPI 研發時程。</p></div>
                     </div>
-
                     <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent border-t-4 border-t-red-500 hover:shadow-lg transition">
-                        <div class="flex items-center mb-4">
-                            <span id="t-c2-tag" class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">2. 市場洞察與分析</span>
-                        </div>
-                        <div class="mb-4">
-                            <h3 id="t-c2-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
-                            <p id="t-c2-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">User Research & 數據分析</p>
-                            <p id="t-c2-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">收集用戶回饋與平台數據，定義產品規格與功能優先級。</p>
-                        </div>
+                        <div class="flex items-center mb-4"><span id="t-c2-tag" class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">2. 市場洞察與分析</span></div>
+                        <div class="mb-4"><h3 id="t-c2-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3><p id="t-c2-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">User Research & 數據分析</p><p id="t-c2-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">收集用戶回饋與平台數據，定義產品規格與功能優先級。</p></div>
                         <div class="flex justify-center my-2 text-gray-400">⬇️</div>
-                        <div>
-                            <h3 id="t-c2-new-h" class="text-red-600 dark:text-red-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3>
-                            <p id="t-c2-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">技術趨勢調研與概念驗證</p>
-                            <p id="t-c2-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">針對硬體散熱趨勢(Air/Liquid)收集有利資訊，進行概念驗證與規格收斂。</p>
-                        </div>
+                        <div><h3 id="t-c2-new-h" class="text-red-600 dark:text-red-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3><p id="t-c2-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">技術趨勢調研與概念驗證</p><p id="t-c2-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">針對硬體散熱趨勢(Air/Liquid)收集有利資訊，進行概念驗證與規格收斂。</p></div>
                     </div>
-
                     <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent border-t-4 border-t-green-500 hover:shadow-lg transition">
-                        <div class="flex items-center mb-4">
-                            <span id="t-c3-tag" class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">3. 跨部門溝通與橋樑</span>
-                        </div>
-                        <div class="mb-4">
-                            <h3 id="t-c3-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
-                            <p id="t-c3-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">RD / UIUX / QA 樞紐</p>
-                            <p id="t-c3-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">整合技術、設計與商業需求，解決開發期間的衝突與 Bug。</p>
-                        </div>
+                        <div class="flex items-center mb-4"><span id="t-c3-tag" class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs font-semibold px-2.5 py-0.5 rounded mr-2">3. 跨部門溝通與橋樑</span></div>
+                        <div class="mb-4"><h3 id="t-c3-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3><p id="t-c3-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">RD / UIUX / QA 樞紐</p><p id="t-c3-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">整合技術、設計與商業需求，解決開發期間的衝突與 Bug。</p></div>
                         <div class="flex justify-center my-2 text-gray-400">⬇️</div>
-                        <div>
-                            <h3 id="t-c3-new-h" class="text-green-600 dark:text-green-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3>
-                            <p id="t-c3-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Sales / RD / 客戶端橋樑</p>
-                            <p id="t-c3-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">協助釐清客戶規格需求，並對 Sales 團隊進行新產品上市的技術培訓。</p>
-                        </div>
+                        <div><h3 id="t-c3-new-h" class="text-green-600 dark:text-green-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3><p id="t-c3-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Sales / RD / 客戶端橋樑</p><p id="t-c3-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">協助釐清客戶規格需求，並對 Sales 團隊進行新產品上市的技術培訓。</p></div>
                     </div>
                 </div>
-
                 <div class="card bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mt-2">
                     <h3 id="t-footer-title" class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3">💡 為什麼軟體背景是 AI Server Planner 的隱藏優勢？</h3>
                     <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-2">
@@ -255,24 +251,15 @@
     </button>
 
     <script>
-        // --- 雙向綁定邏輯 ---
-        function updateInputFromSlider() {
-            document.getElementById('rackValInput').value = document.getElementById('serversPerRack').value;
-        }
+        function updateInputFromSlider() { document.getElementById('rackValInput').value = document.getElementById('serversPerRack').value; }
         function updateSliderFromInput() {
             let val = parseInt(document.getElementById('rackValInput').value);
             if(isNaN(val) || val < 10) val = 10;
             if(val > 72) val = 72;
-            document.getElementById('rackValInput').value = val;
-            document.getElementById('serversPerRack').value = val;
+            document.getElementById('rackValInput').value = val; document.getElementById('serversPerRack').value = val;
         }
-        
-        // --- 限制年限格式邏輯 ---
-        function formatYearsInput(el) {
-            let val = parseFloat(el.value);
-            if(isNaN(val) || val < 1) val = 1;
-            el.value = val.toFixed(1); // 強制轉為 1 位小數
-        }
+        function formatYearsInput(el) { let val = parseFloat(el.value); if(isNaN(val) || val < 1) val = 1; el.value = val.toFixed(1); }
+        function formatUtilInput(el) { let val = parseInt(el.value); if(isNaN(val) || val < 1) val = 1; if(val > 100) val = 100; el.value = val; }
 
         // --- 雙語詞典 (Dictionary) ---
         const dict = {
@@ -282,12 +269,16 @@
                 "t-basic-settings": "基礎參數設定", "t-chip-model": "AI 伺服器型號",
                 "t-opt-h100": "NVIDIA H100 (單台約 1kW)", "t-opt-gb200": "NVIDIA GB200 NVL72 (單台約 1.2kW)",
                 "t-total-servers": "總伺服器數量 (台)", "t-power-rate": "電費費率 (USD/kWh)",
-                "t-servers-per-rack": "單機櫃伺服器數量", "t-power-per-rack": "單機櫃功耗:", 
-                "t-total-racks": "預估機櫃總數:",
-                "t-adv-settings": "進階環境設定 (Advanced)",
-                "t-eval-years": "評估年限 (Years)", // 新增
-                "t-tt-year-title": "為什麼預設是 5 年？", // 新增
-                "t-tt-year-desc": "企業 IT 硬體基礎設施的會計折舊攤提通常為 3-5 年；此外，高階運算晶片的世代汰換週期 (Refresh Cycle) 亦約為此區間。因此業界實務多以 5 年作為 TCO 衡量基準。", // 新增
+                "t-servers-per-rack": "單機櫃伺服器數量", "t-power-per-rack": "單機櫃功耗:", "t-total-racks": "預估機櫃總數:",
+                "t-adv-settings": "進階環境設定 (Advanced)", "t-eval-years": "評估年限 (Years)", 
+                "t-util-rate": "伺服器稼動率 (%)", // 新增
+                "t-tt-util-title": "什麼是稼動率 (Utilization Rate)？", // 新增
+                "t-tt-util-desc": "現實中伺服器不會 24 小時皆處於 100% 滿載運作。設定實際的平均負載率（如 80%），能讓耗電量與營運成本的估算更貼近資料中心真實營運狀況。", // 新增
+                "t-formula-title": "營運成本 (OpEx) 運算邏輯透明化", // 新增
+                "t-formula-desc": "每年 OpEx = 總功耗(kW) × PUE × 稼動率(%) × 8,760小時 × 電費費率", // 新增
+                "t-formula-note": "* 註：PUE (電力使用效率) 代表機房冷卻等基礎設施的額外耗能比例。液冷能大幅降低 PUE，是省下巨額 OpEx 的關鍵。", // 新增
+                "t-tt-year-title": "為什麼預設是 5 年？",
+                "t-tt-year-desc": "企業 IT 硬體基礎設施的會計折舊攤提通常為 3-5 年；此外，高階運算晶片的世代汰換週期 (Refresh Cycle) 亦約為此區間。因此業界實務多以 5 年作為 TCO 衡量基準。", 
                 "t-air-pue": "氣冷 PUE", "t-liq-pue": "液冷 PUE",
                 "t-air-capex": "氣冷單機櫃 CapEx ($)", "t-liq-capex": "液冷單機櫃 CapEx ($)",
                 "t-air-total-capex": "總 CapEx:", "t-liq-total-capex": "總 CapEx:",
@@ -314,12 +305,16 @@
                 "t-basic-settings": "Basic Configurations", "t-chip-model": "AI Server Model",
                 "t-opt-h100": "NVIDIA H100 (~1kW per node)", "t-opt-gb200": "NVIDIA GB200 NVL72 (~1.2kW per node)",
                 "t-total-servers": "Total Servers (Nodes)", "t-power-rate": "Power Rate (USD/kWh)",
-                "t-servers-per-rack": "Servers per Rack", "t-power-per-rack": "Power per Rack:", 
-                "t-total-racks": "Est. Total Racks:",
-                "t-adv-settings": "Advanced Settings",
-                "t-eval-years": "Evaluation Years", // 新增
-                "t-tt-year-title": "Why default to 5 years?", // 新增
-                "t-tt-year-desc": "Accounting depreciation for enterprise IT hardware is typically 3-5 years. The generational refresh cycle for high-end compute chips also falls in this range, making 5 years the industry standard for TCO baselines.", // 新增
+                "t-servers-per-rack": "Servers per Rack", "t-power-per-rack": "Power per Rack:", "t-total-racks": "Est. Total Racks:",
+                "t-adv-settings": "Advanced Settings", "t-eval-years": "Evaluation Years", 
+                "t-util-rate": "Utilization Rate (%)", // 新增
+                "t-tt-util-title": "What is Utilization Rate?", // 新增
+                "t-tt-util-desc": "Servers rarely run at 100% load 24/7. Setting a realistic average load (e.g., 80%) aligns power and cost estimations with actual data center operations.", // 新增
+                "t-formula-title": "Operational Expenditure (OpEx) Formula", // 新增
+                "t-formula-desc": "Annual OpEx = Total Power(kW) × PUE × Utilization Rate(%) × 8,760 hours × Power Rate", // 新增
+                "t-formula-note": "* Note: PUE (Power Usage Effectiveness) represents overhead for cooling/infra. Liquid cooling drastically lowers PUE, which is the key driver for OpEx savings.", // 新增
+                "t-tt-year-title": "Why default to 5 years?",
+                "t-tt-year-desc": "Accounting depreciation for enterprise IT hardware is typically 3-5 years. The generational refresh cycle for high-end compute chips also falls in this range, making 5 years the industry standard for TCO baselines.",
                 "t-air-pue": "Air Cooling PUE", "t-liq-pue": "Liquid Cooling PUE",
                 "t-air-capex": "Air Rack CapEx ($)", "t-liq-capex": "Liquid Rack CapEx ($)",
                 "t-air-total-capex": "Total CapEx:", "t-liq-total-capex": "Total CapEx:",
@@ -347,16 +342,12 @@
         function toggleLanguage() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             document.getElementById('langBtnText').innerText = currentLang === 'zh' ? 'EN' : '中文';
-            
             for (const key in dict[currentLang]) {
-                if (document.getElementById(key)) {
-                    document.getElementById(key).innerHTML = dict[currentLang][key]; 
-                }
+                if (document.getElementById(key)) { document.getElementById(key).innerHTML = dict[currentLang][key]; }
             }
             calculateTCO();
         }
 
-        // --- 深色模式切換邏輯 ---
         function toggleTheme() {
             const htmlElement = document.documentElement;
             const themeIcon = document.getElementById('themeIcon');
@@ -368,7 +359,6 @@
             calculateTCO();
         }
 
-        // --- 切頁邏輯 ---
         function switchTab(tabName) {
             const btnTco = document.getElementById('btn-tab-tco');
             const btnMindset = document.getElementById('btn-tab-mindset');
@@ -386,17 +376,16 @@
             }
         }
 
-        // --- TCO 計算邏輯 ---
         let tcoChartInstance = null;
 
         function calculateTCO() {
             const chipPower = parseFloat(document.getElementById('chipType').value);
             const totalServers = parseInt(document.getElementById('totalServers').value);
-            // 優先讀取 input 的值，確保計算正確
             const serversPerRack = parseInt(document.getElementById('rackValInput').value);
             const powerCost = parseFloat(document.getElementById('powerCost').value);
             
-            const evalYears = parseFloat(document.getElementById('evalYears').value) || 5; // 讀取年限
+            const evalYears = parseFloat(document.getElementById('evalYears').value) || 5; 
+            const utilRate = parseFloat(document.getElementById('utilRate').value) / 100 || 0.8; // 新增：取得稼動率並轉為小數
             const airPUE = parseFloat(document.getElementById('airPue').value);
             const liqPUE = parseFloat(document.getElementById('liqPue').value);
             const airCapExPerRack = parseFloat(document.getElementById('airCapex').value);
@@ -408,7 +397,6 @@
             document.getElementById('kwPerRack').innerText = kwPerRack.toFixed(1);
             document.getElementById('totalRacksDisplay').innerText = totalRacks;
 
-            // 動態標題處理 (如: 3.5年總節省成本)
             const textSavingsTitle = currentLang === 'zh' ? `${evalYears}年總節省成本 (USD)` : `${evalYears}-Year TCO Savings (USD)`;
             const textChartTitle = currentLang === 'zh' ? `${evalYears} 年 TCO 累積成本比較 (CapEx + OpEx)` : `${evalYears}-Year TCO Comparison (CapEx + OpEx)`;
             document.getElementById('t-savings-title').innerText = textSavingsTitle;
@@ -422,14 +410,11 @@
 
             const recEl = document.getElementById('recommendation');
             if (kwPerRack < 30) {
-                recEl.innerText = textAir;
-                recEl.className = "text-lg md:text-xl font-bold text-green-600 dark:text-green-400 mt-1";
+                recEl.innerText = textAir; recEl.className = "text-lg md:text-xl font-bold text-green-600 dark:text-green-400 mt-1";
             } else if (kwPerRack <= 50) {
-                recEl.innerText = textEval;
-                recEl.className = "text-lg md:text-xl font-bold text-yellow-600 dark:text-yellow-400 mt-1";
+                recEl.innerText = textEval; recEl.className = "text-lg md:text-xl font-bold text-yellow-600 dark:text-yellow-400 mt-1";
             } else {
-                recEl.innerText = textLiquid;
-                recEl.className = "text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
+                recEl.innerText = textLiquid; recEl.className = "text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
             }
 
             const totalAirCapEx = totalRacks * airCapExPerRack;
@@ -440,10 +425,10 @@
             const totalKw = totalServers * chipPower;
             const hoursPerYear = 24 * 365;
             
-            const airOpExPerYear = totalKw * airPUE * hoursPerYear * powerCost;
-            const liqOpExPerYear = totalKw * liqPUE * hoursPerYear * powerCost;
+            // 新增：公式乘上稼動率 (utilRate)
+            const airOpExPerYear = totalKw * airPUE * utilRate * hoursPerYear * powerCost;
+            const liqOpExPerYear = totalKw * liqPUE * utilRate * hoursPerYear * powerCost;
 
-            // 根據自訂年限重新繪製圖表點位
             let airData = []; let liqData = []; let labels = [];
             const maxIntYear = Math.floor(evalYears);
 
@@ -457,14 +442,12 @@
                 liqData.push(totalLiqCapEx + (liqOpExPerYear * i));
             }
             
-            // 若有小數點尾數 (如 3.5 的 .5)，補上最後一個點
             if (evalYears % 1 !== 0) {
                 labels.push(currentLang === 'zh' ? `第${evalYears}年` : `Year ${evalYears}`);
                 airData.push(totalAirCapEx + (airOpExPerYear * evalYears));
                 liqData.push(totalLiqCapEx + (liqOpExPerYear * evalYears));
             }
 
-            // 計算最終節省成本
             const finalAirCost = totalAirCapEx + (airOpExPerYear * evalYears);
             const finalLiqCost = totalLiqCapEx + (liqOpExPerYear * evalYears);
             const totalSavings = finalAirCost - finalLiqCost;
@@ -476,9 +459,8 @@
                 const capexDiff = totalLiqCapEx - totalAirCapEx;
                 const opexSavingsPerYear = airOpExPerYear - liqOpExPerYear;
                 const breakevenYear = capexDiff / opexSavingsPerYear;
-                // 如果回本年限超過評估年限，也要特別標示
                 if(breakevenYear > evalYears) {
-                     document.getElementById('breakeven').innerText = textYear.replace('{y}', breakevenYear.toFixed(1)) + " (超出評估期)";
+                     document.getElementById('breakeven').innerText = textYear.replace('{y}', breakevenYear.toFixed(1)) + (currentLang === 'zh' ? " (超出評估期)" : " (Exceeds Eval)");
                 } else {
                      document.getElementById('breakeven').innerText = textYear.replace('{y}', breakevenYear.toFixed(1));
                 }
