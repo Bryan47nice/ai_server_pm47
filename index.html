@@ -9,9 +9,10 @@
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
-    
     <script src="i18n_dict.js"></script>
-    <script src="tco_engine.js"></script> <style>
+    <script src="tco_engine.js"></script>
+
+    <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .card { border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 1.5rem; }
         .tab-active { border-bottom: 4px solid #3b82f6; color: #3b82f6; font-weight: bold; }
@@ -25,11 +26,12 @@
             .card { break-inside: avoid; border: 1px solid #d1d5db !important; box-shadow: none !important; margin-bottom: 1rem; }
             .lg\:grid-cols-3 { display: flex !important; flex-direction: column !important; }
             .lg\:col-span-2, .col-span-1 { width: 100% !important; max-width: 100% !important; }
+            .print\:hidden { display: none !important; }
         }
     </style>
 </head>
-<body class="p-6 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-    <div class="max-w-7xl mx-auto">
+<body class="p-6 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 relative">
+    <div class="max-w-7xl mx-auto pb-20">
         
         <div class="mb-6 border-b border-gray-300 dark:border-gray-700">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end pb-2 gap-4">
@@ -42,7 +44,7 @@
                     </button>
                 </div>
                 
-                <div class="flex items-center space-x-3 mb-2">
+                <div class="flex flex-wrap items-center gap-3 mb-2">
                     <div class="text-sm font-bold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-1.5 rounded-full shadow-sm">
                         <span id="t-author">製作者：莊仕祺 (Bryan)</span>
                     </div>
@@ -157,7 +159,12 @@
                         </div>
                     </div>
 
-                    <div class="card flex-grow bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700 flex flex-col">
+                    <div class="card flex-grow bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700 flex flex-col relative">
+                        <div class="absolute top-4 right-4 flex items-center bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-[10px] md:text-xs px-2 py-1 rounded-full border border-blue-100 dark:border-blue-800 z-10 font-bold shadow-sm">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                            <span id="t-chart-hint">點擊圖表節點查看算式細節</span>
+                        </div>
+                        
                         <h2 id="t-chart-title" class="text-md font-semibold mb-4 text-center text-gray-700 dark:text-gray-200">5 年 TCO 累積成本比較 (CapEx + OpEx)</h2>
                         <div class="relative w-full flex-grow" style="min-height: 300px;">
                             <canvas id="tcoChart"></canvas>
@@ -237,16 +244,70 @@
                 <div class="card bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mt-2">
                     <h3 id="t-footer-title" class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3">💡 為什麼軟體背景是 AI Server Planner 的隱藏優勢？</h3>
                     <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-2">
-                        <li id="t-footer-1">**軟體定義硬體 (Software-Defined Hardware)：** 現代 AI 伺服器高度依賴 BMC 與軟體整合。</li>
-                        <li id="t-footer-2">**敏捷迭代力 (Agile Adaptability)：** 面對快速換代的市場，能以敏捷思維快速調整 Roadmap。</li>
+                        <li id="t-footer-1">軟體定義硬體 (Software-Defined Hardware)： 現代 AI 伺服器高度依賴 BMC 與軟體整合。</li>
+                        <li id="t-footer-2">敏捷迭代力 (Agile Adaptability)： 面對快速換代的市場，能以敏捷思維快速調整 Roadmap。</li>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <button id="themeToggleBtn" onclick="toggleTheme()" class="print:hidden fixed bottom-4 right-4 bg-gray-800 dark:bg-yellow-400 text-white dark:text-gray-900 p-2 md:p-3 rounded-full shadow-md hover:scale-110 transition-transform flex items-center justify-center z-50">
-        <span id="themeIcon" class="text-base">☀️</span>
+    <div id="drilldownModal" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-4 print:hidden backdrop-blur-sm transition-opacity">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden border dark:border-gray-700 transform transition-transform">
+            <div class="bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-700 p-4 flex justify-between items-center">
+                <h3 class="text-lg font-bold flex items-center text-gray-800 dark:text-gray-100">
+                    <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <span id="modalYearLabel"></span>
+                </h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4 p-5 bg-blue-50/50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                    <h4 class="font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800 pb-2 text-lg flex items-center">
+                        💨 <span id="t-modal-air" class="ml-2">氣冷方案 (Air)</span>
+                    </h4>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold mb-1" id="t-modal-capex-label-air">一次性建置成本 (CapEx)</p>
+                        <p id="airCapexDetail" class="text-sm font-mono text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 p-2 rounded border dark:border-gray-700"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold mb-1" id="t-modal-opex-label-air">累計營運成本 (OpEx)</p>
+                        <p id="airOpexDetail" class="text-xs font-mono leading-relaxed text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded border dark:border-gray-700"></p>
+                    </div>
+                    <div class="text-right border-t border-blue-200 dark:border-blue-800 pt-3">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 font-bold" id="t-modal-total-air">該年度累積總成本</p>
+                        <p id="airTotalDetail" class="text-2xl font-bold text-blue-600 dark:text-blue-400"></p>
+                    </div>
+                </div>
+                
+                <div class="space-y-4 p-5 bg-red-50/50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-900/30">
+                    <h4 class="font-bold text-red-700 dark:text-red-400 border-b border-red-200 dark:border-red-800 pb-2 text-lg flex items-center">
+                        💧 <span id="t-modal-liq" class="ml-2">液冷方案 (Liquid)</span>
+                    </h4>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold mb-1" id="t-modal-capex-label-liq">一次性建置成本 (CapEx)</p>
+                        <p id="liqCapexDetail" class="text-sm font-mono text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 p-2 rounded border dark:border-gray-700"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold mb-1" id="t-modal-opex-label-liq">累計營運成本 (OpEx)</p>
+                        <p id="liqOpexDetail" class="text-xs font-mono leading-relaxed text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded border dark:border-gray-700"></p>
+                    </div>
+                    <div class="text-right border-t border-red-200 dark:border-red-800 pt-3">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 font-bold" id="t-modal-total-liq">該年度累積總成本</p>
+                        <p id="liqTotalDetail" class="text-2xl font-bold text-red-600 dark:text-red-400"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="modalDiff" class="bg-gray-100 dark:bg-gray-900 p-4 text-center text-lg font-bold text-gray-800 dark:text-gray-100 border-t dark:border-gray-700"></div>
+        </div>
+    </div>
+
+    <button id="themeToggleBtn" onclick="toggleTheme()" class="print:hidden fixed bottom-4 right-4 bg-gray-800 dark:bg-yellow-400 text-white dark:text-gray-900 p-3 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center z-50">
+        <span id="themeIcon" class="text-xl">☀️</span>
     </button>
 
     <script>
@@ -261,17 +322,32 @@
         function formatYearsInput(el) { let val = parseFloat(el.value); if(isNaN(val) || val < 1) val = 1; el.value = val.toFixed(1); }
         function formatUtilInput(el) { let val = parseInt(el.value); if(isNaN(val) || val < 1) val = 1; if(val > 100) val = 100; el.value = val; }
 
-        // Language State Management
         let currentLang = 'zh';
 
         function toggleLanguage() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             document.getElementById('langBtnText').innerText = currentLang === 'zh' ? 'EN' : '中文';
-            for (const key in dict[currentLang]) {
-                const element = document.getElementById(key);
-                if (element) { element.innerHTML = dict[currentLang][key]; }
+            
+            // 更新畫面上寫死的字串 (如果 i18n_dict 有包到的話)
+            if(typeof dict !== 'undefined' && dict[currentLang]) {
+                for (const key in dict[currentLang]) {
+                    const element = document.getElementById(key);
+                    if (element) { element.innerHTML = dict[currentLang][key]; }
+                }
             }
-            calculateTCO();
+
+            // 更新 Modal 內的靜態文字
+            document.getElementById('t-chart-hint').innerText = currentLang === 'zh' ? '點擊圖表節點查看算式細節' : 'Click chart nodes for math details';
+            document.getElementById('t-modal-air').innerText = currentLang === 'zh' ? '氣冷方案 (Air Cooling)' : 'Air Cooling';
+            document.getElementById('t-modal-liq').innerText = currentLang === 'zh' ? '液冷方案 (Direct Liquid Cooling)' : 'Liquid Cooling';
+            document.getElementById('t-modal-capex-label-air').innerText = currentLang === 'zh' ? '一次性建置成本 (CapEx)' : 'Upfront CapEx';
+            document.getElementById('t-modal-capex-label-liq').innerText = currentLang === 'zh' ? '一次性建置成本 (CapEx)' : 'Upfront CapEx';
+            document.getElementById('t-modal-opex-label-air').innerText = currentLang === 'zh' ? '累計營運成本 (OpEx)' : 'Cumulative OpEx';
+            document.getElementById('t-modal-opex-label-liq').innerText = currentLang === 'zh' ? '累計營運成本 (OpEx)' : 'Cumulative OpEx';
+            document.getElementById('t-modal-total-air').innerText = currentLang === 'zh' ? '該年度累積總成本' : 'Total Cumulative Cost';
+            document.getElementById('t-modal-total-liq').innerText = currentLang === 'zh' ? '該年度累積總成本' : 'Total Cumulative Cost';
+
+            if(typeof calculateTCO === "function") calculateTCO();
         }
 
         function toggleTheme() {
@@ -282,10 +358,9 @@
             } else {
                 html.classList.add('dark'); icon.innerText = '☀️'; 
             }
-            calculateTCO();
+            if(typeof calculateTCO === "function") calculateTCO();
         }
 
-        // Tab Switching Logic (Using classList)
         function switchTab(tabName) {
             const btnTco = document.getElementById('btn-tab-tco');
             const btnMindset = document.getElementById('btn-tab-mindset');
@@ -295,26 +370,32 @@
             if (tabName === 'tco') {
                 btnTco.className = 'tab-active pb-3 text-base md:text-lg transition-colors duration-200';
                 btnMindset.className = 'tab-inactive pb-3 text-base md:text-lg transition-colors duration-200';
-                wrapperTco.classList.remove('hidden');
-                wrapperTco.classList.add('block');
-                wrapperMindset.classList.remove('block');
-                wrapperMindset.classList.add('hidden');
+                wrapperTco.classList.remove('hidden'); wrapperTco.classList.add('block');
+                wrapperMindset.classList.remove('block'); wrapperMindset.classList.add('hidden');
             } else {
                 btnMindset.className = 'tab-active pb-3 text-base md:text-lg transition-colors duration-200';
                 btnTco.className = 'tab-inactive pb-3 text-base md:text-lg transition-colors duration-200';
-                wrapperMindset.classList.remove('hidden');
-                wrapperMindset.classList.add('block');
-                wrapperTco.classList.remove('block');
-                wrapperTco.classList.add('hidden');
+                wrapperMindset.classList.remove('hidden'); wrapperMindset.classList.add('block');
+                wrapperTco.classList.remove('block'); wrapperTco.classList.add('hidden');
             }
         }
 
-        // TCO Calculation Engine is now loaded via <script src="tco_engine.js">
+        function closeModal() {
+            document.getElementById('drilldownModal').classList.add('hidden');
+        }
+
         window.onload = function() {
+            // 初始化語系文字
+            if(typeof dict !== 'undefined' && dict[currentLang]) {
+                for (const key in dict[currentLang]) {
+                    const element = document.getElementById(key);
+                    if (element) { element.innerHTML = dict[currentLang][key]; }
+                }
+            }
             if (typeof calculateTCO === "function") {
                 calculateTCO();
             } else {
-                console.error("calculateTCO function not found. Please ensure tco_engine.js is loaded correctly.");
+                console.error("tco_engine.js is missing!");
             }
         };
     </script>
