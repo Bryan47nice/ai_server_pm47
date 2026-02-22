@@ -70,36 +70,38 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label id="t-total-servers" class="block text-sm font-medium text-gray-700 dark:text-gray-300">總伺服器數量 (台)</label>
-                            <input type="number" id="totalServers" value="100" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
+                            <input type="number" id="totalServers" value="100" min="1" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
                         </div>
                         <div>
                             <label id="t-power-rate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">電費費率 (USD/kWh)</label>
-                            <input type="number" id="powerCost" step="0.01" value="0.10" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
+                            <input type="number" id="powerCost" step="0.01" min="0" value="0.10" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
                         </div>
                     </div>
 
                     <div class="relative">
-                        <div class="flex items-center">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-                                <span id="t-servers-per-rack">單機櫃伺服器數量</span> 
-                                <span id="rackVal" class="text-blue-600 dark:text-blue-400 font-bold ml-1">32</span>
-                            </label>
-                            <div class="group relative ml-2 flex items-center print:hidden">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 cursor-help hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block w-72 p-3 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-xl z-50">
-                                    <strong id="t-tt-title" class="block mb-1 text-blue-300">為什麼上限設定為 72 台 (節點)？</strong>
-                                    <ul class="list-decimal pl-4 space-y-1 text-gray-200">
-                                        <li id="t-tt-1"><b>空間極限：</b>42U-48U 機櫃需容納運算匣、交換器與水冷設備，已達空間飽和。</li>
-                                        <li id="t-tt-2"><b>訊號極限：</b>GPU 間透過銅線 (NVLink) 傳輸，72 節點高度是訊號不衰減的物理極限。</li>
-                                        <li id="t-tt-3"><b>設施極限：</b>單櫃功耗達 100-120kW，已觸及多數先進機房供電與散熱天花板。</li>
-                                    </ul>
-                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
+                                    <span id="t-servers-per-rack">單機櫃伺服器數量</span> 
+                                </label>
+                                <div class="group relative ml-2 flex items-center print:hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 cursor-help hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block w-72 p-3 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-xl z-50">
+                                        <strong id="t-tt-title" class="block mb-1 text-blue-300">為什麼上限設定為 72 台 (節點)？</strong>
+                                        <ul class="list-decimal pl-4 space-y-1 text-gray-200">
+                                            <li id="t-tt-1"><b>空間極限：</b>機櫃需容納運算匣與水冷設備，已達空間飽和。</li>
+                                            <li id="t-tt-2"><b>訊號極限：</b>GPU 間透過銅線傳輸，72 節點高度是訊號極限。</li>
+                                            <li id="t-tt-3"><b>設施極限：</b>單櫃功耗達 100-120kW，觸及機房供電天花板。</li>
+                                        </ul>
+                                        <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                                    </div>
                                 </div>
                             </div>
+                            <input type="number" id="rackValInput" value="32" min="10" max="72" class="w-16 px-2 py-0.5 text-blue-600 dark:text-blue-400 font-bold border rounded-md dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 text-center" onchange="updateSliderFromInput(); calculateTCO()">
                         </div>
-                        <input type="range" id="serversPerRack" min="10" max="72" value="32" class="w-full mt-2" oninput="updateSlider(); calculateTCO()">
+                        <input type="range" id="serversPerRack" min="10" max="72" value="32" class="w-full mt-2" oninput="updateInputFromSlider(); calculateTCO()">
                         
                         <div class="flex justify-between items-center mt-1">
                             <p class="text-xs text-gray-500 dark:text-gray-400"><span id="t-power-per-rack">單機櫃功耗:</span> <span id="kwPerRack" class="font-bold text-red-500 dark:text-red-400">32</span> kW/Rack</p>
@@ -110,6 +112,23 @@
                     <h2 id="t-adv-settings" class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mt-4">進階環境設定 (Advanced)</h2>
                     
                     <div class="grid grid-cols-2 gap-4">
+                        <div class="col-span-2">
+                            <div class="flex items-center mb-1">
+                                <label id="t-eval-years" class="block text-sm font-medium text-gray-700 dark:text-gray-300">評估年限 (Years)</label>
+                                <div class="group relative ml-2 flex items-center print:hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 cursor-help hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div class="absolute bottom-full left-0 mb-2 hidden group-hover:block w-64 p-3 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-xl z-50">
+                                        <strong id="t-tt-year-title" class="block mb-1 text-blue-300">為什麼預設是 5 年？</strong>
+                                        <p id="t-tt-year-desc" class="text-gray-200 leading-relaxed">企業 IT 硬體基礎設施的會計折舊攤提通常為 3-5 年；此外，高階運算晶片的世代汰換週期 (Refresh Cycle) 亦約為此區間。因此業界實務多以 5 年作為 TCO 衡量基準。</p>
+                                        <div class="absolute top-full left-4 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="number" id="evalYears" step="0.1" min="1" max="20" value="5" class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="formatYearsInput(this); calculateTCO()">
+                        </div>
+
                         <div>
                             <label id="t-air-pue" class="block text-sm font-medium text-gray-700 dark:text-gray-300">氣冷 PUE</label>
                             <input type="number" id="airPue" step="0.01" value="1.40" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
@@ -236,6 +255,25 @@
     </button>
 
     <script>
+        // --- 雙向綁定邏輯 ---
+        function updateInputFromSlider() {
+            document.getElementById('rackValInput').value = document.getElementById('serversPerRack').value;
+        }
+        function updateSliderFromInput() {
+            let val = parseInt(document.getElementById('rackValInput').value);
+            if(isNaN(val) || val < 10) val = 10;
+            if(val > 72) val = 72;
+            document.getElementById('rackValInput').value = val;
+            document.getElementById('serversPerRack').value = val;
+        }
+        
+        // --- 限制年限格式邏輯 ---
+        function formatYearsInput(el) {
+            let val = parseFloat(el.value);
+            if(isNaN(val) || val < 1) val = 1;
+            el.value = val.toFixed(1); // 強制轉為 1 位小數
+        }
+
         // --- 雙語詞典 (Dictionary) ---
         const dict = {
             zh: {
@@ -245,17 +283,19 @@
                 "t-opt-h100": "NVIDIA H100 (單台約 1kW)", "t-opt-gb200": "NVIDIA GB200 NVL72 (單台約 1.2kW)",
                 "t-total-servers": "總伺服器數量 (台)", "t-power-rate": "電費費率 (USD/kWh)",
                 "t-servers-per-rack": "單機櫃伺服器數量", "t-power-per-rack": "單機櫃功耗:", 
-                "t-total-racks": "預估機櫃總數:", // 新增
+                "t-total-racks": "預估機櫃總數:",
                 "t-adv-settings": "進階環境設定 (Advanced)",
+                "t-eval-years": "評估年限 (Years)", // 新增
+                "t-tt-year-title": "為什麼預設是 5 年？", // 新增
+                "t-tt-year-desc": "企業 IT 硬體基礎設施的會計折舊攤提通常為 3-5 年；此外，高階運算晶片的世代汰換週期 (Refresh Cycle) 亦約為此區間。因此業界實務多以 5 年作為 TCO 衡量基準。", // 新增
                 "t-air-pue": "氣冷 PUE", "t-liq-pue": "液冷 PUE",
                 "t-air-capex": "氣冷單機櫃 CapEx ($)", "t-liq-capex": "液冷單機櫃 CapEx ($)",
-                "t-air-total-capex": "總 CapEx:", "t-liq-total-capex": "總 CapEx:", // 新增
-                "t-rec-title": "系統強烈建議", "t-savings-title": "5年總節省成本 (USD)", "t-breakeven-title": "黃金交叉點",
-                "t-chart-title": "5 年 TCO 累積成本比較 (CapEx + OpEx)",
+                "t-air-total-capex": "總 CapEx:", "t-liq-total-capex": "總 CapEx:",
+                "t-rec-title": "系統強烈建議", "t-breakeven-title": "黃金交叉點",
                 "t-tt-title": "為什麼上限設定為 72 台 (節點)？",
-                "t-tt-1": "<b>空間極限：</b>42U-48U 機櫃需容納運算匣、交換器與水冷設備，已達空間飽和。",
-                "t-tt-2": "<b>訊號極限：</b>GPU 間透過銅線 (NVLink) 傳輸，72 節點高度是訊號不衰減的物理極限。",
-                "t-tt-3": "<b>設施極限：</b>單櫃功耗達 100-120kW，已觸及多數先進機房供電與散熱天花板。",
+                "t-tt-1": "<b>空間極限：</b>機櫃需容納運算匣與水冷設備，已達空間飽和。",
+                "t-tt-2": "<b>訊號極限：</b>GPU 間透過銅線傳輸，72 節點高度是訊號極限。",
+                "t-tt-3": "<b>設施極限：</b>單櫃功耗達 100-120kW，觸及機房供電天花板。",
                 "t-hero-title": "專案管理的核心：載體不同，邏輯一致",
                 "t-hero-sub": "「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 Product Planning 流程加速的引擎。」",
                 "t-c1-tag": "1. 產品藍圖與生命週期", "t-c1-old-h": "【過去】軟體產品開發", "t-c1-old-v": "Sprint 迭代 / Release", "t-c1-old-d": "定義需求並透過敏捷衝刺，確保軟體功能如期交付上線。",
@@ -275,17 +315,19 @@
                 "t-opt-h100": "NVIDIA H100 (~1kW per node)", "t-opt-gb200": "NVIDIA GB200 NVL72 (~1.2kW per node)",
                 "t-total-servers": "Total Servers (Nodes)", "t-power-rate": "Power Rate (USD/kWh)",
                 "t-servers-per-rack": "Servers per Rack", "t-power-per-rack": "Power per Rack:", 
-                "t-total-racks": "Est. Total Racks:", // 新增
+                "t-total-racks": "Est. Total Racks:",
                 "t-adv-settings": "Advanced Settings",
+                "t-eval-years": "Evaluation Years", // 新增
+                "t-tt-year-title": "Why default to 5 years?", // 新增
+                "t-tt-year-desc": "Accounting depreciation for enterprise IT hardware is typically 3-5 years. The generational refresh cycle for high-end compute chips also falls in this range, making 5 years the industry standard for TCO baselines.", // 新增
                 "t-air-pue": "Air Cooling PUE", "t-liq-pue": "Liquid Cooling PUE",
                 "t-air-capex": "Air Rack CapEx ($)", "t-liq-capex": "Liquid Rack CapEx ($)",
-                "t-air-total-capex": "Total CapEx:", "t-liq-total-capex": "Total CapEx:", // 新增
-                "t-rec-title": "System Recommendation", "t-savings-title": "5-Year TCO Savings (USD)", "t-breakeven-title": "Break-even Point",
-                "t-chart-title": "5-Year TCO Comparison (CapEx + OpEx)",
+                "t-air-total-capex": "Total CapEx:", "t-liq-total-capex": "Total CapEx:",
+                "t-rec-title": "System Recommendation", "t-breakeven-title": "Break-even Point",
                 "t-tt-title": "Why is the limit set to 72 nodes?",
-                "t-tt-1": "<b>Space Limit:</b> A 42U-48U rack is fully packed with compute trays, switches, and cooling manifolds.",
-                "t-tt-2": "<b>Signal Limit:</b> GPUs communicate via copper cables (NVLink); 72 nodes span the max vertical distance before signal degrades.",
-                "t-tt-3": "<b>Infra Limit:</b> Total power reaches 100-120kW per rack, hitting the ceiling of current advanced data center designs.",
+                "t-tt-1": "<b>Space Limit:</b> Rack is fully packed with compute trays and cooling equipment.",
+                "t-tt-2": "<b>Signal Limit:</b> 72 nodes span the max vertical distance for copper (NVLink).",
+                "t-tt-3": "<b>Infra Limit:</b> Power reaches 100-120kW, hitting data center ceilings.",
                 "t-hero-title": "Core Project Management: Different Medium, Same Logic",
                 "t-hero-sub": "\"Transforming the agile mindset of leading software teams into an engine that accelerates AI Server Product Planning and NPI processes.\"",
                 "t-c1-tag": "1. Product Roadmap & Lifecycle", "t-c1-old-h": "[Past] Software Development", "t-c1-old-v": "Sprint Iteration / Release", "t-c1-old-d": "Define requirements and ensure on-time delivery through agile sprints.",
@@ -347,28 +389,30 @@
         // --- TCO 計算邏輯 ---
         let tcoChartInstance = null;
 
-        function updateSlider() {
-            document.getElementById('rackVal').innerText = document.getElementById('serversPerRack').value;
-        }
-
         function calculateTCO() {
             const chipPower = parseFloat(document.getElementById('chipType').value);
             const totalServers = parseInt(document.getElementById('totalServers').value);
-            const serversPerRack = parseInt(document.getElementById('serversPerRack').value);
+            // 優先讀取 input 的值，確保計算正確
+            const serversPerRack = parseInt(document.getElementById('rackValInput').value);
             const powerCost = parseFloat(document.getElementById('powerCost').value);
             
+            const evalYears = parseFloat(document.getElementById('evalYears').value) || 5; // 讀取年限
             const airPUE = parseFloat(document.getElementById('airPue').value);
             const liqPUE = parseFloat(document.getElementById('liqPue').value);
             const airCapExPerRack = parseFloat(document.getElementById('airCapex').value);
             const liqCapExPerRack = parseFloat(document.getElementById('liqCapex').value);
 
-            // 1. 計算機櫃總數與功耗
             const kwPerRack = serversPerRack * chipPower;
-            const totalRacks = Math.ceil(totalServers / serversPerRack); // 無條件進位
+            const totalRacks = Math.ceil(totalServers / serversPerRack);
             
-            // 更新 UI: 單機櫃功耗與預估機櫃總數
             document.getElementById('kwPerRack').innerText = kwPerRack.toFixed(1);
             document.getElementById('totalRacksDisplay').innerText = totalRacks;
+
+            // 動態標題處理 (如: 3.5年總節省成本)
+            const textSavingsTitle = currentLang === 'zh' ? `${evalYears}年總節省成本 (USD)` : `${evalYears}-Year TCO Savings (USD)`;
+            const textChartTitle = currentLang === 'zh' ? `${evalYears} 年 TCO 累積成本比較 (CapEx + OpEx)` : `${evalYears}-Year TCO Comparison (CapEx + OpEx)`;
+            document.getElementById('t-savings-title').innerText = textSavingsTitle;
+            document.getElementById('t-chart-title').innerText = textChartTitle;
 
             const textAir = currentLang === 'zh' ? "氣冷方案 (Air Cooling)" : "Air Cooling";
             const textEval = currentLang === 'zh' ? "評估液冷 (Evaluate DLC)" : "Evaluate DLC";
@@ -388,7 +432,6 @@
                 recEl.className = "text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
             }
 
-            // 2. 計算總 CapEx 並更新 UI
             const totalAirCapEx = totalRacks * airCapExPerRack;
             const totalLiqCapEx = totalRacks * liqCapExPerRack;
             document.getElementById('airTotalCapexDisplay').innerText = totalAirCapEx.toLocaleString();
@@ -400,27 +443,47 @@
             const airOpExPerYear = totalKw * airPUE * hoursPerYear * powerCost;
             const liqOpExPerYear = totalKw * liqPUE * hoursPerYear * powerCost;
 
-            let airData = []; let liqData = [];
-            let labels = currentLang === 'zh' ? 
-                ['第0年 (CapEx)', '第1年', '第2年', '第3年', '第4年', '第5年'] : 
-                ['Year 0 (CapEx)', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'];
+            // 根據自訂年限重新繪製圖表點位
+            let airData = []; let liqData = []; let labels = [];
+            const maxIntYear = Math.floor(evalYears);
 
-            for (let i = 0; i <= 5; i++) {
+            for (let i = 0; i <= maxIntYear; i++) {
+                if(i === 0) {
+                    labels.push(currentLang === 'zh' ? '第0年 (CapEx)' : 'Year 0 (CapEx)');
+                } else {
+                    labels.push(currentLang === 'zh' ? `第${i}年` : `Year ${i}`);
+                }
                 airData.push(totalAirCapEx + (airOpExPerYear * i));
                 liqData.push(totalLiqCapEx + (liqOpExPerYear * i));
             }
+            
+            // 若有小數點尾數 (如 3.5 的 .5)，補上最後一個點
+            if (evalYears % 1 !== 0) {
+                labels.push(currentLang === 'zh' ? `第${evalYears}年` : `Year ${evalYears}`);
+                airData.push(totalAirCapEx + (airOpExPerYear * evalYears));
+                liqData.push(totalLiqCapEx + (liqOpExPerYear * evalYears));
+            }
 
-            const year5Savings = airData[5] - liqData[5];
-            if (year5Savings > 0) {
-                document.getElementById('savings').innerText = "+$" + year5Savings.toLocaleString(undefined, {maximumFractionDigits: 0});
+            // 計算最終節省成本
+            const finalAirCost = totalAirCapEx + (airOpExPerYear * evalYears);
+            const finalLiqCost = totalLiqCapEx + (liqOpExPerYear * evalYears);
+            const totalSavings = finalAirCost - finalLiqCost;
+
+            if (totalSavings > 0) {
+                document.getElementById('savings').innerText = "+$" + totalSavings.toLocaleString(undefined, {maximumFractionDigits: 0});
                 document.getElementById('savings').className = "text-lg md:text-xl font-bold text-green-600 dark:text-green-400 mt-1";
                 
                 const capexDiff = totalLiqCapEx - totalAirCapEx;
                 const opexSavingsPerYear = airOpExPerYear - liqOpExPerYear;
                 const breakevenYear = capexDiff / opexSavingsPerYear;
-                document.getElementById('breakeven').innerText = textYear.replace('{y}', breakevenYear.toFixed(1));
+                // 如果回本年限超過評估年限，也要特別標示
+                if(breakevenYear > evalYears) {
+                     document.getElementById('breakeven').innerText = textYear.replace('{y}', breakevenYear.toFixed(1)) + " (超出評估期)";
+                } else {
+                     document.getElementById('breakeven').innerText = textYear.replace('{y}', breakevenYear.toFixed(1));
+                }
             } else {
-                document.getElementById('savings').innerText = "-$" + Math.abs(year5Savings).toLocaleString(undefined, {maximumFractionDigits: 0});
+                document.getElementById('savings').innerText = "-$" + Math.abs(totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0});
                 document.getElementById('savings').className = "text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
                 document.getElementById('breakeven').innerText = textNoBreakeven;
             }
