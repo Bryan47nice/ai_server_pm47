@@ -2,6 +2,8 @@
 // TCO Calculation Engine & Sales Report State
 // ==========================================
 
+// 🚀 全域語系變數提升至此，避免 HTML 表單提早觸發 onchange 導致找不到變數而當機
+let currentLang = 'zh'; 
 let tcoChartInstance = null;
 let latestCalcData = {}; 
 
@@ -21,6 +23,7 @@ function calculateTCO() {
     const airCapExPerRack = parseFloat(document.getElementById('airCapex').value);
     const liqCapExPerRack = parseFloat(document.getElementById('liqCapex').value);
 
+    // 參數變更時：清空所有快取 (Cache Invalidation)
     reportCache = { zh: null, en: null };
     
     if (isReportGenerated) {
@@ -192,7 +195,7 @@ function openDrilldownModal(dataIndex, labelStr) {
     const titlePrefix = currentLang === 'zh' ? '成本結構拆解：' : 'Cost Breakdown: ';
     document.getElementById('modalYearLabel').innerText = titlePrefix + labelStr;
     
-    // 🚀 氣冷算式組裝 (加入雙語判斷)
+    // 氣冷算式組裝
     const airOpex = d.airOpExPerYear * actualYear; 
     const airTotal = d.totalAirCapEx + airOpex;
     document.getElementById('airCapexDetail').innerText = `${d.totalRacks} Racks × $${d.airCapExPerRack.toLocaleString()}`;
@@ -206,7 +209,7 @@ function openDrilldownModal(dataIndex, labelStr) {
     }
     document.getElementById('airTotalDetail').innerText = "$" + airTotal.toLocaleString(undefined, {maximumFractionDigits: 0});
     
-    // 🚀 液冷算式組裝 (加入雙語判斷)
+    // 液冷算式組裝
     const liqOpex = d.liqOpExPerYear * actualYear; 
     const liqTotal = d.totalLiqCapEx + liqOpex;
     document.getElementById('liqCapexDetail').innerText = `${d.totalRacks} Racks × $${d.liqCapExPerRack.toLocaleString()}`;
@@ -236,6 +239,7 @@ function openDrilldownModal(dataIndex, labelStr) {
     document.getElementById('drilldownModal').classList.remove('hidden');
 }
 
+// 🚀 完整修復的 drawChart 函式
 function drawChart(labels, airData, liqData) {
     const ctx = document.getElementById('tcoChart').getContext('2d');
     const isDark = document.documentElement.classList.contains('dark');
@@ -252,4 +256,25 @@ function drawChart(labels, airData, liqData) {
             labels: labels,
             datasets: [
                 { label: labelAir, data: airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 },
-                { label: labelLiq
+                { label: labelLiq, data: liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 }
+            ]
+        },
+        options: { 
+            responsive: true, maintainAspectRatio: false,
+            onClick: (event) => {
+                const points = tcoChartInstance.getElementsAtEventForMode(event, 'index', { intersect: false }, true);
+                if (points.length) {
+                    const dataIndex = points[0].index;
+                    const labelStr = labels[dataIndex];
+                    openDrilldownModal(dataIndex, labelStr);
+                }
+            },
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { labels: { color: textColor } }, tooltip: { bodyFont: { size: 14 } } },
+            scales: { 
+                x: { ticks: { color: textColor } },
+                y: { ticks: { color: textColor }, title: { display: true, text: 'USD ($)', color: textColor } } 
+            } 
+        }
+    });
+}
