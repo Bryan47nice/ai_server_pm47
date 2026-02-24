@@ -2,12 +2,11 @@
 // TCO Calculation Engine & Sales Report State
 // ==========================================
 
-// 🚀 全域語系變數提升至此，避免 HTML 表單提早觸發 onchange 導致找不到變數而當機
 let currentLang = 'zh'; 
 let tcoChartInstance = null;
+let gaugeChartInstance = null; // 🚀 新增 Gauge Chart 實例
 let latestCalcData = {}; 
 
-// 🚀 Sales Report 狀態機與快取變數
 let isReportGenerated = false;
 let reportCache = { zh: null, en: null };
 
@@ -23,7 +22,6 @@ function calculateTCO() {
     const airCapExPerRack = parseFloat(document.getElementById('airCapex').value);
     const liqCapExPerRack = parseFloat(document.getElementById('liqCapex').value);
 
-    // 參數變更時：清空所有快取 (Cache Invalidation)
     reportCache = { zh: null, en: null };
     
     if (isReportGenerated) {
@@ -76,27 +74,38 @@ function calculateTCO() {
 
     if (totalSavings > 0) {
         document.getElementById('savings').innerText = "+$" + totalSavings.toLocaleString(undefined, {maximumFractionDigits: 0});
-        document.getElementById('savings').className = "text-lg md:text-xl font-bold text-green-600 dark:text-green-400 mt-1";
+        document.getElementById('savings').className = "text-sm md:text-xl font-bold text-green-600 dark:text-green-400 mt-1";
         document.getElementById('breakeven').innerText = beYearRaw > evalYears ? "N/A" : beYearRaw.toFixed(1) + "Y";
     } else {
         document.getElementById('savings').innerText = "-$" + Math.abs(totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0});
-        document.getElementById('savings').className = "text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
+        document.getElementById('savings').className = "text-sm md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
         document.getElementById('breakeven').innerText = "N/A";
     }
 
-    let winnerStr = kwPerRack < 30 ? "air" : "liquid";
+    let winnerStr = kwPerRack < 40 ? "air" : "liquid";
 
-    const recEl = document.getElementById('recommendation');
-    if (kwPerRack < 30) { 
-        recEl.innerText = currentLang === 'zh' ? "氣冷方案" : "Air Cooling"; 
-        recEl.className = "text-lg md:text-xl font-bold text-green-600 dark:text-green-400 mt-1"; 
-    } else if (kwPerRack <= 50) {
-        recEl.innerText = currentLang === 'zh' ? "評估液冷" : "Evaluate DLC"; 
-        recEl.className = "text-lg md:text-xl font-bold text-yellow-600 dark:text-yellow-400 mt-1";
-    } else { 
-        recEl.innerText = currentLang === 'zh' ? "液冷方案" : "Liquid Cooling"; 
-        recEl.className = "text-lg md:text-xl font-bold text-red-600 dark:text-red-400 mt-1"; 
+    // 🚀 動態更新 Gauge Chart 的文字與狀態
+    let gaugeColor, gaugeStatusText;
+    const warningBanner = document.getElementById('gaugeWarningBanner');
+    
+    if (kwPerRack < 40) {
+        gaugeColor = '#22c55e'; // 綠色
+        gaugeStatusText = currentLang === 'zh' ? '傳統氣冷 (Air Cooling)' : 'Air Cooling';
+        warningBanner.classList.add('hidden');
+    } else if (kwPerRack <= 80) {
+        gaugeColor = '#eab308'; // 黃色
+        gaugeStatusText = currentLang === 'zh' ? '氣冷極限 (RDHX)' : 'Air Limit (RDHX)';
+        warningBanner.classList.add('hidden');
+    } else {
+        gaugeColor = '#ef4444'; // 紅色
+        gaugeStatusText = currentLang === 'zh' ? '強制液冷 (DLC)' : 'Must use DLC';
+        warningBanner.classList.remove('hidden'); // 顯示高密度危險警告
     }
+
+    document.getElementById('gaugeValueText').innerText = kwPerRack.toFixed(1) + " kW";
+    document.getElementById('gaugeValueText').style.color = gaugeColor;
+    document.getElementById('gaugeStatusText').innerText = gaugeStatusText;
+    document.getElementById('gaugeStatusText').style.color = gaugeColor;
 
     latestCalcData = {
         evalYears, utilRate, totalRacks, totalKw, powerCost, airPUE, liqPUE, kwPerRack,
@@ -106,6 +115,48 @@ function calculateTCO() {
     };
 
     drawChart(labels, airData, liqData);
+    drawGaugeChart(kwPerRack, gaugeColor); // 🚀 繪製半圓儀表板
+}
+
+// 🚀 新增：繪製半圓儀表板 (Gauge Chart)
+function drawGaugeChart(kwPerRack, color) {
+    const ctx = document.getElementById('gaugeChart').getContext('2d');
+    const isDark = document.documentElement.classList.contains('dark');
+    const bgColor = isDark ? '#374151' : '#e5e7eb'; // 剩餘空間的底色
+    
+    // 設定最大上限為 140kW，超過則強制顯示為滿格
+    const maxKw = 140;
+    const currentVal = Math.min(kwPerRack, maxKw);
+    const remainVal = Math.max(maxKw - currentVal, 0);
+
+    if (gaugeChartInstance) gaugeChartInstance.destroy();
+
+    gaugeChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Current kW', 'Remaining'],
+            datasets: [{
+                data: [currentVal, remainVal],
+                backgroundColor: [color, bgColor],
+                borderWidth: 0,
+                circumference: 180, // 半圓
+                rotation: 270       // 從左側 9 點鐘方向開始畫
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '75%', // 甜甜圈寬度，越接近 100% 越細
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false } // 不顯示 tooltip，保持乾淨
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            }
+        }
+    });
 }
 
 function renderReportFromData(data) {
@@ -195,7 +246,6 @@ function openDrilldownModal(dataIndex, labelStr) {
     const titlePrefix = currentLang === 'zh' ? '成本結構拆解：' : 'Cost Breakdown: ';
     document.getElementById('modalYearLabel').innerText = titlePrefix + labelStr;
     
-    // 氣冷算式組裝
     const airOpex = d.airOpExPerYear * actualYear; 
     const airTotal = d.totalAirCapEx + airOpex;
     document.getElementById('airCapexDetail').innerText = `${d.totalRacks} Racks × $${d.airCapExPerRack.toLocaleString()}`;
@@ -209,7 +259,6 @@ function openDrilldownModal(dataIndex, labelStr) {
     }
     document.getElementById('airTotalDetail').innerText = "$" + airTotal.toLocaleString(undefined, {maximumFractionDigits: 0});
     
-    // 液冷算式組裝
     const liqOpex = d.liqOpExPerYear * actualYear; 
     const liqTotal = d.totalLiqCapEx + liqOpex;
     document.getElementById('liqCapexDetail').innerText = `${d.totalRacks} Racks × $${d.liqCapExPerRack.toLocaleString()}`;
@@ -239,7 +288,6 @@ function openDrilldownModal(dataIndex, labelStr) {
     document.getElementById('drilldownModal').classList.remove('hidden');
 }
 
-// 🚀 完整修復的 drawChart 函式
 function drawChart(labels, airData, liqData) {
     const ctx = document.getElementById('tcoChart').getContext('2d');
     const isDark = document.documentElement.classList.contains('dark');
