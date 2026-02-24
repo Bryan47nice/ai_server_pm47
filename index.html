@@ -89,6 +89,7 @@
                         <select id="chipType" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-2 border" onchange="calculateTCO()">
                             <option id="t-opt-h100" value="1">NVIDIA H100 (單台約 1kW)</option>
                             <option id="t-opt-gb200" value="1.2">NVIDIA GB200 NVL72 (單台約 1.2kW)</option>
+                            <option id="t-opt-rubin" value="1.8">NVIDIA Rubin 世代預估 (單台約 1.8kW) 🚀</option>
                         </select>
                     </div>
 
@@ -166,18 +167,33 @@
 
                 <div class="col-span-1 lg:grid-cols-2 lg:col-span-2 flex flex-col gap-6">
                     <div class="grid grid-cols-3 gap-4">
-                        <div class="card text-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                            <p id="t-rec-title" class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">系統強烈建議</p>
-                            <p id="recommendation" class="text-sm md:text-lg font-bold text-green-600 dark:text-green-400 mt-1">氣冷方案</p>
+                        
+                        <div class="card flex flex-col items-center justify-between bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-3 px-2 shadow-inner overflow-hidden relative group">
+                            <p id="t-rec-title" class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold z-10">冷卻技術轉折點</p>
+                            <div class="relative w-full flex justify-center items-end mt-2" style="height: 65px;">
+                                <canvas id="gaugeChart" class="absolute bottom-0 w-full h-full"></canvas>
+                            </div>
+                            <div class="flex flex-col items-center z-10 mt-1">
+                                <span id="gaugeValueText" class="text-lg md:text-xl font-black leading-none tracking-tight">0 kW</span>
+                                <span id="gaugeStatusText" class="text-[10px] md:text-xs font-bold mt-0.5 tracking-wide">Air</span>
+                            </div>
                         </div>
-                        <div class="card text-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                            <p id="t-savings-title" class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">5年總節省成本 (USD)</p>
-                            <p id="savings" class="text-sm md:text-lg font-bold text-blue-600 dark:text-blue-400 mt-1">$0</p>
+
+                        <div class="card text-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex flex-col justify-center">
+                            <p id="t-savings-title" class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">5年總節省成本 (USD)</p>
+                            <p id="savings" class="text-sm md:text-xl font-bold text-blue-600 dark:text-blue-400 mt-1">$0</p>
                         </div>
-                        <div class="card text-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                            <p id="t-breakeven-title" class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">黃金交叉點</p>
-                            <p id="breakeven" class="text-sm md:text-lg font-bold text-purple-600 dark:text-purple-400 mt-1">N/A</p>
+                        <div class="card text-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex flex-col justify-center">
+                            <p id="t-breakeven-title" class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">黃金交叉點</p>
+                            <p id="breakeven" class="text-sm md:text-xl font-bold text-purple-600 dark:text-purple-400 mt-1">N/A</p>
                         </div>
+                    </div>
+                    
+                    <div id="gaugeWarningBanner" class="hidden -mt-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-3 shadow-md rounded-md dark:bg-red-900/30 dark:border-red-500 dark:text-red-400 animate-pulse transition-all">
+                        <p class="text-xs md:text-sm font-bold flex items-center">
+                            <span class="mr-2 text-lg">⚠️</span>
+                            <span id="t-gauge-warning">警告：已達 GB200 高密度功耗門檻！傳統氣冷將導致機房 PUE 突破 1.5，強烈建議切換至 DLC 液冷方案。</span>
+                        </p>
                     </div>
 
                     <div class="card bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700 flex flex-col relative">
@@ -355,7 +371,6 @@
     </button>
 
     <script>
-        // UI Helpers
         function updateInputFromSlider() { document.getElementById('rackValInput').value = document.getElementById('serversPerRack').value; }
         function updateSliderFromInput() {
             let val = parseInt(document.getElementById('rackValInput').value);
@@ -377,7 +392,6 @@
                 }
             }
             
-            // 更新靜態文案
             document.getElementById('t-chart-hint').innerText = currentLang === 'zh' ? '點擊圖表節點查看算式細節' : 'Click chart nodes for math details';
             document.getElementById('t-modal-air').innerText = currentLang === 'zh' ? '氣冷方案 (Air Cooling)' : 'Air Cooling';
             document.getElementById('t-modal-liq').innerText = currentLang === 'zh' ? '液冷方案 (Direct Liquid Cooling)' : 'Liquid Cooling';
@@ -403,7 +417,6 @@
             if(typeof calculateTCO === "function") calculateTCO();
         }
 
-        // 穩定的 Tab 切換邏輯
         function switchTab(tabName) {
             const btnTco = document.getElementById('btn-tab-tco');
             const btnMindset = document.getElementById('btn-tab-mindset');
@@ -429,7 +442,6 @@
 
         function closeModal() { document.getElementById('drilldownModal').classList.add('hidden'); }
 
-        // 🚀 移除全域 let currentLang，純粹執行初始化
         window.onload = function() {
             if(typeof dict !== 'undefined' && dict[currentLang]) {
                 for (const key in dict[currentLang]) {
