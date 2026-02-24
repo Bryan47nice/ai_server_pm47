@@ -10,15 +10,15 @@ const dict = {
         "t-author": "製作者：莊仕祺 (Bryan)", 
         "t-export": "匯出 PDF",
 
-        // 🚀 About Me (首頁)
-        "t-about-hero-title": "以軟體敏捷思維，驅動 AI 伺服器 NPI 的策略規劃師",
-        "t-about-hero-subtitle": "4+ 年跨部門產品管理經驗 | TOEIC 910 (Gold) | 專注於模組化架構與高價值產品藍圖",
-        "t-about-p1-title": "🧩 模組化產品藍圖 (對標 JD: 產品藍圖擬定)",
-        "t-about-p1-desc": "將客製化需求拆解為「標準化模組 (Standardized Modules)」，成功降低 80% NRE 成本並加速產品上市，完美契合 MGX 等模組化伺服器架構思維。",
-        "t-about-p2-title": "🌉 技術與商業的樞紐 (對標 JD: Sales/RD 橋樑)",
-        "t-about-p2-desc": "擔任 Technical Translator，將複雜的硬體散熱與架構限制，轉譯為 Sales 聽得懂的「價值主張 (Value Proposition)」，並製作 GTM 教戰手冊賦能業務。",
-        "t-about-p3-title": "📊 數據驅動與概念驗證 (對標 JD: 新技術 PoC)",
-        "t-about-p3-desc": "擅長以數據支持決策 (如 ROI、TCO 分析)。不憑直覺行事，而是透過開發概念驗證 (PoC) 工具，協助客戶與內部高層進行精準的規格取捨 (Spec Trade-off)。",
+        // 🚀 About Me (首頁 - 融合版)
+        "t-about-hero-title": "以軟體敏捷思維，貫通產品規劃與 NPI 落地的資深 PM",
+        "t-about-hero-subtitle": "4+ 年跨部門專案管理經驗 | TOEIC 910 (Gold) | 專注於模組化架構與高價值產品藍圖",
+        "t-about-p1-title": "🧩 模組化產品藍圖與需求管理",
+        "t-about-p1-desc": "將客製化需求拆解為「標準化模組 (Standardized Modules)」，降低 80% NRE 成本。精準控管客戶需求變更 (Scope Creep)，確保產品架構契合市場，並穩步推進專案。",
+        "t-about-p2-title": "🌉 跨部門樞紐與業務賦能",
+        "t-about-p2-desc": "擔任 Technical Translator，將複雜的硬體架構限制，轉譯為 Sales 聽得懂的「價值主張」，製作 GTM 教戰手冊賦能業務。同時無縫橋接 RD、工廠與客戶端，排除 NPI 落地過程的跨部門障礙。",
+        "t-about-p3-title": "📊 數據驅動決策與風險控管",
+        "t-about-p3-desc": "具備高度風險意識，不憑直覺行事。透過開發概念驗證 (PoC) 工具與專案儀表板，提前識別開發瓶頸，輔助管理層在規格與時程上進行精準取捨 (Trade-off)。",
         "t-about-cta": "👉 立即體驗我的 PoC 專案：AI 伺服器 TCO 評估儀表板",
 
         // TCO Calculator
@@ -75,15 +75,15 @@ const dict = {
         "t-author": "Created by: Bryan Jhuang", 
         "t-export": "Export PDF",
 
-        // 🚀 About Me
-        "t-about-hero-title": "Software-Defined Hardware Planner for AI Server NPI",
-        "t-about-hero-subtitle": "4+ Years PM Experience | TOEIC 910 (Gold) | Expert in Modular Architecture & Product Roadmaps",
-        "t-about-p1-title": "🧩 Modular Product Roadmap (Aligns with JD: Roadmap Planning)",
-        "t-about-p1-desc": "Decomposed custom requests into 'Standardized Modules', reducing NRE costs by 80%. Perfectly aligns with MGX and modern modular server architecture.",
-        "t-about-p2-title": "🌉 Bridge Between Tech & Biz (Aligns with JD: Sales/RD Liaison)",
-        "t-about-p2-desc": "Acted as a Technical Translator, transforming complex cooling limits into compelling 'Value Propositions' to empower sales teams with GTM battlecards.",
-        "t-about-p3-title": "📊 Data-Driven PoC (Aligns with JD: Tech PoC & Evaluation)",
-        "t-about-p3-desc": "Leveraged data (ROI, TCO) to support decisions. Built Proof-of-Concept (PoC) tools to help clients and internal stakeholders make precise Spec Trade-offs.",
+        // 🚀 About Me (首頁 - 融合版)
+        "t-about-hero-title": "Senior PM Bridging Product Strategy and NPI Execution",
+        "t-about-hero-subtitle": "4+ Years Cross-Functional Leadership | TOEIC 910 (Gold) | Modular Architecture & Roadmap",
+        "t-about-p1-title": "🧩 Modular Roadmap & Requirement Management",
+        "t-about-p1-desc": "Decomposed custom requests into 'Standardized Modules', reducing NRE costs by 80%. Effectively managed scope creep to ensure market alignment and steady project progression.",
+        "t-about-p2-title": "🌉 Cross-Functional Hub & Sales Enablement",
+        "t-about-p2-desc": "Acted as a Technical Translator, turning complex hardware limits into compelling 'Value Propositions' for GTM battlecards. Seamlessly bridged RD, factory, and clients to remove NPI roadblocks.",
+        "t-about-p3-title": "📊 Data-Driven Decisions & Risk Management",
+        "t-about-p3-desc": "Highly risk-aware. Leveraged PoC tools and project dashboards to proactively identify bottlenecks, assisting management in making precise spec and schedule trade-offs.",
         "t-about-cta": "👉 Experience My PoC Project: AI Server TCO Dashboard",
 
         // TCO Calculator
