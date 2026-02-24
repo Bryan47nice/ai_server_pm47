@@ -1,16 +1,25 @@
-# 📊 AI Server Cooling TCO Dashboard & Product Planning Portfolio
-**AI 伺服器散熱 TCO 評估儀表板 暨 產品企劃思維展示**
+# 📊 AI Server Cooling TCO Dashboard & Sales Enablement Tool
+> **作者：** 莊仕祺 (Bryan Jhuang) | **目標領域：** AI Server Product Planning / NPI Management
 
-> **製作者：** 莊仕祺 (Bryan) 
-> **Live Demo (線上預覽)：** [https://bryan47nice.github.io/ai_server_pm47/]
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white)
+![Vanilla JS](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![MVC Architecture](https://img.shields.io/badge/Architecture-MVC_Modular-blue)
 
-## 1. 專案概述 (Project Overview)
-本專案為一款專為 B2B 伺服器代工廠 (ODM) 產品企劃、Sales 與企業 IT 採購端設計的**互動式商業決策輔助工具**。
-隨著高階 AI 晶片（如 NVIDIA GB200）功耗激增，資料中心散熱基礎設施的轉型成為關鍵痛點。本工具透過視覺化數據面板，協助第一線業務與客戶快速評估「氣冷 (Air Cooling)」與「液冷 (Liquid Cooling)」方案在指定年限內的總擁有成本 (TCO)，找出建置成本 (CapEx) 與營運電費 (OpEx) 的黃金交叉點。
+🔗 **Live Demo (線上預覽):** [點擊這裡體驗互動式儀表板](https://bryan47nice.github.io/ai_server_pm47/)
 
-此外，專案內附「軟體轉硬體 Product Planning 專案管理對照表」，展現軟體敏捷思維如何無縫接軌並加速硬體產品藍圖規劃與 NPI 流程。
+---
 
-## 2. 核心功能模組 (Core Features)
+## 💡 產品背景與價值主張 (Value Proposition)
+在 AI 伺服器的高密度算力時代（如 NVIDIA GB200 叢集），客戶面臨從「傳統氣冷 (Air Cooling)」轉型至「直接液冷 (Direct Liquid Cooling, DLC)」的巨大決策成本。
+
+本專案為一款專為 B2B 伺服器代工廠 (ODM) 產品企劃與前端業務打造的 **「動態商業決策與銷售賦能 (Sales Enablement) 系統」**。不僅提供精準的 TCO (總擁有成本) 試算，更導入了 **AI 業務教戰生成** 與 **算式下鑽分析** 功能。協助業務以數據為基底，具象化硬體架構轉換的長期財務 ROI。
+（專案內附「軟硬體 Product Planning 思維對照表」，展現軟體敏捷思維如何無縫接軌硬體 NPI 流程。）
+
+---
+
+## ✨ 核心功能模組 (Core Features)
 
 ### 📈 Module A: 參數連動與精算儀表板 (TCO Engine)
 * **雙向綁定與即時試算：** 「單機櫃伺服器數量」支援滑桿與精確輸入雙向連動，即時換算機櫃總數與單櫃功耗。
@@ -23,14 +32,15 @@
 
 ### 🪄 Module C: 業務賦能與狀態機管理 (Sales Enablement)
 * **動態教戰報告生成：** 依據當下 TCO 計算結果，一鍵產出對應的「核心說帖 (Elevator Pitch)」、「反對意見克服」與「財務 ROI 亮點」。
-* **嚴謹的 UI State Machine：** 具備 Skeleton Loading (骨架屏載入動畫) 與 Error Handling 體驗。
 * **防呆覆蓋機制 (Dirty State)：** 當報告產出後，若使用者再次修改硬體參數，系統會自動利用 Overlay 覆蓋過期報告，提醒「參數已變更」，確保業務拿到手的數據 100% 準確。
-* **模擬 RAG 技術知識庫：** 內建輕量化技術字典，模擬接接 NotebookLM 知識庫，業務可針對「漏液、空間、維護」進行即時關鍵字問答。
+* **FinOps 成本優化 (Cache 機制)：** 實作參數綁定之多語系快取池 (Cache Pool)。在參數不變的前提下切換語系，系統會自動命中快取 (Cache Hit)，達到 0 Token 額外消耗與瞬間渲染，展現嚴謹的 SaaS 產品營運思維。
 
 ### 🌐 Module D: 企業級 UI/UX 體驗
 * **i18n 中英雙語解耦：** 全站支援即時中英切換（含圖表標籤與 Tooltip）。
 * **列印最佳化 (@media print)：** 針對 A4 報告輸出客製化 CSS，自動隱藏操作按鈕，確保 PDF 匯出清晰不破版。
 * **Domain Knowledge 提示：** 於關鍵參數旁加入 Hover Tooltip，解釋硬體物理極限 (如 72 節點的空間/訊號/供電限制)。
+
+---
 
 ## 🏗️ 系統架構與模組化設計 (System Architecture)
 
@@ -41,23 +51,27 @@
 * 🌐 **`i18n_dict.js` (Data - L10n):** 獨立語系資料字典。未來擴充第三語言無需更動核心代碼。
 * 🧠 **`cooling_kb.js` (Data - RAG Mock):** 獨立技術知識庫。存放散熱 Domain Knowledge，模擬 AI 檢索資料源。
 
-## 3. 系統運算邏輯與假設 (Business Logic & Constraints)
+---
 
-### 硬體架構極限：為何單機櫃上限設定為 72 台？
-本系統刻意將單機櫃節點上限設為 72，係對標 NVIDIA GB200 NVL72 參考架構之三大物理極限：
-1. **空間極限 (Rack U-space)：** 42U-48U 機櫃需容納運算匣、Switch 與水冷 Manifold，空間已達飽和。
-2. **訊號極限 (Signal Integrity)：** GPU 間透過銅線 (Copper Cables) 傳輸，72 節點之機櫃高度為 NVLink 訊號不衰減之極限。
-3. **基礎設施供電極限 (Power Limit)：** 單櫃總功耗達 100-120kW，已觸及多數先進機房之供電天花板。
+## 📐 系統運算邏輯與假設 (Business Constraints)
 
-## 4. 技術架構 (Tech Stack)
-* **前端骨架：** HTML5, Vanilla JavaScript
-* **UI 樣式與排版：** Tailwind CSS (包含 Dark Mode, Group-hover Tooltip 與 Print 狀態控制)
-* **圖表渲染：** Chart.js (支援動態重繪與深淺色自適應)
-* **部署與版控：** Git / GitHub Pages
+**1. 散熱臨界值判定 (Cooling Thresholds)**
+* `< 30 kW/Rack:` 🟢 推薦氣冷方案
+* `30 - 50 kW/Rack:` 🟡 建議評估液冷方案
+* `> 50 kW/Rack:` 🔴 強烈建議液冷方案 (突破氣冷物理極限)
 
-## 5. 未來產品藍圖 (Future Roadmap)
-作為一個商業決策產品，為滿足更深度的企業採購精算需求，下一階段規劃導入以下核心參數：
-- [ ] **導入進階財務模型：** 加入 NPV (淨現值) 與折現率 (Discount Rate) 計算，讓財務指標更符合大型企業 CFO 的審核標準。
-- [ ] **整合 RAG 專屬知識庫：** 規劃介接 NotebookLM 或向量資料庫，讓 Sales AI 助手能根據內部散熱技術文件（如 ABL 測試報告、漏液防護規範）進行精準問答。
-- [ ] **客製化硬體配置模組：** 允許使用者自定義 Server TDP 與冷卻解熱能力上限，從預設型號走向高度客製化。
-- [ ] **報表 CSV 匯出功能：** 讓技術人員能將各年度算式匯出，方便後續在 Excel 進行二次加工。
+**2. 為什麼單機櫃上限設定為 72 節點？**
+對標 NVIDIA GB200 NVL72 參考架構之三大物理極限：
+* **空間極限 (U-space):** 機櫃需容納運算匣、Switch 與水冷 Manifold，已達飽和。
+* **訊號極限 (Signal Integrity):** GPU 間透過銅線傳輸，72 節點之高度為 NVLink 訊號不衰減之極限。
+* **供電極限 (Power Limit):** 單櫃總功耗達 100-120kW，觸及多數先進機房供電天花板。
+
+---
+
+## 🛣️ 未來優化發展 (Product Roadmap)
+
+作為一個持續迭代的商業決策產品，下一階段規劃導入：
+
+1. **機房佔地成本模組 (Floor Space Cost)：** 將液冷架構「高密度、少機櫃」省下的實體廠房租金納入 CapEx/OpEx 抵扣，凸顯液冷隱性優勢。
+2. **淨現值折現率 (NPV Discount Rate)：** 導入貨幣時間價值概念，將 5 年後的節省電費進行折現，符合大型 IT 採購之企業財報精算慣例。
+3. **真實 API RAG 串接：** 將目前的 `cooling_kb.js` 升級，實際串接企業內部技術文檔的向量資料庫 (Vector DB)，實現真正的低 Token 消耗精準問答。
