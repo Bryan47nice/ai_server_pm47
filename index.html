@@ -38,7 +38,7 @@
             100% { background-position: 468px 0; }
         }
 
-        /* 🚀 列印模式強制約束 */
+        /* 列印模式強制約束 */
         @media print {
             body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .card { break-inside: avoid; page-break-inside: avoid; border: 1px solid #d1d5db !important; box-shadow: none !important; margin-bottom: 1rem; }
@@ -46,7 +46,6 @@
             .lg\:col-span-2, .col-span-1 { width: 100% !important; max-width: 100% !important; }
             .print\:hidden { display: none !important; }
             
-            /* 🚀 嚴格鎖定圖表畫布大小，防止列印時無限膨脹 */
             .chart-container { width: 100% !important; max-width: 100% !important; height: 300px !important; display: block !important; }
             canvas { max-width: 100% !important; height: 300px !important; }
         }
@@ -188,7 +187,7 @@
                         </div>
                         <h2 id="t-chart-title" class="text-md font-semibold mb-4 text-center text-gray-700 dark:text-gray-200">5 年 TCO 累積成本比較 (CapEx + OpEx)</h2>
                         
-                        <div class="relative w-full h-[280px] md:h-[320px] flex-shrink-0 chart-container">
+                        <div class="relative w-full flex-shrink-0 chart-container" style="height: 300px; min-height: 300px;">
                             <canvas id="tcoChart"></canvas>
                         </div>
                         
@@ -356,6 +355,7 @@
     </button>
 
     <script>
+        // UI Helpers
         function updateInputFromSlider() { document.getElementById('rackValInput').value = document.getElementById('serversPerRack').value; }
         function updateSliderFromInput() {
             let val = parseInt(document.getElementById('rackValInput').value);
@@ -365,8 +365,6 @@
         }
         function formatYearsInput(el) { let val = parseFloat(el.value); if(isNaN(val) || val < 1) val = 1; el.value = val.toFixed(1); }
         function formatUtilInput(el) { let val = parseInt(el.value); if(isNaN(val) || val < 1) val = 1; if(val > 100) val = 100; el.value = val; }
-
-        let currentLang = 'zh';
 
         function toggleLanguage() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
@@ -379,6 +377,7 @@
                 }
             }
             
+            // 更新靜態文案
             document.getElementById('t-chart-hint').innerText = currentLang === 'zh' ? '點擊圖表節點查看算式細節' : 'Click chart nodes for math details';
             document.getElementById('t-modal-air').innerText = currentLang === 'zh' ? '氣冷方案 (Air Cooling)' : 'Air Cooling';
             document.getElementById('t-modal-liq').innerText = currentLang === 'zh' ? '液冷方案 (Direct Liquid Cooling)' : 'Liquid Cooling';
@@ -404,6 +403,7 @@
             if(typeof calculateTCO === "function") calculateTCO();
         }
 
+        // 穩定的 Tab 切換邏輯
         function switchTab(tabName) {
             const btnTco = document.getElementById('btn-tab-tco');
             const btnMindset = document.getElementById('btn-tab-mindset');
@@ -429,6 +429,7 @@
 
         function closeModal() { document.getElementById('drilldownModal').classList.add('hidden'); }
 
+        // 🚀 移除全域 let currentLang，純粹執行初始化
         window.onload = function() {
             if(typeof dict !== 'undefined' && dict[currentLang]) {
                 for (const key in dict[currentLang]) {
