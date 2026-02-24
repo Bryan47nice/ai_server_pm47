@@ -1,12 +1,29 @@
 // AI Server TCO Dashboard - Globalization Dictionary
 const dict = {
     zh: {
-        "t-tab-tco": "AI 伺服器 TCO 評估儀表板", "t-tab-mindset": "產品企劃：專案管理思維對照",
-        "t-author": "製作者：莊仕祺 (Bryan)", "t-export": "匯出 PDF",
+        // Tabs
+        "t-tab-about": "👤 關於我 (About Me)",
+        "t-tab-tco": "📊 AI 伺服器 TCO 評估儀表板", 
+        "t-tab-mindset": "🧠 產品企劃：專案管理思維對照",
+        
+        // Header
+        "t-author": "製作者：莊仕祺 (Bryan)", 
+        "t-export": "匯出 PDF",
+
+        // 🚀 About Me (首頁)
+        "t-about-hero-title": "以軟體敏捷思維，驅動 AI 伺服器 NPI 的策略規劃師",
+        "t-about-hero-subtitle": "4+ 年跨部門產品管理經驗 | TOEIC 910 (Gold) | 專注於模組化架構與高價值產品藍圖",
+        "t-about-p1-title": "🧩 模組化產品藍圖 (對標 JD: 產品藍圖擬定)",
+        "t-about-p1-desc": "將客製化需求拆解為「標準化模組 (Standardized Modules)」，成功降低 80% NRE 成本並加速產品上市，完美契合 MGX 等模組化伺服器架構思維。",
+        "t-about-p2-title": "🌉 技術與商業的樞紐 (對標 JD: Sales/RD 橋樑)",
+        "t-about-p2-desc": "擔任 Technical Translator，將複雜的硬體散熱與架構限制，轉譯為 Sales 聽得懂的「價值主張 (Value Proposition)」，並製作 GTM 教戰手冊賦能業務。",
+        "t-about-p3-title": "📊 數據驅動與概念驗證 (對標 JD: 新技術 PoC)",
+        "t-about-p3-desc": "擅長以數據支持決策 (如 ROI、TCO 分析)。不憑直覺行事，而是透過開發概念驗證 (PoC) 工具，協助客戶與內部高層進行精準的規格取捨 (Spec Trade-off)。",
+        "t-about-cta": "👉 立即體驗我的 PoC 專案：AI 伺服器 TCO 評估儀表板",
+
+        // TCO Calculator
         "t-basic-settings": "基礎參數設定", "t-chip-model": "AI 伺服器型號",
-        "t-opt-h100": "NVIDIA H100 (單台約 1kW)", 
-        "t-opt-gb200": "NVIDIA GB200 NVL72 (單台約 1.2kW)",
-        "t-opt-rubin": "NVIDIA Rubin 世代預估 (單台約 1.8kW) 🚀",
+        "t-opt-h100": "NVIDIA H100 (單台約 1kW)", "t-opt-gb200": "NVIDIA GB200 NVL72 (單台約 1.2kW)", "t-opt-rubin": "NVIDIA Rubin 世代預估 (單台約 1.8kW) 🚀",
         "t-total-servers": "總伺服器數量 (台)", "t-power-rate": "電費費率 (USD/kWh)",
         "t-servers-per-rack": "單機櫃伺服器數量", "t-power-per-rack": "單機櫃功耗:", "t-total-racks": "預估機櫃總數:",
         "t-adv-settings": "進階環境設定 (Advanced)", "t-eval-years": "評估年限 (Years)", 
@@ -23,6 +40,8 @@ const dict = {
         "t-air-total-capex": "總 CapEx:", "t-liq-total-capex": "總 CapEx:",
         "t-rec-title": "冷卻技術轉折點", "t-breakeven-title": "黃金交叉點",
         "t-tt-title": "為什麼上限設定為 72 台 (節點)？",
+        
+        // Mindset 
         "t-hero-title": "專案管理的核心：載體不同，邏輯一致",
         "t-hero-sub": "「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 Product Planning 流程加速的引擎。」",
         "t-c1-tag": "1. 產品藍圖與生命週期", "t-c1-old-h": "【過去】軟體產品開發", "t-c1-old-v": "Sprint 迭代 / Release", "t-c1-old-d": "定義需求並透過敏捷衝刺，確保軟體功能如期交付上線。",
@@ -34,6 +53,8 @@ const dict = {
         "t-footer-title": "💡 為什麼軟體背景是 AI Server Planner 的隱藏優勢？",
         "t-footer-1": "軟體定義硬體 (Software-Defined Hardware)： 現代 AI 伺服器高度依賴 BMC 與軟體整合。",
         "t-footer-2": "敏捷迭代力 (Agile Adaptability)： 面對快速換代的市場，能以敏捷思維快速調整 Roadmap。",
+        
+        // Sales Report & Gauge
         "t-btn-gen-report": "產出 Sales 提案報告",
         "t-report-title": "💡 AI 生成 Sales 提案教戰手冊",
         "t-report-outdated": "⚠️ 參數已變更，報告內容已過時",
@@ -42,16 +63,32 @@ const dict = {
         "t-report-obj": "🛡️ 反對意見克服 (Objection Handling)",
         "t-report-roi": "💰 財務亮點 (ROI Highlight)",
         "t-report-error": "❌ 報告生成失敗，請檢查網路連線或稍後再試。",
-        // Gauge Chart Alert
         "t-gauge-warning": "警告：已達 GB200 高密度功耗門檻！傳統氣冷將導致機房 PUE 突破 1.5，強烈建議切換至 DLC 液冷方案。"
     },
     en: {
-        "t-tab-tco": "AI Server TCO Dashboard", "t-tab-mindset": "Product Planning Mindset",
-        "t-author": "Created by: Bryan Jhuang", "t-export": "Export PDF",
+        // Tabs
+        "t-tab-about": "👤 About Me",
+        "t-tab-tco": "📊 AI Server TCO Dashboard", 
+        "t-tab-mindset": "🧠 Product Planning Mindset",
+        
+        // Header
+        "t-author": "Created by: Bryan Jhuang", 
+        "t-export": "Export PDF",
+
+        // 🚀 About Me
+        "t-about-hero-title": "Software-Defined Hardware Planner for AI Server NPI",
+        "t-about-hero-subtitle": "4+ Years PM Experience | TOEIC 910 (Gold) | Expert in Modular Architecture & Product Roadmaps",
+        "t-about-p1-title": "🧩 Modular Product Roadmap (Aligns with JD: Roadmap Planning)",
+        "t-about-p1-desc": "Decomposed custom requests into 'Standardized Modules', reducing NRE costs by 80%. Perfectly aligns with MGX and modern modular server architecture.",
+        "t-about-p2-title": "🌉 Bridge Between Tech & Biz (Aligns with JD: Sales/RD Liaison)",
+        "t-about-p2-desc": "Acted as a Technical Translator, transforming complex cooling limits into compelling 'Value Propositions' to empower sales teams with GTM battlecards.",
+        "t-about-p3-title": "📊 Data-Driven PoC (Aligns with JD: Tech PoC & Evaluation)",
+        "t-about-p3-desc": "Leveraged data (ROI, TCO) to support decisions. Built Proof-of-Concept (PoC) tools to help clients and internal stakeholders make precise Spec Trade-offs.",
+        "t-about-cta": "👉 Experience My PoC Project: AI Server TCO Dashboard",
+
+        // TCO Calculator
         "t-basic-settings": "Basic Configurations", "t-chip-model": "AI Server Model",
-        "t-opt-h100": "NVIDIA H100 (~1kW per node)", 
-        "t-opt-gb200": "NVIDIA GB200 NVL72 (~1.2kW per node)",
-        "t-opt-rubin": "NVIDIA Rubin Gen Est. (~1.8kW per node) 🚀",
+        "t-opt-h100": "NVIDIA H100 (~1kW per node)", "t-opt-gb200": "NVIDIA GB200 NVL72 (~1.2kW per node)", "t-opt-rubin": "NVIDIA Rubin Gen Est. (~1.8kW per node) 🚀",
         "t-total-servers": "Total Servers (Nodes)", "t-power-rate": "Power Rate (USD/kWh)",
         "t-servers-per-rack": "Servers per Rack", "t-power-per-rack": "Power per Rack:", "t-total-racks": "Est. Total Racks:",
         "t-adv-settings": "Advanced Settings", "t-eval-years": "Evaluation Years", 
@@ -68,6 +105,8 @@ const dict = {
         "t-air-total-capex": "Total CapEx:", "t-liq-total-capex": "Total CapEx:",
         "t-rec-title": "Cooling Tipping Point", "t-breakeven-title": "Break-even Point",
         "t-tt-title": "Why is the limit set to 72 nodes?",
+        
+        // Mindset
         "t-hero-title": "Core Project Management: Different Medium, Same Logic",
         "t-hero-sub": "\"Transforming the agile mindset of leading software teams into an engine that accelerates AI Server Product Planning.\"",
         "t-c1-tag": "1. Product Roadmap", "t-c1-old-h": "[Past] Software Development", "t-c1-old-v": "Sprint Iteration", "t-c1-old-d": "Ensure on-time delivery through agile sprints.",
@@ -79,6 +118,8 @@ const dict = {
         "t-footer-title": "💡 Why Software Background is an Advantage?",
         "t-footer-1": "Software-Defined Hardware: Modern AI servers rely heavily on BMC and software integration.",
         "t-footer-2": "Agile Adaptability: Allows for quick adjustments to Roadmaps in a fast-paced market.",
+        
+        // Sales Report & Gauge
         "t-btn-gen-report": "Generate Sales Pitch",
         "t-report-title": "💡 AI Sales Battlecard",
         "t-report-outdated": "⚠️ Parameters changed, report outdated",
@@ -87,7 +128,6 @@ const dict = {
         "t-report-obj": "🛡️ Objection Handling",
         "t-report-roi": "💰 ROI Highlight",
         "t-report-error": "❌ Generation failed. Please try again later.",
-        // Gauge Chart Alert
         "t-gauge-warning": "Warning: High-density threshold reached! Air cooling PUE will exceed 1.5. Mandatory switch to DLC recommended."
     }
 };
