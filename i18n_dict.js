@@ -10,9 +10,14 @@ const dict = {
         "t-author": "製作者：莊仕祺 (Bryan)", 
         "t-export": "匯出 PDF",
 
-        // 🚀 About Me (首頁 - 融合版)
+        // 🚀 About Me (首頁)
         "t-about-hero-title": "以軟體敏捷思維，貫通產品規劃與 NPI 落地的資深 PM",
         "t-about-hero-subtitle": "4+ 年跨部門專案管理經驗 | TOEIC 910 (Gold) | 專注於模組化架構與高價值產品藍圖",
+        
+        // 🚀 Mission
+        "t-mission-title": "🎯 使命宣言 (Mission)",
+        "t-mission-text": "「在 AI 基礎設施的爆發時代，成為橋接『軟體敏捷性 (Software Agility)』與『硬體可靠性 (Hardware Reliability)』的關鍵樞紐。」",
+
         "t-about-p1-title": "🧩 模組化產品藍圖與需求管理",
         "t-about-p1-desc": "將客製化需求拆解為「標準化模組 (Standardized Modules)」，降低 80% NRE 成本。精準控管客戶需求變更 (Scope Creep)，確保產品架構契合市場，並穩步推進專案。",
         "t-about-p2-title": "🌉 跨部門樞紐與業務賦能",
@@ -75,9 +80,14 @@ const dict = {
         "t-author": "Created by: Bryan Jhuang", 
         "t-export": "Export PDF",
 
-        // 🚀 About Me (首頁 - 融合版)
+        // 🚀 About Me
         "t-about-hero-title": "Senior PM Bridging Product Strategy and NPI Execution",
         "t-about-hero-subtitle": "4+ Years Cross-Functional Leadership | TOEIC 910 (Gold) | Modular Architecture & Roadmap",
+        
+        // 🚀 Mission
+        "t-mission-title": "🎯 Mission Statement",
+        "t-mission-text": "\"To bridge the gap between Software Agility and Hardware Reliability in the AI Infrastructure era.\"",
+
         "t-about-p1-title": "🧩 Modular Roadmap & Requirement Management",
         "t-about-p1-desc": "Decomposed custom requests into 'Standardized Modules', reducing NRE costs by 80%. Effectively managed scope creep to ensure market alignment and steady project progression.",
         "t-about-p2-title": "🌉 Cross-Functional Hub & Sales Enablement",
