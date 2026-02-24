@@ -5,8 +5,9 @@
 let tcoChartInstance = null;
 let latestCalcData = {}; 
 
-// 🚀 Sales Report 狀態機變數
+// 🚀 Sales Report 狀態機與快取變數
 let isReportGenerated = false;
+let reportCache = { zh: null, en: null }; // 建立語系快取池
 
 function calculateTCO() {
     const chipPower = parseFloat(document.getElementById('chipType').value);
@@ -20,7 +21,9 @@ function calculateTCO() {
     const airCapExPerRack = parseFloat(document.getElementById('airCapex').value);
     const liqCapExPerRack = parseFloat(document.getElementById('liqCapex').value);
 
-    // 🚀 當參數變更且報告已產生時，觸發 Outdated 狀態 (Dirty State)
+    // 🚀 當參數變更時：清空所有快取 (Cache Invalidation) 並觸發 Dirty State
+    reportCache = { zh: null, en: null };
+    
     if (isReportGenerated) {
         document.getElementById('reportStateOutdated').classList.remove('hidden');
     }
@@ -103,7 +106,14 @@ function calculateTCO() {
     drawChart(labels, airData, liqData);
 }
 
-// 🚀 生成業務教戰報告邏輯
+// 負責將資料渲染到畫面上
+function renderReportFromData(data) {
+    document.getElementById('reportContentPitch').innerText = data.pitch;
+    document.getElementById('reportContentObj').innerText = data.obj;
+    document.getElementById('reportContentROI').innerText = data.roi;
+}
+
+// 🚀 生成業務教戰報告邏輯 (包含快取機制)
 function generateSalesReport() {
     const section = document.getElementById('salesReportSection');
     const outdated = document.getElementById('reportStateOutdated');
@@ -111,9 +121,21 @@ function generateSalesReport() {
     const error = document.getElementById('reportStateError');
     const success = document.getElementById('reportStateSuccess');
 
-    // 切換 UI 狀態至 Loading
+    // 展開區塊並隱藏過期警告
     section.classList.remove('hidden');
     outdated.classList.add('hidden');
+
+    // 🚀 Cache Hit: 如果該語系已經產出過，直接瞬間讀取快取，0 Token 消耗
+    if (reportCache[currentLang]) {
+        renderReportFromData(reportCache[currentLang]);
+        loading.classList.add('hidden');
+        error.classList.add('hidden');
+        success.classList.remove('hidden');
+        isReportGenerated = true;
+        return;
+    }
+
+    // Cache Miss: 顯示 Loading 狀態並模擬 AI 生成 (API Call)
     error.classList.add('hidden');
     success.classList.add('hidden');
     loading.classList.remove('hidden');
@@ -147,9 +169,11 @@ function generateSalesReport() {
                 ? `▪️ 評估期：${d.evalYears} 年\n▪️ 預設稼動率：${d.utilRate * 100}%\n▪️ 累積 ${d.evalYears} 年，最佳方案預計可節省總額：$${Math.abs(d.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})} USD`
                 : `▪️ Eval Period: ${d.evalYears} Years\n▪️ Utilization: ${d.utilRate * 100}%\n▪️ Over ${d.evalYears} years, the best solution saves you: $${Math.abs(d.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})} USD`;
 
-            document.getElementById('reportContentPitch').innerText = pitch;
-            document.getElementById('reportContentObj').innerText = obj;
-            document.getElementById('reportContentROI').innerText = roi;
+            const generatedData = { pitch, obj, roi };
+            
+            // 🚀 將生成的資料寫入對應語系的快取池中
+            reportCache[currentLang] = generatedData;
+            renderReportFromData(generatedData);
 
             // 切換至 Success
             loading.classList.add('hidden');
@@ -165,7 +189,7 @@ function generateSalesReport() {
     }, 800);
 }
 
-// 供多語系切換時重新渲染
+// 供多語系切換時重新渲染 (利用快取機制)
 function forceRegenerateReport() {
     if (isReportGenerated) generateSalesReport();
 }
