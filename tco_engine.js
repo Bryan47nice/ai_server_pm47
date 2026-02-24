@@ -7,7 +7,7 @@ let latestCalcData = {};
 
 // 🚀 Sales Report 狀態機與快取變數
 let isReportGenerated = false;
-let reportCache = { zh: null, en: null }; // 建立語系快取池
+let reportCache = { zh: null, en: null };
 
 function calculateTCO() {
     const chipPower = parseFloat(document.getElementById('chipType').value);
@@ -21,7 +21,6 @@ function calculateTCO() {
     const airCapExPerRack = parseFloat(document.getElementById('airCapex').value);
     const liqCapExPerRack = parseFloat(document.getElementById('liqCapex').value);
 
-    // 🚀 當參數變更時：清空所有快取 (Cache Invalidation) 並觸發 Dirty State
     reportCache = { zh: null, en: null };
     
     if (isReportGenerated) {
@@ -106,14 +105,12 @@ function calculateTCO() {
     drawChart(labels, airData, liqData);
 }
 
-// 負責將資料渲染到畫面上
 function renderReportFromData(data) {
     document.getElementById('reportContentPitch').innerText = data.pitch;
     document.getElementById('reportContentObj').innerText = data.obj;
     document.getElementById('reportContentROI').innerText = data.roi;
 }
 
-// 🚀 生成業務教戰報告邏輯 (包含快取機制)
 function generateSalesReport() {
     const section = document.getElementById('salesReportSection');
     const outdated = document.getElementById('reportStateOutdated');
@@ -121,11 +118,9 @@ function generateSalesReport() {
     const error = document.getElementById('reportStateError');
     const success = document.getElementById('reportStateSuccess');
 
-    // 展開區塊並隱藏過期警告
     section.classList.remove('hidden');
     outdated.classList.add('hidden');
 
-    // 🚀 Cache Hit: 如果該語系已經產出過，直接瞬間讀取快取，0 Token 消耗
     if (reportCache[currentLang]) {
         renderReportFromData(reportCache[currentLang]);
         loading.classList.add('hidden');
@@ -135,12 +130,10 @@ function generateSalesReport() {
         return;
     }
 
-    // Cache Miss: 顯示 Loading 狀態並模擬 AI 生成 (API Call)
     error.classList.add('hidden');
     success.classList.add('hidden');
     loading.classList.remove('hidden');
     
-    // 模擬 AI 生成時間 (延遲 800ms)
     setTimeout(() => {
         try {
             const d = latestCalcData;
@@ -170,18 +163,14 @@ function generateSalesReport() {
                 : `▪️ Eval Period: ${d.evalYears} Years\n▪️ Utilization: ${d.utilRate * 100}%\n▪️ Over ${d.evalYears} years, the best solution saves you: $${Math.abs(d.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})} USD`;
 
             const generatedData = { pitch, obj, roi };
-            
-            // 🚀 將生成的資料寫入對應語系的快取池中
             reportCache[currentLang] = generatedData;
             renderReportFromData(generatedData);
 
-            // 切換至 Success
             loading.classList.add('hidden');
             success.classList.remove('hidden');
             isReportGenerated = true;
 
         } catch (e) {
-            // 切換至 Error
             loading.classList.add('hidden');
             error.classList.remove('hidden');
             console.error("Report Generation Failed:", e);
@@ -189,14 +178,10 @@ function generateSalesReport() {
     }, 800);
 }
 
-// 供多語系切換時重新渲染 (利用快取機制)
 function forceRegenerateReport() {
     if (isReportGenerated) generateSalesReport();
 }
 
-// ==========================================
-// 以下保留 Drilldown Modal 及 drawChart 邏輯
-// ==========================================
 function openDrilldownModal(dataIndex, labelStr) {
     const modal = document.getElementById('drilldownModal');
     const d = latestCalcData;
@@ -207,25 +192,36 @@ function openDrilldownModal(dataIndex, labelStr) {
     const titlePrefix = currentLang === 'zh' ? '成本結構拆解：' : 'Cost Breakdown: ';
     document.getElementById('modalYearLabel').innerText = titlePrefix + labelStr;
     
-    const airOpex = d.airOpExPerYear * actualYear; const airTotal = d.totalAirCapEx + airOpex;
+    // 🚀 氣冷算式組裝 (加入雙語判斷)
+    const airOpex = d.airOpExPerYear * actualYear; 
+    const airTotal = d.totalAirCapEx + airOpex;
     document.getElementById('airCapexDetail').innerText = `${d.totalRacks} Racks × $${d.airCapExPerRack.toLocaleString()}`;
+    
     if (actualYear === 0) {
         document.getElementById('airOpexDetail').innerText = currentLang === 'zh' ? "建置初期，尚無營運電費產生。" : "No OpEx in Year 0.";
     } else {
-        document.getElementById('airOpexDetail').innerHTML = `總功耗 ${d.totalKw}kW × <b>PUE ${d.airPUE}</b><br>× 稼動率 ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${actualYear}年</b>`;
+        document.getElementById('airOpexDetail').innerHTML = currentLang === 'zh' 
+            ? `總功耗 ${d.totalKw}kW × <b>PUE ${d.airPUE}</b><br>× 稼動率 ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${actualYear}年</b>`
+            : `Total Pwr ${d.totalKw}kW × <b>PUE ${d.airPUE}</b><br>× Util. ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${actualYear} Yrs</b>`;
     }
     document.getElementById('airTotalDetail').innerText = "$" + airTotal.toLocaleString(undefined, {maximumFractionDigits: 0});
     
-    const liqOpex = d.liqOpExPerYear * actualYear; const liqTotal = d.totalLiqCapEx + liqOpex;
+    // 🚀 液冷算式組裝 (加入雙語判斷)
+    const liqOpex = d.liqOpExPerYear * actualYear; 
+    const liqTotal = d.totalLiqCapEx + liqOpex;
     document.getElementById('liqCapexDetail').innerText = `${d.totalRacks} Racks × $${d.liqCapExPerRack.toLocaleString()}`;
+    
     if (actualYear === 0) {
         document.getElementById('liqOpexDetail').innerText = currentLang === 'zh' ? "建置初期，尚無營運電費產生。" : "No OpEx in Year 0.";
     } else {
-        document.getElementById('liqOpexDetail').innerHTML = `總功耗 ${d.totalKw}kW × <b>PUE ${d.liqPUE}</b><br>× 稼動率 ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${actualYear}年</b>`;
+        document.getElementById('liqOpexDetail').innerHTML = currentLang === 'zh'
+            ? `總功耗 ${d.totalKw}kW × <b>PUE ${d.liqPUE}</b><br>× 稼動率 ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${actualYear}年</b>`
+            : `Total Pwr ${d.totalKw}kW × <b>PUE ${d.liqPUE}</b><br>× Util. ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${actualYear} Yrs</b>`;
     }
     document.getElementById('liqTotalDetail').innerText = "$" + liqTotal.toLocaleString(undefined, {maximumFractionDigits: 0});
     
-    const diff = Math.abs(airTotal - liqTotal); let winnerText = "";
+    const diff = Math.abs(airTotal - liqTotal); 
+    let winnerText = "";
     if (airTotal < liqTotal) {
         winnerText = currentLang === 'zh' ? `🏆 氣冷勝出 (節省 $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})` : `🏆 Air Wins (Save $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})`;
         document.getElementById('modalDiff').className = "bg-blue-100 dark:bg-blue-900/40 p-4 text-center text-lg font-bold text-blue-800 dark:text-blue-300 border-t border-blue-200 dark:border-blue-800";
@@ -256,25 +252,4 @@ function drawChart(labels, airData, liqData) {
             labels: labels,
             datasets: [
                 { label: labelAir, data: airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 },
-                { label: labelLiq, data: liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 }
-            ]
-        },
-        options: { 
-            responsive: true, maintainAspectRatio: false,
-            onClick: (event) => {
-                const points = tcoChartInstance.getElementsAtEventForMode(event, 'index', { intersect: false }, true);
-                if (points.length) {
-                    const dataIndex = points[0].index;
-                    const labelStr = labels[dataIndex];
-                    openDrilldownModal(dataIndex, labelStr);
-                }
-            },
-            interaction: { mode: 'index', intersect: false },
-            plugins: { legend: { labels: { color: textColor } }, tooltip: { bodyFont: { size: 14 } } },
-            scales: { 
-                x: { ticks: { color: textColor } },
-                y: { ticks: { color: textColor }, title: { display: true, text: 'USD ($)', color: textColor } } 
-            } 
-        }
-    });
-}
+                { label: labelLiq
