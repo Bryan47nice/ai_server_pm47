@@ -4,7 +4,9 @@ const dict = {
         "t-tab-tco": "AI 伺服器 TCO 評估儀表板", "t-tab-mindset": "產品企劃：專案管理思維對照",
         "t-author": "製作者：莊仕祺 (Bryan)", "t-export": "匯出 PDF",
         "t-basic-settings": "基礎參數設定", "t-chip-model": "AI 伺服器型號",
-        "t-opt-h100": "NVIDIA H100 (單台約 1kW)", "t-opt-gb200": "NVIDIA GB200 NVL72 (單台約 1.2kW)",
+        "t-opt-h100": "NVIDIA H100 (單台約 1kW)", 
+        "t-opt-gb200": "NVIDIA GB200 NVL72 (單台約 1.2kW)",
+        "t-opt-rubin": "NVIDIA Rubin 世代預估 (單台約 1.8kW) 🚀",
         "t-total-servers": "總伺服器數量 (台)", "t-power-rate": "電費費率 (USD/kWh)",
         "t-servers-per-rack": "單機櫃伺服器數量", "t-power-per-rack": "單機櫃功耗:", "t-total-racks": "預估機櫃總數:",
         "t-adv-settings": "進階環境設定 (Advanced)", "t-eval-years": "評估年限 (Years)", 
@@ -19,7 +21,7 @@ const dict = {
         "t-air-pue": "氣冷 PUE", "t-liq-pue": "液冷 PUE",
         "t-air-capex": "氣冷單機櫃 CapEx ($)", "t-liq-capex": "液冷單機櫃 CapEx ($)",
         "t-air-total-capex": "總 CapEx:", "t-liq-total-capex": "總 CapEx:",
-        "t-rec-title": "系統強烈建議", "t-breakeven-title": "黃金交叉點",
+        "t-rec-title": "冷卻技術轉折點", "t-breakeven-title": "黃金交叉點",
         "t-tt-title": "為什麼上限設定為 72 台 (節點)？",
         "t-hero-title": "專案管理的核心：載體不同，邏輯一致",
         "t-hero-sub": "「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 Product Planning 流程加速的引擎。」",
@@ -32,7 +34,6 @@ const dict = {
         "t-footer-title": "💡 為什麼軟體背景是 AI Server Planner 的隱藏優勢？",
         "t-footer-1": "軟體定義硬體 (Software-Defined Hardware)： 現代 AI 伺服器高度依賴 BMC 與軟體整合。",
         "t-footer-2": "敏捷迭代力 (Agile Adaptability)： 面對快速換代的市場，能以敏捷思維快速調整 Roadmap。",
-        // 新增：業務報告區塊語系
         "t-btn-gen-report": "產出 Sales 提案報告",
         "t-report-title": "💡 AI 生成 Sales 提案教戰手冊",
         "t-report-outdated": "⚠️ 參數已變更，報告內容已過時",
@@ -40,13 +41,17 @@ const dict = {
         "t-report-pitch": "🎯 核心說帖 (Elevator Pitch)",
         "t-report-obj": "🛡️ 反對意見克服 (Objection Handling)",
         "t-report-roi": "💰 財務亮點 (ROI Highlight)",
-        "t-report-error": "❌ 報告生成失敗，請檢查網路連線或稍後再試。"
+        "t-report-error": "❌ 報告生成失敗，請檢查網路連線或稍後再試。",
+        // Gauge Chart Alert
+        "t-gauge-warning": "警告：已達 GB200 高密度功耗門檻！傳統氣冷將導致機房 PUE 突破 1.5，強烈建議切換至 DLC 液冷方案。"
     },
     en: {
         "t-tab-tco": "AI Server TCO Dashboard", "t-tab-mindset": "Product Planning Mindset",
         "t-author": "Created by: Bryan Jhuang", "t-export": "Export PDF",
         "t-basic-settings": "Basic Configurations", "t-chip-model": "AI Server Model",
-        "t-opt-h100": "NVIDIA H100 (~1kW per node)", "t-opt-gb200": "NVIDIA GB200 NVL72 (~1.2kW per node)",
+        "t-opt-h100": "NVIDIA H100 (~1kW per node)", 
+        "t-opt-gb200": "NVIDIA GB200 NVL72 (~1.2kW per node)",
+        "t-opt-rubin": "NVIDIA Rubin Gen Est. (~1.8kW per node) 🚀",
         "t-total-servers": "Total Servers (Nodes)", "t-power-rate": "Power Rate (USD/kWh)",
         "t-servers-per-rack": "Servers per Rack", "t-power-per-rack": "Power per Rack:", "t-total-racks": "Est. Total Racks:",
         "t-adv-settings": "Advanced Settings", "t-eval-years": "Evaluation Years", 
@@ -61,7 +66,7 @@ const dict = {
         "t-air-pue": "Air Cooling PUE", "t-liq-pue": "Liquid Cooling PUE",
         "t-air-capex": "Air Rack CapEx ($)", "t-liq-capex": "Liquid Rack CapEx ($)",
         "t-air-total-capex": "Total CapEx:", "t-liq-total-capex": "Total CapEx:",
-        "t-rec-title": "System Recommendation", "t-breakeven-title": "Break-even Point",
+        "t-rec-title": "Cooling Tipping Point", "t-breakeven-title": "Break-even Point",
         "t-tt-title": "Why is the limit set to 72 nodes?",
         "t-hero-title": "Core Project Management: Different Medium, Same Logic",
         "t-hero-sub": "\"Transforming the agile mindset of leading software teams into an engine that accelerates AI Server Product Planning.\"",
@@ -74,7 +79,6 @@ const dict = {
         "t-footer-title": "💡 Why Software Background is an Advantage?",
         "t-footer-1": "Software-Defined Hardware: Modern AI servers rely heavily on BMC and software integration.",
         "t-footer-2": "Agile Adaptability: Allows for quick adjustments to Roadmaps in a fast-paced market.",
-        // 新增：業務報告區塊語系
         "t-btn-gen-report": "Generate Sales Pitch",
         "t-report-title": "💡 AI Sales Battlecard",
         "t-report-outdated": "⚠️ Parameters changed, report outdated",
@@ -82,6 +86,8 @@ const dict = {
         "t-report-pitch": "🎯 Elevator Pitch",
         "t-report-obj": "🛡️ Objection Handling",
         "t-report-roi": "💰 ROI Highlight",
-        "t-report-error": "❌ Generation failed. Please try again later."
+        "t-report-error": "❌ Generation failed. Please try again later.",
+        // Gauge Chart Alert
+        "t-gauge-warning": "Warning: High-density threshold reached! Air cooling PUE will exceed 1.5. Mandatory switch to DLC recommended."
     }
 };
