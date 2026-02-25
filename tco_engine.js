@@ -4,7 +4,7 @@
 
 let currentLang = 'zh'; 
 let tcoChartInstance = null;
-let gaugeChartInstance = null; // 🚀 新增 Gauge Chart 實例
+let gaugeChartInstance = null; 
 let latestCalcData = {}; 
 
 let isReportGenerated = false;
@@ -43,11 +43,6 @@ function calculateTCO() {
     const airOpExPerYear = totalKw * airPUE * utilRate * hoursPerYear * powerCost;
     const liqOpExPerYear = totalKw * liqPUE * utilRate * hoursPerYear * powerCost;
 
-    const textSavingsTitle = currentLang === 'zh' ? `${evalYears}年總節省成本 (USD)` : `${evalYears}-Year TCO Savings (USD)`;
-    const textChartTitle = currentLang === 'zh' ? `${evalYears} 年 TCO 累積成本比較 (CapEx + OpEx)` : `${evalYears}-Year TCO Comparison (CapEx + OpEx)`;
-    document.getElementById('t-savings-title').innerText = textSavingsTitle;
-    document.getElementById('t-chart-title').innerText = textChartTitle;
-
     let airData = []; let liqData = []; let labels = [];
     const maxIntYear = Math.floor(evalYears);
 
@@ -69,22 +64,42 @@ function calculateTCO() {
 
     const finalAirCost = totalAirCapEx + (airOpExPerYear * evalYears);
     const finalLiqCost = totalLiqCapEx + (liqOpExPerYear * evalYears);
+    
+    // 總節省成本：若為正數代表氣冷較貴 (液冷勝出)，若為負數代表液冷較貴 (氣冷勝出)
     const totalSavings = finalAirCost - finalLiqCost;
     const beYearRaw = (totalLiqCapEx - totalAirCapEx) / (airOpExPerYear - liqOpExPerYear);
 
-    if (totalSavings > 0) {
-        document.getElementById('savings').innerText = "+$" + totalSavings.toLocaleString(undefined, {maximumFractionDigits: 0});
-        document.getElementById('savings').className = "text-sm md:text-xl font-bold text-green-600 dark:text-green-400 mt-1";
-        document.getElementById('breakeven').innerText = beYearRaw > evalYears ? "N/A" : beYearRaw.toFixed(1) + "Y";
+    // 🚀 動態贏家計分板邏輯重構
+    const isAirWinner = totalSavings <= 0;
+    const absSavings = Math.abs(totalSavings);
+
+    // 1. 動態修改標題 (指出誰是最佳方案)
+    const textSavingsTitle = currentLang === 'zh' 
+        ? `${evalYears}年採用最佳方案(${isAirWinner ? '氣冷' : '液冷'})可省下` 
+        : `${evalYears}-Year Savings w/ Best Option (${isAirWinner ? 'Air' : 'Liquid'})`;
+    document.getElementById('t-savings-title').innerText = textSavingsTitle;
+
+    // 2. 強制顯示絕對值(正數)，並動態變更顏色對應圖表線條 (藍色=氣冷，紅色=液冷)
+    document.getElementById('savings').innerText = "+$" + absSavings.toLocaleString(undefined, {maximumFractionDigits: 0});
+    if (isAirWinner) {
+        document.getElementById('savings').className = "text-sm md:text-xl font-bold text-blue-600 dark:text-blue-400 mt-1";
     } else {
-        document.getElementById('savings').innerText = "-$" + Math.abs(totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0});
         document.getElementById('savings').className = "text-sm md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
+    }
+
+    // 3. 黃金交叉點：永遠顯示真實交叉年份，破除 N/A 的盲區
+    if (beYearRaw > 0 && beYearRaw !== Infinity) {
+        document.getElementById('breakeven').innerText = beYearRaw.toFixed(1) + "Y";
+    } else {
         document.getElementById('breakeven').innerText = "N/A";
     }
 
+    // 圖表標題動態更新
+    const textChartTitle = currentLang === 'zh' ? `${evalYears} 年 TCO 累積成本比較 (CapEx + OpEx)` : `${evalYears}-Year TCO Comparison (CapEx + OpEx)`;
+    document.getElementById('t-chart-title').innerText = textChartTitle;
+
     let winnerStr = kwPerRack < 40 ? "air" : "liquid";
 
-    // 🚀 動態更新 Gauge Chart 的文字與狀態
     let gaugeColor, gaugeStatusText;
     const warningBanner = document.getElementById('gaugeWarningBanner');
     
@@ -99,7 +114,7 @@ function calculateTCO() {
     } else {
         gaugeColor = '#ef4444'; // 紅色
         gaugeStatusText = currentLang === 'zh' ? '強制液冷 (DLC)' : 'Must use DLC';
-        warningBanner.classList.remove('hidden'); // 顯示高密度危險警告
+        warningBanner.classList.remove('hidden'); 
     }
 
     document.getElementById('gaugeValueText').innerText = kwPerRack.toFixed(1) + " kW";
@@ -115,16 +130,14 @@ function calculateTCO() {
     };
 
     drawChart(labels, airData, liqData);
-    drawGaugeChart(kwPerRack, gaugeColor); // 🚀 繪製半圓儀表板
+    drawGaugeChart(kwPerRack, gaugeColor); 
 }
 
-// 🚀 新增：繪製半圓儀表板 (Gauge Chart)
 function drawGaugeChart(kwPerRack, color) {
     const ctx = document.getElementById('gaugeChart').getContext('2d');
     const isDark = document.documentElement.classList.contains('dark');
-    const bgColor = isDark ? '#374151' : '#e5e7eb'; // 剩餘空間的底色
+    const bgColor = isDark ? '#374151' : '#e5e7eb'; 
     
-    // 設定最大上限為 140kW，超過則強制顯示為滿格
     const maxKw = 140;
     const currentVal = Math.min(kwPerRack, maxKw);
     const remainVal = Math.max(maxKw - currentVal, 0);
@@ -139,17 +152,17 @@ function drawGaugeChart(kwPerRack, color) {
                 data: [currentVal, remainVal],
                 backgroundColor: [color, bgColor],
                 borderWidth: 0,
-                circumference: 180, // 半圓
-                rotation: 270       // 從左側 9 點鐘方向開始畫
+                circumference: 180, 
+                rotation: 270       
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '75%', // 甜甜圈寬度，越接近 100% 越細
+            cutout: '75%', 
             plugins: {
                 legend: { display: false },
-                tooltip: { enabled: false } // 不顯示 tooltip，保持乾淨
+                tooltip: { enabled: false } 
             },
             animation: {
                 animateScale: true,
