@@ -496,6 +496,14 @@
                     if (el) el.innerHTML = dict[currentLang][key];
                 }
             }
+            
+            // 🚀 URL 參數偵測 (Deep Linking)
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetTab = urlParams.get('tab');
+            if (targetTab && ['about', 'tco', 'mindset'].includes(targetTab)) {
+                switchTab(targetTab);
+            }
+
             if (typeof calculateTCO === "function") {
                 calculateTCO();
             } else {
