@@ -259,6 +259,7 @@ function openDrilldownModal(dataIndex, labelStr) {
     const titlePrefix = currentLang === 'zh' ? '成本結構拆解：' : 'Cost Breakdown: ';
     document.getElementById('modalYearLabel').innerText = titlePrefix + labelStr;
     
+    // 氣冷算式組裝
     const airOpex = d.airOpExPerYear * actualYear; 
     const airTotal = d.totalAirCapEx + airOpex;
     document.getElementById('airCapexDetail').innerText = `${d.totalRacks} Racks × $${d.airCapExPerRack.toLocaleString()}`;
@@ -272,6 +273,7 @@ function openDrilldownModal(dataIndex, labelStr) {
     }
     document.getElementById('airTotalDetail').innerText = "$" + airTotal.toLocaleString(undefined, {maximumFractionDigits: 0});
     
+    // 液冷算式組裝
     const liqOpex = d.liqOpExPerYear * actualYear; 
     const liqTotal = d.totalLiqCapEx + liqOpex;
     document.getElementById('liqCapexDetail').innerText = `${d.totalRacks} Racks × $${d.liqCapExPerRack.toLocaleString()}`;
@@ -301,6 +303,7 @@ function openDrilldownModal(dataIndex, labelStr) {
     document.getElementById('drilldownModal').classList.remove('hidden');
 }
 
+// 🚀 完整修復的 drawChart 函式，確保大括號完美收尾
 function drawChart(labels, airData, liqData) {
     const ctx = document.getElementById('tcoChart').getContext('2d');
     const isDark = document.documentElement.classList.contains('dark');
