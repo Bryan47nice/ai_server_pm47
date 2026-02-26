@@ -6,6 +6,10 @@
     <title>Bryan's Portfolio | AI Server PM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
@@ -74,8 +78,8 @@
                     <button onclick="toggleLanguage()" class="print:hidden bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-3 py-1.5 rounded shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm font-bold flex items-center">
                         🌐 <span id="langBtnText" class="ml-1">EN</span>
                     </button>
-                    <button onclick="window.print()" class="print:hidden bg-gray-800 dark:bg-gray-600 text-white px-4 py-1.5 rounded shadow hover:bg-gray-900 dark:hover:bg-gray-500 transition text-sm font-bold">
-                        📄 <span id="t-export">匯出 PDF</span>
+                    <button id="btn-export-pdf" onclick="exportToPDF()" class="print:hidden bg-gray-800 dark:bg-gray-600 text-white px-4 py-1.5 rounded shadow hover:bg-gray-900 dark:hover:bg-gray-500 transition text-sm font-bold flex items-center">
+                        📄 <span id="t-export" class="ml-1">匯出 PDF</span>
                     </button>
                 </div>
             </div>
@@ -326,13 +330,13 @@
                         <div class="mb-4">
                             <h3 id="t-c2-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
                             <p id="t-c2-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">User Research & 數據分析</p>
-                            <p id="t-c2-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">收集用戶回饋與平台數據，定義規格與優先級。</p>
+                            <p id="t-c2-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">收集用戶回饋與平台數據，定義產品規格與功能優先級。</p>
                         </div>
                         <div class="flex justify-center my-2 text-gray-400">⬇️</div>
                         <div>
                             <h3 id="t-c2-new-h" class="text-red-600 dark:text-red-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3>
                             <p id="t-c2-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">技術趨勢調研與概念驗證</p>
-                            <p id="t-c2-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">針對硬體散熱趨勢收集有利資訊，進行 PoC 與規格收斂。</p>
+                            <p id="t-c2-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">針對硬體散熱趨勢(Air/Liquid)收集有利資訊，進行概念驗證與規格收斂。</p>
                         </div>
                     </div>
                     <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent border-t-4 border-t-green-500 hover:shadow-lg transition">
@@ -340,13 +344,13 @@
                         <div class="mb-4">
                             <h3 id="t-c3-old-h" class="text-gray-500 dark:text-gray-400 text-sm font-bold">【過去】軟體產品開發</h3>
                             <p id="t-c3-old-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">RD / UIUX / QA 樞紐</p>
-                            <p id="t-c3-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">整合技術與商業需求，解決開發期間的衝突與 Bug。</p>
+                            <p id="t-c3-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">整合技術、設計與商業需求，解決開發期間的衝突與 Bug。</p>
                         </div>
                         <div class="flex justify-center my-2 text-gray-400">⬇️</div>
                         <div>
                             <h3 id="t-c3-new-h" class="text-green-600 dark:text-green-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3>
                             <p id="t-c3-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Sales / RD / 客戶端橋樑</p>
-                            <p id="t-c3-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">協助釐清客戶規格需求，並對 Sales 進行技術培訓。</p>
+                            <p id="t-c3-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">協助釐清客戶規格需求，並對 Sales 團隊進行新產品上市的技術培訓。</p>
                         </div>
                     </div>
                 </div>
@@ -416,6 +420,40 @@
     <button id="themeToggleBtn" onclick="toggleTheme()" class="print:hidden fixed bottom-4 right-4 bg-gray-800 dark:bg-yellow-400 text-white dark:text-gray-900 p-3 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center z-50">
         <span id="themeIcon" class="text-xl">☀️</span>
     </button>
+    
+    <div id="pdfContainerWrapper" style="position: absolute; left: -9999px; top: 0; pointer-events: none;">
+        <div id="pdfTemplate" class="bg-white text-gray-900 w-[800px] flex flex-col gap-6 font-sans p-10" style="min-height: 1131px;">
+            <div class="border-b-4 border-indigo-600 pb-4">
+                <h1 class="text-4xl font-black text-indigo-900 tracking-tight">AI Server TCO Analysis Report</h1>
+                <p class="text-gray-500 mt-2 text-lg" id="pdfDate"></p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-8">
+                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
+                    <h2 class="text-xl font-bold border-b border-gray-300 pb-2 mb-4 text-gray-800">Configuration Parameters</h2>
+                    <div class="flex flex-col gap-2 text-sm" id="pdfParams"></div>
+                </div>
+                <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-100 flex flex-col justify-center items-center text-center shadow-inner" id="pdfWinnerBoard">
+                </div>
+            </div>
+
+            <div class="mt-4 flex flex-col gap-6">
+                <h2 class="text-xl font-bold border-b border-gray-300 pb-2 text-gray-800">Visualizations (Gauge & Trend)</h2>
+                <div class="flex justify-center h-[200px]">
+                    <img id="pdfGaugeImg" src="" class="h-full object-contain" />
+                </div>
+                <div class="w-full h-[350px]">
+                    <img id="pdfLineImg" src="" class="w-full h-full object-contain" />
+                </div>
+            </div>
+
+            <div class="mt-auto pt-6 border-t border-gray-300 text-sm text-gray-500 text-center flex flex-col gap-1">
+                <p class="font-bold text-gray-700">Generated by AI Server PM Prototype (Bryan Jhuang)</p>
+                <p>Interactive Dashboard available at:</p>
+                <a id="pdfUrl" href="#" class="text-blue-600 underline"></a>
+            </div>
+        </div>
+    </div>
 
     <script>
         function updateInputFromSlider() { document.getElementById('rackValInput').value = document.getElementById('serversPerRack').value; }
@@ -497,7 +535,6 @@
                 }
             }
             
-            // 🚀 URL 參數偵測 (Deep Linking)
             const urlParams = new URLSearchParams(window.location.search);
             const targetTab = urlParams.get('tab');
             if (targetTab && ['about', 'tco', 'mindset'].includes(targetTab)) {
