@@ -64,22 +64,17 @@ function calculateTCO() {
 
     const finalAirCost = totalAirCapEx + (airOpExPerYear * evalYears);
     const finalLiqCost = totalLiqCapEx + (liqOpExPerYear * evalYears);
-    
-    // 總節省成本：若為正數代表氣冷較貴 (液冷勝出)，若為負數代表液冷較貴 (氣冷勝出)
     const totalSavings = finalAirCost - finalLiqCost;
     const beYearRaw = (totalLiqCapEx - totalAirCapEx) / (airOpExPerYear - liqOpExPerYear);
 
-    // 🚀 動態贏家計分板邏輯重構
     const isAirWinner = totalSavings <= 0;
     const absSavings = Math.abs(totalSavings);
 
-    // 1. 動態修改標題 (指出誰是最佳方案)
     const textSavingsTitle = currentLang === 'zh' 
         ? `${evalYears}年採用最佳方案(${isAirWinner ? '氣冷' : '液冷'})可省下` 
         : `${evalYears}-Year Savings w/ Best Option (${isAirWinner ? 'Air' : 'Liquid'})`;
     document.getElementById('t-savings-title').innerText = textSavingsTitle;
 
-    // 2. 強制顯示絕對值(正數)，並動態變更顏色對應圖表線條 (藍色=氣冷，紅色=液冷)
     document.getElementById('savings').innerText = "+$" + absSavings.toLocaleString(undefined, {maximumFractionDigits: 0});
     if (isAirWinner) {
         document.getElementById('savings').className = "text-sm md:text-xl font-bold text-blue-600 dark:text-blue-400 mt-1";
@@ -87,14 +82,12 @@ function calculateTCO() {
         document.getElementById('savings').className = "text-sm md:text-xl font-bold text-red-600 dark:text-red-400 mt-1";
     }
 
-    // 3. 黃金交叉點：永遠顯示真實交叉年份，破除 N/A 的盲區
     if (beYearRaw > 0 && beYearRaw !== Infinity) {
         document.getElementById('breakeven').innerText = beYearRaw.toFixed(1) + "Y";
     } else {
         document.getElementById('breakeven').innerText = "N/A";
     }
 
-    // 圖表標題動態更新
     const textChartTitle = currentLang === 'zh' ? `${evalYears} 年 TCO 累積成本比較 (CapEx + OpEx)` : `${evalYears}-Year TCO Comparison (CapEx + OpEx)`;
     document.getElementById('t-chart-title').innerText = textChartTitle;
 
@@ -104,15 +97,15 @@ function calculateTCO() {
     const warningBanner = document.getElementById('gaugeWarningBanner');
     
     if (kwPerRack < 40) {
-        gaugeColor = '#22c55e'; // 綠色
+        gaugeColor = '#22c55e'; 
         gaugeStatusText = currentLang === 'zh' ? '傳統氣冷 (Air Cooling)' : 'Air Cooling';
         warningBanner.classList.add('hidden');
     } else if (kwPerRack <= 80) {
-        gaugeColor = '#eab308'; // 黃色
+        gaugeColor = '#eab308'; 
         gaugeStatusText = currentLang === 'zh' ? '氣冷極限 (RDHX)' : 'Air Limit (RDHX)';
         warningBanner.classList.add('hidden');
     } else {
-        gaugeColor = '#ef4444'; // 紅色
+        gaugeColor = '#ef4444'; 
         gaugeStatusText = currentLang === 'zh' ? '強制液冷 (DLC)' : 'Must use DLC';
         warningBanner.classList.remove('hidden'); 
     }
@@ -122,8 +115,9 @@ function calculateTCO() {
     document.getElementById('gaugeStatusText').innerText = gaugeStatusText;
     document.getElementById('gaugeStatusText').style.color = gaugeColor;
 
+    // 🚀 將 totalServers 也放進 cache 供匯出 PDF 使用
     latestCalcData = {
-        evalYears, utilRate, totalRacks, totalKw, powerCost, airPUE, liqPUE, kwPerRack,
+        evalYears, utilRate, totalServers, totalRacks, totalKw, powerCost, airPUE, liqPUE, kwPerRack,
         airCapExPerRack, liqCapExPerRack, totalAirCapEx, totalLiqCapEx,
         airOpExPerYear, liqOpExPerYear, labelsCount: labels.length,
         breakevenYear: beYearRaw, totalSavings, winnerStr
@@ -222,7 +216,7 @@ function generateSalesReport() {
                 
                 obj = currentLang === 'zh'
                     ? `若客戶嫌貴：「初期建置要多花幾千萬太貴了。」\n👉 回覆策略：沒錯，但液冷每年能為您省下龐大電費！這筆投資預計在第 ${beText} 年就會達到黃金交叉回本，之後每年都是淨賺。`
-                    : `If client objects: "The upfront cost is too high."\n👉 Strategy: True, but it saves massive electricity bills annually. You will break even in Year ${beText}, after which every year is pure profit.`;
+                    : `If client objects: "The upfront cost is too high."\n👉 Strategy: True, but it saves massive electricity bills annually. You will break break even in Year ${beText}, after which every year is pure profit.`;
             }
 
             roi = currentLang === 'zh'
@@ -245,10 +239,6 @@ function generateSalesReport() {
     }, 800);
 }
 
-function forceRegenerateReport() {
-    if (isReportGenerated) generateSalesReport();
-}
-
 function openDrilldownModal(dataIndex, labelStr) {
     const modal = document.getElementById('drilldownModal');
     const d = latestCalcData;
@@ -259,7 +249,6 @@ function openDrilldownModal(dataIndex, labelStr) {
     const titlePrefix = currentLang === 'zh' ? '成本結構拆解：' : 'Cost Breakdown: ';
     document.getElementById('modalYearLabel').innerText = titlePrefix + labelStr;
     
-    // 氣冷算式組裝
     const airOpex = d.airOpExPerYear * actualYear; 
     const airTotal = d.totalAirCapEx + airOpex;
     document.getElementById('airCapexDetail').innerText = `${d.totalRacks} Racks × $${d.airCapExPerRack.toLocaleString()}`;
@@ -273,7 +262,6 @@ function openDrilldownModal(dataIndex, labelStr) {
     }
     document.getElementById('airTotalDetail').innerText = "$" + airTotal.toLocaleString(undefined, {maximumFractionDigits: 0});
     
-    // 液冷算式組裝
     const liqOpex = d.liqOpExPerYear * actualYear; 
     const liqTotal = d.totalLiqCapEx + liqOpex;
     document.getElementById('liqCapexDetail').innerText = `${d.totalRacks} Racks × $${d.liqCapExPerRack.toLocaleString()}`;
@@ -303,7 +291,6 @@ function openDrilldownModal(dataIndex, labelStr) {
     document.getElementById('drilldownModal').classList.remove('hidden');
 }
 
-// 🚀 完整修復的 drawChart 函式，確保大括號完美收尾
 function drawChart(labels, airData, liqData) {
     const ctx = document.getElementById('tcoChart').getContext('2d');
     const isDark = document.documentElement.classList.contains('dark');
@@ -341,4 +328,101 @@ function drawChart(labels, airData, liqData) {
             } 
         }
     });
+}
+
+// 🚀 新增：一鍵 PDF 報告產生器 (使用 jsPDF & html2canvas)
+async function exportToPDF() {
+    const btn = document.getElementById('btn-export-pdf');
+    const originalHtml = btn.innerHTML;
+    const isZh = currentLang === 'zh';
+    
+    // 進入 Loading 狀態，防止重複點擊
+    btn.innerHTML = `⏳ <span class="ml-1">${isZh ? '產出中...' : 'Generating...'}</span>`;
+    btn.disabled = true;
+
+    try {
+        if (!window.jspdf || !window.html2canvas) {
+            alert(isZh ? "PDF 套件載入中，請稍後再試。" : "PDF libraries loading, please try again.");
+            return;
+        }
+
+        const d = latestCalcData;
+        const chipSelect = document.getElementById('chipType');
+        const chipName = chipSelect.options[chipSelect.selectedIndex].text;
+
+        // 1. 填充 PDF 模板的文字資料 (雙語支援)
+        document.getElementById('pdfDate').innerText = (isZh ? '生成日期：' : 'Generated on: ') + new Date().toLocaleDateString();
+        
+        document.getElementById('pdfParams').innerHTML = `
+            <div class="flex justify-between border-b pb-1"><span class="text-gray-500">${isZh ? 'AI 伺服器型號' : 'Chip Model'}</span> <b>${chipName}</b></div>
+            <div class="flex justify-between border-b pb-1"><span class="text-gray-500">${isZh ? '總伺服器數量' : 'Total Servers'}</span> <b>${d.totalServers} Nodes</b></div>
+            <div class="flex justify-between border-b pb-1"><span class="text-gray-500">${isZh ? '電費費率' : 'Power Rate'}</span> <b>$${d.powerCost}/kWh</b></div>
+            <div class="flex justify-between border-b pb-1"><span class="text-gray-500">${isZh ? '評估年限' : 'Eval Years'}</span> <b>${d.evalYears} Yrs</b></div>
+            <div class="flex justify-between border-b pb-1"><span class="text-gray-500">${isZh ? '氣冷 PUE' : 'Air PUE'}</span> <b>${d.airPUE}</b></div>
+            <div class="flex justify-between border-b pb-1"><span class="text-gray-500">${isZh ? '液冷 PUE' : 'Liquid PUE'}</span> <b>${d.liqPUE}</b></div>
+        `;
+
+        const isAirWinner = d.totalSavings <= 0;
+        const bestOpt = isAirWinner ? (isZh ? '傳統氣冷方案 (Air)' : 'Air Cooling') : (isZh ? '強制液冷方案 (Liquid)' : 'Liquid Cooling');
+        const winnerColor = isAirWinner ? 'text-blue-600' : 'text-red-600';
+        
+        document.getElementById('pdfWinnerBoard').innerHTML = `
+            <h3 class="text-xl font-bold text-gray-700">${isZh ? '🏆 最佳 TCO 散熱方案' : '🏆 Best TCO Solution'}</h3>
+            <p class="text-3xl font-black mt-2 ${winnerColor}">${bestOpt}</p>
+            <div class="mt-4 flex justify-center gap-8 w-full">
+                <div>
+                    <p class="text-sm text-gray-500">${isZh ? '5年總節省成本' : 'Total Savings'}</p>
+                    <p class="text-xl font-bold text-green-600">+$${Math.abs(d.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">${isZh ? '黃金交叉回本點' : 'Breakeven Point'}</p>
+                    <p class="text-xl font-bold text-purple-600">${d.breakevenYear > 0 && d.breakevenYear !== Infinity ? d.breakevenYear.toFixed(1) + ' Yrs' : 'N/A'}</p>
+                </div>
+            </div>
+        `;
+
+        // 2. 將 Chart.js 畫布轉換為 Base64 靜態圖嵌入 HTML
+        document.getElementById('pdfGaugeImg').src = gaugeChartInstance.toBase64Image();
+        document.getElementById('pdfLineImg').src = tcoChartInstance.toBase64Image();
+        
+        // 3. 設定報告頁尾專屬的深度連結 (含分享網址)
+        const urlObj = new URL(window.location.href);
+        urlObj.searchParams.set('tab', 'tco'); 
+        document.getElementById('pdfUrl').innerText = urlObj.toString();
+        document.getElementById('pdfUrl').href = urlObj.toString();
+
+        // 4. 使用 html2canvas 將隱藏 DOM 轉繪成 Canvas
+        const targetEl = document.getElementById('pdfTemplate');
+        
+        const canvas = await html2canvas(targetEl, { 
+            scale: 2, // 提升 PDF 解析度
+            useCORS: true,
+            backgroundColor: '#ffffff' // 強制白底，避免深色模式干擾
+        });
+        
+        const imgData = canvas.toDataURL('image/png');
+        
+        // 5. 封裝進 jsPDF 並下載
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        
+        // 動態檔名邏輯
+        const dateStr = new Date().toISOString().slice(0,10).replace(/-/g, '');
+        const chipKey = chipName.match(/[a-zA-Z0-9]+/g)?.[1] || 'Chip'; // 擷取 H100 或 GB200
+        const filename = `TCO_Report_${chipKey}_${d.totalServers}nodes_${dateStr}.pdf`;
+        
+        pdf.save(filename);
+
+    } catch (err) {
+        console.error("PDF Export Error:", err);
+        alert(isZh ? '匯出失敗，請檢查瀏覽器設定。' : 'Export failed, check console for details.');
+    } finally {
+        // 恢復按鈕狀態
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+    }
 }
