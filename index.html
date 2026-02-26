@@ -78,7 +78,7 @@
                     <button onclick="toggleLanguage()" class="print:hidden bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-3 py-1.5 rounded shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm font-bold flex items-center">
                         🌐 <span id="langBtnText" class="ml-1">EN</span>
                     </button>
-                    <button id="btn-export-pdf" onclick="exportToPDF()" class="print:hidden bg-gray-800 dark:bg-gray-600 text-white px-4 py-1.5 rounded shadow hover:bg-gray-900 dark:hover:bg-gray-500 transition text-sm font-bold flex items-center">
+                    <button id="btn-export-pdf" onclick="exportToPDF()" class="print:hidden hidden bg-gray-800 dark:bg-gray-600 text-white px-4 py-1.5 rounded shadow hover:bg-gray-900 dark:hover:bg-gray-500 transition text-sm font-bold flex items-center">
                         📄 <span id="t-export" class="ml-1">匯出 PDF</span>
                     </button>
                 </div>
@@ -336,7 +336,7 @@
                         <div>
                             <h3 id="t-c2-new-h" class="text-red-600 dark:text-red-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3>
                             <p id="t-c2-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">技術趨勢調研與概念驗證</p>
-                            <p id="t-c2-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">針對硬體散熱趨勢(Air/Liquid)收集有利資訊，進行概念驗證與規格收斂。</p>
+                            <p id="t-c2-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">針對硬體散熱趨勢(Air/Liquid)收集有利資訊，進行 PoC 與規格收斂。</p>
                         </div>
                     </div>
                     <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent border-t-4 border-t-green-500 hover:shadow-lg transition">
@@ -502,8 +502,10 @@
             if(typeof calculateTCO === "function") calculateTCO();
         }
 
+        // 🚀 修改 switchTab：加入情境感知，只有 TCO 頁面顯示匯出按鈕
         function switchTab(tabName) {
             const tabs = ['about', 'tco', 'mindset'];
+            const exportBtn = document.getElementById('btn-export-pdf');
             
             tabs.forEach(t => {
                 const btn = document.getElementById('btn-tab-' + t);
@@ -520,8 +522,14 @@
                 }
             });
             
-            if (tabName === 'tco' && typeof calculateTCO === "function") {
-                setTimeout(() => calculateTCO(), 50); 
+            // 邏輯判斷：按鈕只存在於 TCO 面板
+            if (tabName === 'tco') {
+                exportBtn.classList.remove('hidden');
+                if (typeof calculateTCO === "function") {
+                    setTimeout(() => calculateTCO(), 50); 
+                }
+            } else {
+                exportBtn.classList.add('hidden');
             }
         }
 
