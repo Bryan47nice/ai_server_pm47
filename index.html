@@ -27,22 +27,6 @@
         .tab-inactive:hover { color: #374151; border-bottom: 4px solid #d1d5db; }
         .dark .tab-inactive:hover { color: #f3f4f6; border-bottom: 4px solid #4b5563; }
         
-        .shimmer {
-            background: #f6f7f8;
-            background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
-            background-repeat: no-repeat;
-            background-size: 800px 100%; 
-            animation: placeholderShimmer 1.5s linear infinite forwards;
-        }
-        .dark .shimmer {
-            background: #374151;
-            background-image: linear-gradient(to right, #374151 0%, #4b5563 20%, #374151 40%, #374151 100%);
-        }
-        @keyframes placeholderShimmer {
-            0% { background-position: -468px 0; }
-            100% { background-position: 468px 0; }
-        }
-
         @media print {
             body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .card { break-inside: avoid; page-break-inside: avoid; border: 1px solid #d1d5db !important; box-shadow: none !important; margin-bottom: 1rem; }
@@ -78,7 +62,7 @@
                     <button onclick="toggleLanguage()" class="print:hidden bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-3 py-1.5 rounded shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm font-bold flex items-center">
                         🌐 <span id="langBtnText" class="ml-1">EN</span>
                     </button>
-                    <button id="btn-export-pdf" onclick="exportToPDF()" class="print:hidden hidden bg-gray-800 dark:bg-gray-600 text-white px-4 py-1.5 rounded shadow hover:bg-gray-900 dark:hover:bg-gray-500 transition text-sm font-bold flex items-center">
+                    <button id="btn-export-pdf" onclick="openExportModal()" class="print:hidden hidden bg-gray-800 dark:bg-gray-600 text-white px-4 py-1.5 rounded shadow hover:bg-gray-900 dark:hover:bg-gray-500 transition text-sm font-bold flex items-center">
                         📄 <span id="t-export" class="ml-1">匯出 PDF</span>
                     </button>
                 </div>
@@ -366,6 +350,30 @@
         </div>
     </div>
 
+    <div id="exportModal" class="fixed inset-0 bg-black/60 z-[110] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-gray-700 transform transition-transform">
+            <div class="bg-indigo-50 dark:bg-indigo-900/30 border-b border-indigo-100 dark:border-gray-700 p-5">
+                <h3 class="text-lg font-bold flex items-center text-indigo-900 dark:text-indigo-200">
+                    📄 匯出 TCO 分析報告
+                </h3>
+                <p class="text-sm text-indigo-600 dark:text-indigo-400 mt-1">請為您的報告自訂專屬名稱，以利後續歸檔與傳閱。</p>
+            </div>
+            <div class="p-6">
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">報告檔名 (不需副檔名)</label>
+                <div class="flex items-center">
+                    <input type="text" id="exportFilename" class="block w-full rounded-l-md border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm p-3 border focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <span class="bg-gray-200 dark:bg-gray-600 border border-l-0 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-r-md px-3 py-3 font-mono text-sm">.pdf</span>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-900 border-t dark:border-gray-700 p-4 flex justify-end space-x-3">
+                <button onclick="closeExportModal()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-bold transition">取消</button>
+                <button id="btn-confirm-export" onclick="executePDFExport()" class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 font-bold shadow-md transition flex items-center">
+                    確認匯出
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="drilldownModal" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-4 print:hidden backdrop-blur-sm transition-opacity">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden border dark:border-gray-700 transform transition-transform">
             <div class="bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-700 p-4 flex justify-between items-center">
@@ -422,49 +430,57 @@
     </button>
     
     <div id="pdfContainerWrapper" style="position: absolute; left: -9999px; top: 0; pointer-events: none;">
-        <div id="pdfTemplate" class="bg-gray-50 text-gray-900 w-[900px] flex flex-col font-sans">
-            <div class="bg-gradient-to-r from-slate-900 to-indigo-900 text-white p-10">
-                <h1 class="text-4xl font-black tracking-tight" id="pdfMainTitle">AI Server TCO Analysis Report</h1>
-                <p class="text-indigo-200 mt-2 text-lg font-medium" id="pdfDate"></p>
+        <div id="pdfTemplate" class="bg-gray-50 text-gray-900 w-[1100px] flex flex-col font-sans">
+            <div class="bg-gradient-to-r from-slate-900 to-indigo-900 text-white p-10 flex justify-between items-end">
+                <div>
+                    <h1 class="text-4xl font-black tracking-tight" id="pdfMainTitle">AI Server TCO Analysis Report</h1>
+                    <p class="text-indigo-200 mt-2 text-lg font-medium" id="pdfDate"></p>
+                </div>
+                <div class="text-right text-indigo-200 text-sm">
+                    <p>Generated by TCO Engine V2</p>
+                </div>
             </div>
 
-            <div class="p-10 flex flex-col gap-6 flex-grow">
+            <div class="p-10 grid grid-cols-12 gap-8 flex-grow">
                 
-                <div class="grid grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                        <h2 class="text-xl font-bold border-b border-gray-100 pb-3 mb-4 text-slate-800 flex items-center">⚙️ Configuration Parameters</h2>
-                        <div class="flex flex-col gap-3 text-sm text-slate-600" id="pdfParams"></div>
-                    </div>
+                <div class="col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 h-fit">
+                    <h2 class="text-lg font-bold border-b border-gray-100 pb-3 mb-4 text-slate-800 flex items-center">⚙️ Configuration</h2>
+                    <div class="flex flex-col gap-4 text-sm text-slate-600" id="pdfParams"></div>
+                </div>
+
+                <div class="col-span-8 flex flex-col gap-8">
                     <div class="bg-gradient-to-br from-indigo-50 to-white p-6 rounded-2xl border border-indigo-100 flex flex-col justify-center items-center text-center shadow-sm" id="pdfWinnerBoard"></div>
-                </div>
 
-                <div id="pdfPitchSection" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-indigo-200 border-l-8 border-l-indigo-500">
-                    <h2 class="text-xl font-bold border-b border-indigo-50 pb-3 mb-4 text-indigo-900 flex items-center">💡 AI Sales Battlecard</h2>
-                    <div class="grid grid-cols-2 gap-6 text-sm">
-                        <div>
-                            <h3 class="font-bold text-indigo-600 mb-2">🎯 Elevator Pitch</h3>
-                            <p id="pdfPitchText" class="text-slate-700 leading-relaxed"></p>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-red-600 mb-2">🛡️ Objection Handling</h3>
-                            <p id="pdfObjText" class="text-slate-700 leading-relaxed"></p>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <h2 class="text-lg font-bold border-b border-gray-100 pb-3 mb-6 text-slate-800 flex items-center">📊 Visualizations (Gauge & Trend)</h2>
+                        <div class="flex flex-col gap-6">
+                            <div class="flex justify-center h-[200px]">
+                                <img id="pdfGaugeImg" src="" class="h-full object-contain" />
+                            </div>
+                            <div class="w-full h-[320px]">
+                                <img id="pdfLineImg" src="" class="w-full h-full object-contain" />
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mt-2">
-                    <h2 class="text-xl font-bold border-b border-gray-100 pb-3 mb-6 text-slate-800 flex items-center">📊 Visualizations (Gauge & Trend)</h2>
-                    <div class="flex justify-center h-[220px] mb-6">
-                        <img id="pdfGaugeImg" src="" class="h-full object-contain" />
-                    </div>
-                    <div class="w-full h-[350px]">
-                        <img id="pdfLineImg" src="" class="w-full h-full object-contain" />
+                <div id="pdfPitchSection" class="col-span-12 hidden bg-white p-8 rounded-2xl shadow-sm border border-indigo-200 border-l-8 border-l-indigo-500 mt-2">
+                    <h2 class="text-xl font-bold border-b border-indigo-50 pb-3 mb-6 text-indigo-900 flex items-center">💡 AI Sales Battlecard</h2>
+                    <div class="grid grid-cols-2 gap-8 text-sm">
+                        <div>
+                            <h3 class="font-bold text-indigo-600 mb-3 text-base">🎯 Elevator Pitch</h3>
+                            <p id="pdfPitchText" class="text-slate-700 leading-relaxed text-justify"></p>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-red-600 mb-3 text-base">🛡️ Objection Handling</h3>
+                            <p id="pdfObjText" class="text-slate-700 leading-relaxed text-justify"></p>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="bg-slate-900 text-slate-400 p-8 text-center text-sm flex flex-col gap-2 mt-auto border-t-4 border-indigo-500">
-                <p class="font-bold text-slate-300">版權所有 © 2026 Bryan Jhuang. Designed & Developed for AI Server PM Proof-of-Concept.</p>
+                <p class="font-bold text-slate-300 tracking-wide">版權所有 © 2026 Bryan Jhuang. Designed & Developed for AI Server PM Proof-of-Concept.</p>
                 <p>Interactive Dashboard available at: <a id="pdfUrl" href="#" class="text-indigo-400 hover:text-indigo-300 underline break-all"></a></p>
             </div>
         </div>
