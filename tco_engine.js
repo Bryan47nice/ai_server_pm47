@@ -1,5 +1,5 @@
 // ==========================================
-// TCO Calculation Engine & Shareable State
+// TCO Calculation Engine & Scenario Manager
 // ==========================================
 
 let currentLang = 'zh'; 
@@ -9,6 +9,12 @@ let latestCalcData = {};
 
 let isReportGenerated = false;
 let reportCache = { zh: null, en: null };
+
+// 🚀 情境管理全域變數 (In-Memory Data Store)
+let scenarios = [];
+let activeScenarioId = null;
+let isCompareMode = false;
+let compareChartInstances = {}; // 存放比較模式中的多組圖表實體
 
 const DEFAULT_PARAMS = {
     chip: "1",         
@@ -30,6 +36,20 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+}
+
+// 🚀 初始化情境 A
+function initScenarios() {
+    if (scenarios.length === 0) {
+        scenarios.push({
+            id: 'sc_' + Date.now(),
+            name: currentLang === 'zh' ? '情境 A' : 'Scenario A',
+            params: null,
+            results: null
+        });
+        activeScenarioId = scenarios[0].id;
+    }
+    renderScenarioBar();
 }
 
 function loadStateFromURL() {
@@ -67,6 +87,9 @@ function loadStateFromURL() {
 }
 
 const syncToURL = () => {
+    // 比較模式下不更新 URL
+    if (isCompareMode) return; 
+
     const url = new URL(window.location);
     url.searchParams.set('tab', 'tco'); 
     url.searchParams.set('chip', document.getElementById('chipType').value);
@@ -85,6 +108,251 @@ const syncToURL = () => {
 };
 
 const debouncedSyncToURL = debounce(syncToURL, 300);
+
+// 🚀 將當前 DOM 參數與計算結果快照儲存至 Active Scenario
+function updateActiveScenario() {
+    if (!activeScenarioId || isCompareMode) return;
+    const scenario = scenarios.find(s => s.id === activeScenarioId);
+    if (scenario) {
+        scenario.params = {
+            chip: document.getElementById('chipType').value,
+            servers: document.getElementById('totalServers').value,
+            nodes: document.getElementById('rackValInput').value,
+            cost: document.getElementById('powerCost').value,
+            years: document.getElementById('evalYears').value,
+            util: document.getElementById('utilRate').value,
+            air_pue: document.getElementById('airPue').value,
+            liq_pue: document.getElementById('liqPue').value,
+            air_capex: document.getElementById('airCapex').value,
+            liq_capex: document.getElementById('liqCapex').value
+        };
+        // 深度拷貝結果陣列，避免被覆寫
+        scenario.results = JSON.parse(JSON.stringify(latestCalcData)); 
+    }
+}
+
+// 🚀 渲染情境管理列 UI
+function renderScenarioBar() {
+    const list = document.getElementById('scenarioList');
+    list.innerHTML = '';
+    scenarios.forEach((sc, index) => {
+        const isActive = sc.id === activeScenarioId && !isCompareMode;
+        const baseClass = isActive 
+            ? 'bg-indigo-600 text-white shadow-md border-indigo-700' 
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 border-gray-200 dark:border-gray-600';
+        
+        const deleteBtn = scenarios.length > 1 
+            ? `<span onclick="event.stopPropagation(); deleteScenario('${sc.id}')" class="ml-2 px-1 hover:text-red-400 font-black cursor-pointer rounded transition-colors">&times;</span>` 
+            : '';
+
+        list.innerHTML += `
+            <div onclick="switchScenario('${sc.id}')" ondblclick="renameScenario('${sc.id}')" title="雙擊可重新命名 (Double click to rename)"
+                 class="${baseClass} px-4 py-1.5 rounded-full text-sm font-bold cursor-pointer transition-all flex items-center select-none shrink-0 border">
+                ${sc.name}
+                ${deleteBtn}
+            </div>
+        `;
+    });
+    
+    // 防呆：最多 4 組
+    const addBtn = document.getElementById('btnAddScenario');
+    addBtn.disabled = scenarios.length >= 4;
+    addBtn.style.opacity = scenarios.length >= 4 ? '0.4' : '1';
+    addBtn.style.cursor = scenarios.length >= 4 ? 'not-allowed' : 'pointer';
+    
+    // 防呆：至少 2 組才能比較
+    const compBtn = document.getElementById('btnToggleCompare');
+    compBtn.disabled = scenarios.length < 2;
+}
+
+// 🚀 新增情境 (複製當前參數)
+function addScenario() {
+    if (scenarios.length >= 4) return;
+    const newId = 'sc_' + Date.now();
+    const defaultNames = ['A', 'B', 'C', 'D'];
+    const name = currentLang === 'zh' ? `情境 ${defaultNames[scenarios.length]}` : `Scenario ${defaultNames[scenarios.length]}`;
+    
+    const currentSc = scenarios.find(s => s.id === activeScenarioId);
+    
+    scenarios.push({
+        id: newId,
+        name: name,
+        params: JSON.parse(JSON.stringify(currentSc.params)),
+        results: JSON.parse(JSON.stringify(currentSc.results))
+    });
+    switchScenario(newId);
+}
+
+// 🚀 切換情境 (還原參數至 DOM 並重算)
+function switchScenario(id) {
+    if (isCompareMode) return; // 比較模式下禁止切換底層
+    activeScenarioId = id;
+    const sc = scenarios.find(s => s.id === id);
+    
+    if (sc && sc.params) {
+        document.getElementById('chipType').value = sc.params.chip;
+        document.getElementById('totalServers').value = sc.params.servers;
+        document.getElementById('rackValInput').value = sc.params.nodes;
+        document.getElementById('serversPerRack').value = sc.params.nodes;
+        document.getElementById('powerCost').value = sc.params.cost;
+        document.getElementById('evalYears').value = sc.params.years;
+        document.getElementById('utilRate').value = sc.params.util;
+        document.getElementById('airPue').value = sc.params.air_pue;
+        document.getElementById('liqPue').value = sc.params.liq_pue;
+        document.getElementById('airCapex').value = sc.params.air_capex;
+        document.getElementById('liqCapex').value = sc.params.liq_capex;
+        
+        calculateTCO(); 
+    }
+    renderScenarioBar();
+}
+
+function deleteScenario(id) {
+    if (scenarios.length <= 1) return;
+    scenarios = scenarios.filter(s => s.id !== id);
+    if (activeScenarioId === id) {
+        switchScenario(scenarios[scenarios.length - 1].id);
+    } else {
+        renderScenarioBar();
+    }
+}
+
+function renameScenario(id) {
+    if (isCompareMode) return;
+    const sc = scenarios.find(s => s.id === id);
+    const newName = prompt(currentLang === 'zh' ? "請輸入情境名稱 (上限 15 字)：" : "Enter scenario name (max 15 chars):", sc.name);
+    if (newName && newName.trim() !== '') {
+        sc.name = newName.trim().substring(0, 15);
+        renderScenarioBar();
+    }
+}
+
+// 🚀 雙軌模式切換引擎
+function toggleCompareMode() {
+    if (scenarios.length < 2) return;
+    isCompareMode = !isCompareMode;
+    
+    const singleView = document.getElementById('singleViewSection');
+    const compareView = document.getElementById('compareViewSection');
+    const pdfBtn = document.getElementById('btn-export-pdf');
+    const copyBtn = document.getElementById('btn-copy-link');
+    const scenarioBar = document.getElementById('scenarioBar');
+    
+    if (isCompareMode) {
+        updateActiveScenario();
+        
+        singleView.classList.add('hidden');
+        compareView.classList.remove('hidden');
+        
+        // 鎖死匯出與分享功能
+        pdfBtn.disabled = true;
+        pdfBtn.title = currentLang === 'zh' ? '請退出比較模式再匯出報告' : 'Exit compare mode to export';
+        copyBtn.disabled = true;
+        copyBtn.title = currentLang === 'zh' ? '比較模式不支援網址分享' : 'Sharing disabled in compare mode';
+        
+        scenarioBar.classList.add('opacity-50', 'pointer-events-none');
+        document.getElementById('btnToggleCompare').innerHTML = `🔙 <span id="t-exit-compare" class="ml-1">${currentLang === 'zh' ? '退出比較，返回編輯' : 'Exit Compare'}</span>`;
+        
+        renderCompareGrid();
+    } else {
+        singleView.classList.remove('hidden');
+        compareView.classList.add('hidden');
+        
+        pdfBtn.disabled = false; pdfBtn.title = '';
+        copyBtn.disabled = false; copyBtn.title = '';
+        
+        scenarioBar.classList.remove('opacity-50', 'pointer-events-none');
+        document.getElementById('btnToggleCompare').innerHTML = `📊 <span id="t-compare-mode" class="ml-1">${currentLang === 'zh' ? '進入比較模式' : 'Compare Mode'}</span>`;
+        
+        calculateTCO();
+    }
+    renderScenarioBar(); // 更新 Pill 顏色狀態
+}
+
+// 🚀 比較視圖的動態渲染引擎 (Dynamic Grid & Multi-Charts)
+function renderCompareGrid() {
+    const grid = document.getElementById('compareGrid');
+    grid.innerHTML = '';
+    
+    const cols = scenarios.length;
+    let gridClass = 'grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch';
+    if (cols === 3) gridClass += ' lg:grid-cols-3';
+    if (cols === 4) gridClass += ' lg:grid-cols-4';
+    grid.className = gridClass;
+    
+    // 清理舊的圖表實體避免記憶體流失
+    Object.values(compareChartInstances).forEach(c => c.destroy());
+    compareChartInstances = {};
+    
+    scenarios.forEach(sc => {
+        const res = sc.results;
+        if (!res) return;
+        
+        const isAirWinner = res.totalSavings <= 0;
+        const winnerText = isAirWinner ? (currentLang === 'zh' ? '氣冷' : 'Air') : (currentLang === 'zh' ? '液冷' : 'Liquid');
+        const winnerColor = isAirWinner ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400';
+        const beText = (res.breakevenYear > 0 && res.breakevenYear !== Infinity) ? res.breakevenYear.toFixed(1) + " Yrs" : "N/A";
+        
+        const card = document.createElement('div');
+        card.className = "bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 flex flex-col h-full transform transition hover:-translate-y-1 hover:shadow-lg";
+        card.innerHTML = `
+            <div class="border-b border-gray-100 dark:border-gray-700 pb-3 mb-5">
+                <h3 class="text-xl font-black text-gray-800 dark:text-gray-100 flex items-center justify-between">
+                    <span class="truncate pr-2">${sc.name}</span>
+                    <span class="text-xs font-bold px-2.5 py-1 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 rounded-lg whitespace-nowrap">${res.kwPerRack.toFixed(1)} kW</span>
+                </h3>
+            </div>
+            
+            <div class="flex justify-between items-center mb-6 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                <div class="text-center w-1/3 border-r border-gray-200 dark:border-gray-700">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">${currentLang === 'zh' ? '最佳方案' : 'Best Opt.'}</p>
+                    <p class="text-lg font-black ${winnerColor}">${winnerText}</p>
+                </div>
+                <div class="text-center w-1/3 border-r border-gray-200 dark:border-gray-700 pl-2">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">${currentLang === 'zh' ? '總省下' : 'Savings'}</p>
+                    <p class="text-lg font-black text-green-600">+$${Math.abs(res.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
+                </div>
+                <div class="text-center w-1/3 pl-2">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">${currentLang === 'zh' ? '回本點' : 'Breakeven'}</p>
+                    <p class="text-lg font-black text-purple-600">${beText}</p>
+                </div>
+            </div>
+            
+            <div class="w-full h-[220px] mt-auto relative">
+                <canvas id="compChart_${sc.id}"></canvas>
+            </div>
+        `;
+        grid.appendChild(card);
+        
+        // 延遲繪圖確保 DOM 已掛載
+        setTimeout(() => {
+            const ctx = document.getElementById(`compChart_${sc.id}`).getContext('2d');
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#9ca3af' : '#6b7280';
+            const gridColor = isDark ? '#374151' : '#f3f4f6';
+            
+            compareChartInstances[sc.id] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: res.labels,
+                    datasets: [
+                        { label: 'Air', data: res.airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointRadius: 1, borderWidth: 2 },
+                        { label: 'Liquid', data: res.liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1, pointRadius: 1, borderWidth: 2 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { bodyFont: { size: 12 } } },
+                    scales: { 
+                        x: { ticks: { color: textColor, font: {size: 9}, maxTicksLimit: 3 }, grid: { display: false } }, 
+                        y: { ticks: { color: textColor, maxTicksLimit: 5, font: {size: 9} }, grid: { color: gridColor } } 
+                    }
+                }
+            });
+        }, 100);
+    });
+}
+
 
 function resetParameters() {
     document.getElementById('chipType').value = DEFAULT_PARAMS.chip;
@@ -219,6 +487,9 @@ function calculateTCO() {
 
     drawChart(labels, airData, liqData);
     drawGaugeChart(kwPerRack, gaugeColor); 
+    
+    // 🚀 計算完畢後，將最新資料寫回記憶體陣列
+    updateActiveScenario();
 }
 
 function drawGaugeChart(kwPerRack, color, isPrintMode = false) {
@@ -385,10 +656,7 @@ async function executePDFExport() {
         document.getElementById('pdfGaugeValueText').innerText = d.kwPerRack.toFixed(1) + " kW"; document.getElementById('pdfGaugeValueText').style.color = d.gaugeColor; document.getElementById('pdfGaugeStatusText').innerText = d.gaugeStatusText; document.getElementById('pdfGaugeStatusText').style.color = d.gaugeColor;
 
         drawGaugeChart(d.kwPerRack, d.gaugeColor, true); drawChart(d.labels, d.airData, d.liqData, true);
-        
-        // 🚀 關鍵修復：給予瀏覽器 400ms 的強制等待期，確保圖表與文字已在 DOM 中完全撐開
         await new Promise(r => setTimeout(r, 400));
-        
         document.getElementById('pdfGaugeImg').src = gaugeChartInstance.toBase64Image(); document.getElementById('pdfLineImg').src = tcoChartInstance.toBase64Image();
         drawGaugeChart(d.kwPerRack, d.gaugeColor, false); drawChart(d.labels, d.airData, d.liqData, false);
 
@@ -407,7 +675,6 @@ async function executePDFExport() {
         document.getElementById('pdfUrl').innerText = cleanBaseUrl + linkTextSuffix; 
         document.getElementById('pdfUrl').href = urlObj.toString(); 
 
-        // 再給一點點緩衝確保字體載入
         await new Promise(r => setTimeout(r, 100));
 
         const canvas = await html2canvas(document.getElementById('pdfTemplate'), { scale: 2, useCORS: true, backgroundColor: '#f8fafc' });
