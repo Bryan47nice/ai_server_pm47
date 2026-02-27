@@ -98,8 +98,7 @@
         <div id="wrapper-tco" class="hidden">
             
             <div id="scenarioBar" class="mb-6 flex flex-wrap items-center justify-between gap-4 bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-opacity duration-300">
-                <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0" id="scenarioList">
-                    </div>
+                <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0" id="scenarioList"></div>
                 <div class="flex gap-2 shrink-0">
                     <button onclick="addScenario()" id="btnAddScenario" class="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-bold transition flex items-center shadow-sm">
                         ➕ <span id="t-add-scenario" class="ml-1">新增情境</span>
@@ -241,24 +240,38 @@
                         <h3 class="text-xl font-black text-indigo-900 dark:text-indigo-300" id="t-compare-title">📊 決策面板：多情境並排比較</h3>
                         <p class="text-sm text-indigo-600 dark:text-indigo-400 mt-1" id="t-compare-subtitle">橫向比對不同建置參數下的投資報酬率與最佳散熱策略。</p>
                     </div>
-                    <button onclick="toggleCompareMode()" class="px-5 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold shadow-md hover:bg-indigo-500 transition flex items-center shrink-0">
-                        🔙 <span id="t-exit-compare" class="ml-1">退出比較，返回編輯</span>
-                    </button>
+                    <div class="flex gap-3 shrink-0 capture-hide">
+                        <button id="btn-export-png" onclick="exportComparePNG()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-bold shadow-md transition flex items-center shrink-0">
+                            📸 <span id="t-export-png" class="ml-1">匯出比較圖卡</span>
+                        </button>
+                        <button onclick="toggleCompareMode()" class="px-4 py-2 bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-gray-600 rounded-lg text-sm font-bold shadow-sm hover:bg-indigo-50 dark:hover:bg-gray-600 transition flex items-center shrink-0">
+                            🔙 <span id="t-exit-compare" class="ml-1">退出比較</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div id="compareGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch"></div>
                 
-                <div class="mt-6 flex justify-end print:hidden">
+                <div class="mt-6 flex justify-end print:hidden capture-hide">
                     <button onclick="generateCompareReport()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 rounded-xl shadow-md transition-colors font-bold text-sm md:text-base flex items-center group">
                         🪄 <span id="t-btn-gen-compare-report" class="ml-2 group-hover:tracking-wider transition-all">產出跨方案 AI 決策報告</span>
                     </button>
                 </div>
                 
-                <div id="compareReportSection" class="hidden mt-4 card bg-gradient-to-br from-indigo-50 to-white dark:from-gray-800 dark:to-gray-900 border border-indigo-200 dark:border-indigo-800">
+                <div id="compareReportSection" class="hidden mt-4 card bg-gradient-to-br from-indigo-50 to-white dark:from-gray-800 dark:to-gray-900 border border-indigo-200 dark:border-indigo-800 relative overflow-hidden">
+                    
+                    <div id="compareReportOutdated" class="hidden absolute inset-0 bg-white/80 dark:bg-gray-900/90 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-xl">
+                        <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-xl border dark:border-gray-700 text-center">
+                            <p id="t-compare-outdated-text" class="text-red-500 dark:text-red-400 font-bold mb-4">⚠️ 參數已變更，決策報告已過時</p>
+                            <button onclick="generateCompareReport()" class="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-500 text-sm font-bold w-full transition"><span id="t-compare-regen-btn">🔄 重新分析最新決策</span></button>
+                        </div>
+                    </div>
+
                     <div id="compareReportLoading" class="hidden flex flex-col items-center justify-center py-8">
                         <svg class="animate-spin h-8 w-8 text-indigo-500 mb-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
                         <p class="text-indigo-600 dark:text-indigo-400 font-bold animate-pulse text-sm">⏳ AI 正在分析各方案優劣，為您總結最佳決策...</p>
                     </div>
+                    
                     <div id="compareReportSuccess" class="hidden">
                         <div class="flex items-center text-indigo-800 dark:text-indigo-400 font-bold text-lg md:text-xl border-b border-indigo-200 dark:border-indigo-800 pb-2 mb-4">
                             <span id="t-compare-report-title">💡 跨方案決策建議 (Executive Summary)</span>
@@ -286,6 +299,28 @@
                         <div><h3 id="t-c1-new-h" class="text-blue-600 dark:text-blue-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3><p id="t-c1-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Roadmap ➔ NPI ➔ MP</p><p id="t-c1-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">擬定符合市場需求的產品規格發展，並與 RD 合作掌控 NPI 研發時程。</p></div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="exportPromptModal" class="fixed inset-0 bg-black/60 z-[120] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md border dark:border-gray-700 overflow-hidden transform transition-transform">
+            <div class="p-6 bg-indigo-50 dark:bg-indigo-900/30 border-b border-indigo-100 dark:border-gray-700">
+                <h3 class="text-lg font-bold flex items-center text-indigo-900 dark:text-indigo-200 mb-2">
+                    <span id="t-export-prompt-title">💡 溫馨提示</span>
+                </h3>
+                <p class="text-sm text-indigo-700 dark:text-indigo-300 font-medium" id="t-export-prompt-desc">您尚未產出 / 更新 AI 跨方案決策報告。建議您附上高階總結，讓這份截圖更有說服力。</p>
+            </div>
+            <div class="bg-white dark:bg-gray-900 p-5 flex flex-col space-y-3">
+                <button onclick="generateAndExportCompare()" class="w-full py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 font-bold shadow-md transition flex items-center justify-center group">
+                    <span id="t-btn-gen-export">🪄 產出報告並匯出</span>
+                </button>
+                <button onclick="forceExportCompare()" class="w-full py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 font-bold transition">
+                    <span id="t-btn-force-export">直接匯出當前畫面</span>
+                </button>
+                <button onclick="closeExportPrompt()" class="w-full py-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm font-medium transition underline mt-1">
+                    <span id="t-btn-cancel-prompt">取消</span>
+                </button>
             </div>
         </div>
     </div>
@@ -379,23 +414,26 @@
             
             document.getElementById('t-add-scenario').innerText = currentLang === 'zh' ? '新增情境' : 'Add Scenario';
             if(document.getElementById('t-compare-mode')) document.getElementById('t-compare-mode').innerText = currentLang === 'zh' ? '進入比較模式' : 'Compare Mode';
-            if(document.getElementById('t-exit-compare')) document.getElementById('t-exit-compare').innerText = currentLang === 'zh' ? '退出比較，返回編輯' : 'Exit Compare';
+            if(document.getElementById('t-exit-compare')) document.getElementById('t-exit-compare').innerText = currentLang === 'zh' ? '退出比較' : 'Exit Compare';
             document.getElementById('t-compare-title').innerText = currentLang === 'zh' ? '📊 決策面板：多情境並排比較' : '📊 Decision Board: Scenario Comparison';
             document.getElementById('t-compare-subtitle').innerText = currentLang === 'zh' ? '橫向比對不同建置參數下的投資報酬率與最佳散熱策略。' : 'Side-by-side ROI and cooling strategy comparison across different configs.';
             
-            // 🚀 比較模式說帖按鈕雙語
-            if(document.getElementById('t-btn-gen-compare-report')) {
-                document.getElementById('t-btn-gen-compare-report').innerText = currentLang === 'zh' ? '產出跨方案 AI 決策報告' : 'Generate AI Executive Summary';
-            }
-            if(document.getElementById('t-compare-report-title')) {
-                document.getElementById('t-compare-report-title').innerText = currentLang === 'zh' ? '💡 跨方案決策建議 (Executive Summary)' : '💡 AI Executive Summary';
-            }
+            if(document.getElementById('t-btn-gen-compare-report')) document.getElementById('t-btn-gen-compare-report').innerText = currentLang === 'zh' ? '產出跨方案 AI 決策報告' : 'Generate AI Executive Summary';
+            if(document.getElementById('t-compare-report-title')) document.getElementById('t-compare-report-title').innerText = currentLang === 'zh' ? '💡 跨方案決策建議 (Executive Summary)' : '💡 AI Executive Summary';
+            
+            // 🚀 多語系：防呆彈窗與過期文字
+            if(document.getElementById('t-export-png')) document.getElementById('t-export-png').innerText = currentLang === 'zh' ? '匯出比較圖卡' : 'Export PNG';
+            if(document.getElementById('t-export-prompt-title')) document.getElementById('t-export-prompt-title').innerText = currentLang === 'zh' ? '💡 溫馨提示' : '💡 Quick Tip';
+            if(document.getElementById('t-export-prompt-desc')) document.getElementById('t-export-prompt-desc').innerText = currentLang === 'zh' ? '您尚未產出 / 更新 AI 跨方案決策報告。建議您附上高階總結，讓這份截圖更有說服力。' : 'Decision report is missing or outdated. Add an executive summary to make this comparison more persuasive.';
+            if(document.getElementById('t-btn-gen-export')) document.getElementById('t-btn-gen-export').innerText = currentLang === 'zh' ? '🪄 產出報告並匯出' : 'Generate & Export';
+            if(document.getElementById('t-btn-force-export')) document.getElementById('t-btn-force-export').innerText = currentLang === 'zh' ? '直接匯出當前畫面' : 'Export As Is';
+            if(document.getElementById('t-btn-cancel-prompt')) document.getElementById('t-btn-cancel-prompt').innerText = currentLang === 'zh' ? '取消' : 'Cancel';
+            if(document.getElementById('t-compare-outdated-text')) document.getElementById('t-compare-outdated-text').innerText = currentLang === 'zh' ? '⚠️ 參數已變更，決策報告已過時' : '⚠️ Parameters changed. Report outdated.';
+            if(document.getElementById('t-compare-regen-btn')) document.getElementById('t-compare-regen-btn').innerText = currentLang === 'zh' ? '🔄 重新分析最新決策' : '🔄 Analyze Latest Scenarios';
 
             if(typeof renderScenarioBar === "function") renderScenarioBar();
             if(typeof renderCompareGrid === "function" && document.getElementById('compareViewSection') && !document.getElementById('compareViewSection').classList.contains('hidden')) {
                 renderCompareGrid();
-                // 若有比較報告，清空強制重算
-                document.getElementById('compareReportSuccess').classList.add('hidden');
             }
 
             if(typeof calculateTCO === "function") calculateTCO();
