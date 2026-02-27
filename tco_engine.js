@@ -64,8 +64,6 @@ function loadStateFromURL() {
     setVal('liqPue', 'liq_pue', DEFAULT_PARAMS.liq_pue, true);
     setVal('airCapex', 'air_capex', DEFAULT_PARAMS.air_capex, true);
     setVal('liqCapex', 'liq_capex', DEFAULT_PARAMS.liq_capex, true);
-    
-    // UI Report State is handled in window.onload
 }
 
 const syncToURL = () => {
@@ -81,8 +79,6 @@ const syncToURL = () => {
     url.searchParams.set('liq_pue', document.getElementById('liqPue').value);
     url.searchParams.set('air_capex', document.getElementById('airCapex').value);
     url.searchParams.set('liq_capex', document.getElementById('liqCapex').value);
-    
-    // 🚀 將「報告是否已生成」的 UI 狀態寫入網址
     url.searchParams.set('report', isReportGenerated ? '1' : '0');
     
     window.history.replaceState({}, '', url);
@@ -143,11 +139,8 @@ function calculateTCO() {
     const liqCapExPerRack = parseFloat(document.getElementById('liqCapex').value);
 
     debouncedSyncToURL();
-
     reportCache = { zh: null, en: null };
-    if (isReportGenerated) {
-        document.getElementById('reportStateOutdated').classList.remove('hidden');
-    }
+    if (isReportGenerated) document.getElementById('reportStateOutdated').classList.remove('hidden');
 
     const kwPerRack = serversPerRack * chipPower;
     const totalRacks = Math.ceil(totalServers / serversPerRack);
@@ -164,7 +157,6 @@ function calculateTCO() {
     const airOpExPerYear = totalKw * airPUE * utilRate * hoursPerYear * powerCost;
     const liqOpExPerYear = totalKw * liqPUE * utilRate * hoursPerYear * powerCost;
 
-    // 🚀 新增：ESG 減碳基礎資料計算 (1度電 = 0.5kg CO2)
     const airTotalKwh = totalKw * airPUE * utilRate * hoursPerYear * evalYears;
     const liqTotalKwh = totalKw * liqPUE * utilRate * hoursPerYear * evalYears;
     const co2SavedTons = Math.abs(airTotalKwh - liqTotalKwh) * 0.5 / 1000;
@@ -251,7 +243,6 @@ function renderReportFromData(data) {
     document.getElementById('reportContentRisk').innerText = data.risk;
 }
 
-// 🚀 產生強化的核彈級業務教戰手冊
 function generateSalesReport() {
     const section = document.getElementById('salesReportSection');
     const outdated = document.getElementById('reportStateOutdated');
@@ -259,8 +250,7 @@ function generateSalesReport() {
     const error = document.getElementById('reportStateError');
     const success = document.getElementById('reportStateSuccess');
 
-    section.classList.remove('hidden');
-    outdated.classList.add('hidden');
+    section.classList.remove('hidden'); outdated.classList.add('hidden');
 
     if (reportCache[currentLang]) {
         renderReportFromData(reportCache[currentLang]);
@@ -304,22 +294,15 @@ function generateSalesReport() {
                 : `Compared to the alternative, saves approx.\n🌍 ${d.co2SavedTons.toLocaleString(undefined, {maximumFractionDigits: 1})} Tons of CO2\nover ${d.evalYears} years.`;
 
             const generatedData = { pitch, obj, roi, esg, risk };
-            reportCache[currentLang] = generatedData;
-            renderReportFromData(generatedData);
-
+            reportCache[currentLang] = generatedData; renderReportFromData(generatedData);
             loading.classList.add('hidden'); success.classList.remove('hidden');
             isReportGenerated = true; syncToURL();
-
-        } catch (e) {
-            loading.classList.add('hidden'); error.classList.remove('hidden'); console.error("Report Generation Failed:", e);
-        }
+        } catch (e) { loading.classList.add('hidden'); error.classList.remove('hidden'); console.error(e); }
     }, 800);
 }
 
 function openDrilldownModal(dataIndex, labelStr) {
-    const d = latestCalcData;
-    let actualYear = dataIndex; if (dataIndex === d.labelsCount - 1 && d.evalYears % 1 !== 0) { actualYear = d.evalYears; }
-    
+    const d = latestCalcData; let actualYear = dataIndex; if (dataIndex === d.labelsCount - 1 && d.evalYears % 1 !== 0) { actualYear = d.evalYears; }
     document.getElementById('modalYearLabel').innerText = (currentLang === 'zh' ? '成本結構拆解：' : 'Cost Breakdown: ') + labelStr;
     const airOpex = d.airOpExPerYear * actualYear; const airTotal = d.totalAirCapEx + airOpex;
     document.getElementById('airCapexDetail').innerText = `${d.totalRacks} Racks × $${d.airCapExPerRack.toLocaleString()}`;
@@ -337,29 +320,17 @@ function openDrilldownModal(dataIndex, labelStr) {
     if (airTotal < liqTotal) { winnerText = currentLang === 'zh' ? `🏆 氣冷勝出 (節省 $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})` : `🏆 Air Wins (Save $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})`; document.getElementById('modalDiff').className = "bg-blue-100 dark:bg-blue-900/40 p-4 text-center text-lg font-bold text-blue-800 dark:text-blue-300 border-t border-blue-200 dark:border-blue-800"; } 
     else if (liqTotal < airTotal) { winnerText = currentLang === 'zh' ? `🏆 液冷勝出 (節省 $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})` : `🏆 Liquid Wins (Save $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})`; document.getElementById('modalDiff').className = "bg-red-100 dark:bg-red-900/40 p-4 text-center text-lg font-bold text-red-800 dark:text-red-300 border-t border-red-200 dark:border-red-800"; } 
     else { winnerText = currentLang === 'zh' ? "⚖️ 成本平手" : "⚖️ Break-even Point"; document.getElementById('modalDiff').className = "bg-gray-100 dark:bg-gray-900 p-4 text-center text-lg font-bold text-gray-800 dark:text-gray-100 border-t dark:border-gray-700"; }
-    document.getElementById('modalDiff').innerText = winnerText;
-    document.getElementById('drilldownModal').classList.remove('hidden');
+    document.getElementById('modalDiff').innerText = winnerText; document.getElementById('drilldownModal').classList.remove('hidden');
 }
 
 function drawChart(labels, airData, liqData, isPrintMode = false) {
-    const ctx = document.getElementById('tcoChart').getContext('2d');
-    const isDark = document.documentElement.classList.contains('dark');
-    const textColor = isPrintMode ? '#0f172a' : (isDark ? '#e5e7eb' : '#374151');
-    const gridColor = isPrintMode ? '#e2e8f0' : (isDark ? '#374151' : '#e5e7eb');
-    
+    const ctx = document.getElementById('tcoChart').getContext('2d'); const isDark = document.documentElement.classList.contains('dark');
+    const textColor = isPrintMode ? '#0f172a' : (isDark ? '#e5e7eb' : '#374151'); const gridColor = isPrintMode ? '#e2e8f0' : (isDark ? '#374151' : '#e5e7eb');
     if (tcoChartInstance) tcoChartInstance.destroy();
     tcoChartInstance = new Chart(ctx, {
         type: 'line',
-        data: { labels: labels, datasets: [
-                { label: currentLang === 'zh' ? '氣冷累積成本 (Air)' : 'Air Cooling TCO', data: airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 },
-                { label: currentLang === 'zh' ? '液冷累積成本 (Liquid)' : 'Liquid Cooling TCO', data: liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 }
-            ] },
-        options: { 
-            responsive: true, maintainAspectRatio: false, animation: isPrintMode ? false : true,
-            onClick: (event) => { if (isPrintMode) return; const points = tcoChartInstance.getElementsAtEventForMode(event, 'index', { intersect: false }, true); if (points.length) openDrilldownModal(points[0].index, labels[points[0].index]); },
-            interaction: { mode: 'index', intersect: false }, plugins: { legend: { labels: { color: textColor } }, tooltip: { enabled: !isPrintMode, bodyFont: { size: 14 } } },
-            scales: { x: { ticks: { color: textColor }, grid: { color: gridColor } }, y: { ticks: { color: textColor }, grid: { color: gridColor }, title: { display: true, text: 'USD ($)', color: textColor } } } 
-        }
+        data: { labels: labels, datasets: [ { label: currentLang === 'zh' ? '氣冷累積成本 (Air)' : 'Air Cooling TCO', data: airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 }, { label: currentLang === 'zh' ? '液冷累積成本 (Liquid)' : 'Liquid Cooling TCO', data: liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 } ] },
+        options: { responsive: true, maintainAspectRatio: false, animation: isPrintMode ? false : true, onClick: (event) => { if (isPrintMode) return; const points = tcoChartInstance.getElementsAtEventForMode(event, 'index', { intersect: false }, true); if (points.length) openDrilldownModal(points[0].index, labels[points[0].index]); }, interaction: { mode: 'index', intersect: false }, plugins: { legend: { labels: { color: textColor } }, tooltip: { enabled: !isPrintMode, bodyFont: { size: 14 } } }, scales: { x: { ticks: { color: textColor }, grid: { color: gridColor } }, y: { ticks: { color: textColor }, grid: { color: gridColor }, title: { display: true, text: 'USD ($)', color: textColor } } } }
     });
 }
 
@@ -370,17 +341,15 @@ function openExportModal() {
 }
 function closeExportModal() { document.getElementById('exportModal').classList.add('hidden'); }
 
-// 🚀 執行 PDF 匯出 (包含全新四層瀑布流資料綁定)
 async function executePDFExport() {
     const btn = document.getElementById('btn-confirm-export'); const originalHtml = btn.innerHTML; const isZh = currentLang === 'zh';
     let userFilename = document.getElementById('exportFilename').value.trim() || "TCO_Report";
     btn.innerHTML = `⏳ <span class="ml-1">${isZh ? '產出中...' : 'Generating...'}</span>`; btn.disabled = true;
 
     try {
-        if (!window.jspdf || !window.html2canvas) { alert(isZh ? "PDF 套件載入中，請稍後再試。" : "PDF loading, please try again."); return; }
+        if (!window.jspdf || !window.html2canvas) { alert(isZh ? "PDF 套件載入中，請稍後再試。" : "PDF loading..."); return; }
         const d = latestCalcData; const chipName = document.getElementById('chipType').options[document.getElementById('chipType').selectedIndex].text;
 
-        // I18N
         document.getElementById('pdfMainTitle').innerText = isZh ? 'AI 伺服器 TCO 分析報告' : 'AI Server TCO Analysis Report';
         document.getElementById('pdfDate').innerText = (isZh ? '報告生成日期：' : 'Generated on: ') + new Date().toLocaleDateString();
         document.getElementById('pdfSubtitle').innerText = isZh ? '由 TCO 運算引擎 V2 產生' : 'Generated by TCO Engine V2';
@@ -394,7 +363,6 @@ async function executePDFExport() {
         document.getElementById('pdfESGTitle').innerHTML = isZh ? '🌱 ESG 減碳效益' : '🌱 ESG & Carbon';
         document.getElementById('pdfRiskTitle').innerHTML = isZh ? '⏱️ 建置風險與時程' : '⏱️ Deployment Risk';
         document.getElementById('pdfCopyright').innerText = isZh ? '版權所有 © 2026 Bryan Jhuang. 專為 AI 伺服器 PM 概念驗證設計。' : 'Copyright © 2026 Bryan Jhuang. Designed for AI Server PM PoC.';
-        document.getElementById('pdfDashboardLinkText').innerText = isZh ? '完整互動式儀表板請見：' : 'Interactive Dashboard available at:';
 
         document.getElementById('pdfParams').innerHTML = `
             <div class="flex flex-col border-r border-gray-100 pr-2"><span class="text-slate-500 font-medium">${isZh ? 'AI 伺服器型號' : 'Chip Model'}</span> <b class="text-slate-800">${chipName}</b></div>
@@ -409,50 +377,34 @@ async function executePDFExport() {
 
         const isAirWinner = d.totalSavings <= 0; const bestOpt = isAirWinner ? (isZh ? '傳統氣冷方案 (Air)' : 'Air Cooling') : (isZh ? '強制液冷方案 (Liquid)' : 'Liquid Cooling');
         document.getElementById('pdfWinnerBoard').innerHTML = `
-            <div class="text-center border-r border-indigo-100 pr-6 w-1/3">
-                <h3 class="text-sm font-bold text-indigo-900 tracking-wide">${isZh ? '👑 最佳 TCO 散熱方案' : '👑 Best TCO Solution'}</h3>
-                <p class="text-2xl font-black mt-1 ${isAirWinner ? 'text-blue-600' : 'text-red-600'}">${bestOpt}</p>
-            </div>
-            <div class="text-center border-r border-indigo-100 px-6 w-1/3">
-                <p class="text-xs text-slate-500 uppercase tracking-wider font-bold">${isZh ? '5年總節省成本' : 'Total Savings'}</p>
-                <p class="text-2xl font-black text-green-600 mt-1">+$${Math.abs(d.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
-            </div>
-            <div class="text-center pl-6 w-1/3">
-                <p class="text-xs text-slate-500 uppercase tracking-wider font-bold">${isZh ? '黃金交叉回本點' : 'Breakeven Point'}</p>
-                <p class="text-2xl font-black text-purple-600 mt-1">${d.breakevenYear > 0 && d.breakevenYear !== Infinity ? d.breakevenYear.toFixed(1) + ' Yrs' : 'N/A'}</p>
-            </div>
+            <div class="text-center border-r border-indigo-100 pr-6 w-1/3"><h3 class="text-sm font-bold text-indigo-900 tracking-wide">${isZh ? '👑 最佳 TCO 散熱方案' : '👑 Best TCO Solution'}</h3><p class="text-2xl font-black mt-1 ${isAirWinner ? 'text-blue-600' : 'text-red-600'}">${bestOpt}</p></div>
+            <div class="text-center border-r border-indigo-100 px-6 w-1/3"><p class="text-xs text-slate-500 uppercase tracking-wider font-bold">${isZh ? '5年總節省成本' : 'Total Savings'}</p><p class="text-2xl font-black text-green-600 mt-1">+$${Math.abs(d.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})}</p></div>
+            <div class="text-center pl-6 w-1/3"><p class="text-xs text-slate-500 uppercase tracking-wider font-bold">${isZh ? '黃金交叉回本點' : 'Breakeven Point'}</p><p class="text-2xl font-black text-purple-600 mt-1">${d.breakevenYear > 0 && d.breakevenYear !== Infinity ? d.breakevenYear.toFixed(1) + ' Yrs' : 'N/A'}</p></div>
         `;
 
-        document.getElementById('pdfGaugeValueText').innerText = d.kwPerRack.toFixed(1) + " kW";
-        document.getElementById('pdfGaugeValueText').style.color = d.gaugeColor;
-        document.getElementById('pdfGaugeStatusText').innerText = d.gaugeStatusText;
-        document.getElementById('pdfGaugeStatusText').style.color = d.gaugeColor;
+        document.getElementById('pdfGaugeValueText').innerText = d.kwPerRack.toFixed(1) + " kW"; document.getElementById('pdfGaugeValueText').style.color = d.gaugeColor; document.getElementById('pdfGaugeStatusText').innerText = d.gaugeStatusText; document.getElementById('pdfGaugeStatusText').style.color = d.gaugeColor;
 
         drawGaugeChart(d.kwPerRack, d.gaugeColor, true); drawChart(d.labels, d.airData, d.liqData, true);
         await new Promise(r => setTimeout(r, 150));
-        document.getElementById('pdfGaugeImg').src = gaugeChartInstance.toBase64Image();
-        document.getElementById('pdfLineImg').src = tcoChartInstance.toBase64Image();
+        document.getElementById('pdfGaugeImg').src = gaugeChartInstance.toBase64Image(); document.getElementById('pdfLineImg').src = tcoChartInstance.toBase64Image();
         drawGaugeChart(d.kwPerRack, d.gaugeColor, false); drawChart(d.labels, d.airData, d.liqData, false);
 
-        // 綁定報告四層內容
-        const reportContent = document.getElementById('pdfReportContent');
-        const noReportMsg = document.getElementById('pdfNoReportMsg');
-        
+        const reportContent = document.getElementById('pdfReportContent'); const noReportMsg = document.getElementById('pdfNoReportMsg');
         if (isReportGenerated && reportCache[currentLang]) {
-            document.getElementById('pdfPitchText').innerText = reportCache[currentLang].pitch;
-            document.getElementById('pdfObjText').innerText = reportCache[currentLang].obj;
-            document.getElementById('pdfROIText').innerText = reportCache[currentLang].roi;
-            document.getElementById('pdfESGText').innerText = reportCache[currentLang].esg;
-            document.getElementById('pdfRiskText').innerText = reportCache[currentLang].risk;
+            document.getElementById('pdfPitchText').innerText = reportCache[currentLang].pitch; document.getElementById('pdfObjText').innerText = reportCache[currentLang].obj; document.getElementById('pdfROIText').innerText = reportCache[currentLang].roi; document.getElementById('pdfESGText').innerText = reportCache[currentLang].esg; document.getElementById('pdfRiskText').innerText = reportCache[currentLang].risk;
             reportContent.classList.remove('hidden'); noReportMsg.classList.add('hidden');
         } else {
-            reportContent.classList.add('hidden'); noReportMsg.classList.remove('hidden');
-            noReportMsg.innerText = isZh ? '(尚未生成業務教戰手冊，請於系統中點擊產出)' : '(Sales report not generated. Please generate it in the dashboard.)';
+            reportContent.classList.add('hidden'); noReportMsg.classList.remove('hidden'); noReportMsg.innerText = isZh ? '(尚未生成業務教戰手冊，請於系統中點擊產出)' : '(Sales report not generated. Please generate it in the dashboard.)';
         }
 
         syncToURL(); 
         const urlObj = new URL(window.location.href); urlObj.searchParams.set('tab', 'tco'); 
-        document.getElementById('pdfUrl').innerText = urlObj.toString(); document.getElementById('pdfUrl').href = urlObj.toString();
+        
+        // 🚀 將 PDF 頁尾 URL 改為視覺俐落的短網址遮罩，但保有原本強大的參數底層連結
+        const cleanBaseUrl = urlObj.hostname + urlObj.pathname;
+        const linkTextSuffix = isZh ? " (內含動態參數設定)" : " (Dynamic parameters included)";
+        document.getElementById('pdfUrl').innerText = cleanBaseUrl + linkTextSuffix; 
+        document.getElementById('pdfUrl').href = urlObj.toString(); 
 
         const canvas = await html2canvas(document.getElementById('pdfTemplate'), { scale: 2, useCORS: true, backgroundColor: '#f8fafc' });
         const { jsPDF } = window.jspdf; const pdf = new jsPDF('p', 'mm', 'a4');
