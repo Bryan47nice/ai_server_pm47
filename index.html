@@ -442,7 +442,6 @@
             </div>
 
             <div class="p-10 grid grid-cols-12 gap-8 flex-grow">
-                
                 <div class="col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 h-fit">
                     <h2 class="text-lg font-bold border-b border-gray-100 pb-3 mb-4 text-slate-800 flex items-center">⚙️ Configuration</h2>
                     <div class="flex flex-col gap-4 text-sm text-slate-600" id="pdfParams"></div>
@@ -453,11 +452,17 @@
 
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                         <h2 class="text-lg font-bold border-b border-gray-100 pb-3 mb-6 text-slate-800 flex items-center">📊 Visualizations (Gauge & Trend)</h2>
-                        <div class="flex flex-col gap-6">
-                            <div class="flex justify-center h-[200px]">
-                                <img id="pdfGaugeImg" src="" class="h-full object-contain" />
+                        <div class="flex flex-col gap-4">
+                            <div class="flex flex-col items-center -mt-2">
+                                <div class="flex justify-center h-[100px] overflow-hidden">
+                                    <img id="pdfGaugeImg" src="" class="h-full object-cover object-bottom" />
+                                </div>
+                                <div class="text-center mt-1">
+                                    <span id="pdfGaugeValueText" class="text-2xl font-black leading-none tracking-tight block"></span>
+                                    <span id="pdfGaugeStatusText" class="text-sm font-bold tracking-wide block mt-1"></span>
+                                </div>
                             </div>
-                            <div class="w-full h-[320px]">
+                            <div class="w-full h-[280px]">
                                 <img id="pdfLineImg" src="" class="w-full h-full object-contain" />
                             </div>
                         </div>
