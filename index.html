@@ -386,56 +386,30 @@
     </div>
 
     <script>
+        // UI Helpers
         function updateInputFromSlider() { document.getElementById('rackValInput').value = document.getElementById('serversPerRack').value; }
         function updateSliderFromInput() { let val = parseInt(document.getElementById('rackValInput').value); if(isNaN(val) || val < 10) val = 10; if(val > 72) val = 72; document.getElementById('rackValInput').value = val; document.getElementById('serversPerRack').value = val; }
         function formatYearsInput(el) { let val = parseFloat(el.value); if(isNaN(val) || val < 1) val = 1; el.value = val.toFixed(1); }
         function formatUtilInput(el) { let val = parseInt(el.value); if(isNaN(val) || val < 1) val = 1; if(val > 100) val = 100; el.value = val; }
 
+        // 🚀 經過深度瘦身、極度優雅的多語系切換引擎
         function toggleLanguage() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             document.getElementById('langBtnText').innerText = currentLang === 'zh' ? 'EN' : '中文';
-            if(typeof dict !== 'undefined' && dict[currentLang]) { for (const key in dict[currentLang]) { const el = document.getElementById(key); if (el) { el.innerHTML = dict[currentLang][key]; } } }
             
-            document.getElementById('t-chart-hint').innerText = currentLang === 'zh' ? '點擊圖表節點查看算式細節' : 'Click chart nodes for math details';
-            document.getElementById('t-modal-air').innerText = currentLang === 'zh' ? '氣冷方案 (Air Cooling)' : 'Air Cooling';
-            document.getElementById('t-modal-liq').innerText = currentLang === 'zh' ? '液冷方案 (DLC)' : 'Liquid Cooling';
-            document.getElementById('t-modal-capex-label-air').innerText = currentLang === 'zh' ? '一次性建置成本 (CapEx)' : 'Upfront CapEx';
-            document.getElementById('t-modal-capex-label-liq').innerText = currentLang === 'zh' ? '一次性建置成本 (CapEx)' : 'Upfront CapEx';
-            document.getElementById('t-modal-opex-label-air').innerText = currentLang === 'zh' ? '累計營運成本 (OpEx)' : 'Cumulative OpEx';
-            document.getElementById('t-modal-opex-label-liq').innerText = currentLang === 'zh' ? '累計營運成本 (OpEx)' : 'Cumulative OpEx';
-            document.getElementById('t-modal-total-air').innerText = currentLang === 'zh' ? '該年度累積總成本' : 'Total Cumulative Cost';
-            document.getElementById('t-modal-total-liq').innerText = currentLang === 'zh' ? '該年度累積總成本' : 'Total Cumulative Cost';
-            document.getElementById('t-copy-link').innerText = currentLang === 'zh' ? '複製連結' : 'Copy Link';
-            document.getElementById('t-reset').innerText = currentLang === 'zh' ? '還原預設' : 'Reset Defaults';
+            // 全自動字典檔對映渲染
+            if(typeof dict !== 'undefined' && dict[currentLang]) { 
+                for (const key in dict[currentLang]) { 
+                    const el = document.getElementById(key); 
+                    if (el) { el.innerHTML = dict[currentLang][key]; } 
+                } 
+            }
             
-            document.getElementById('t-report-roi').innerText = currentLang === 'zh' ? '💰 財務亮點 (ROI Highlight)' : '💰 ROI Highlight';
-            document.getElementById('t-report-esg').innerText = currentLang === 'zh' ? '🌱 ESG 減碳效益 (Sustainability)' : '🌱 Sustainability & ESG';
-            document.getElementById('t-report-risk').innerText = currentLang === 'zh' ? '⏱️ 建置風險與時程 (Deployment Risk)' : '⏱️ Deployment Risk';
-            
-            document.getElementById('t-add-scenario').innerText = currentLang === 'zh' ? '新增情境' : 'Add Scenario';
-            if(document.getElementById('t-compare-mode')) document.getElementById('t-compare-mode').innerText = currentLang === 'zh' ? '進入比較模式' : 'Compare Mode';
-            if(document.getElementById('t-exit-compare')) document.getElementById('t-exit-compare').innerText = currentLang === 'zh' ? '退出比較' : 'Exit Compare';
-            document.getElementById('t-compare-title').innerText = currentLang === 'zh' ? '📊 決策面板：多情境並排比較' : '📊 Decision Board: Scenario Comparison';
-            document.getElementById('t-compare-subtitle').innerText = currentLang === 'zh' ? '橫向比對不同建置參數下的投資報酬率與最佳散熱策略。' : 'Side-by-side ROI and cooling strategy comparison across different configs.';
-            
-            if(document.getElementById('t-btn-gen-compare-report')) document.getElementById('t-btn-gen-compare-report').innerText = currentLang === 'zh' ? '產出跨方案 AI 決策報告' : 'Generate AI Executive Summary';
-            if(document.getElementById('t-compare-report-title')) document.getElementById('t-compare-report-title').innerText = currentLang === 'zh' ? '💡 跨方案決策建議 (Executive Summary)' : '💡 AI Executive Summary';
-            
-            // 🚀 多語系：防呆彈窗與過期文字
-            if(document.getElementById('t-export-png')) document.getElementById('t-export-png').innerText = currentLang === 'zh' ? '匯出比較圖卡' : 'Export PNG';
-            if(document.getElementById('t-export-prompt-title')) document.getElementById('t-export-prompt-title').innerText = currentLang === 'zh' ? '💡 溫馨提示' : '💡 Quick Tip';
-            if(document.getElementById('t-export-prompt-desc')) document.getElementById('t-export-prompt-desc').innerText = currentLang === 'zh' ? '您尚未產出 / 更新 AI 跨方案決策報告。建議您附上高階總結，讓這份截圖更有說服力。' : 'Decision report is missing or outdated. Add an executive summary to make this comparison more persuasive.';
-            if(document.getElementById('t-btn-gen-export')) document.getElementById('t-btn-gen-export').innerText = currentLang === 'zh' ? '🪄 產出報告並匯出' : 'Generate & Export';
-            if(document.getElementById('t-btn-force-export')) document.getElementById('t-btn-force-export').innerText = currentLang === 'zh' ? '直接匯出當前畫面' : 'Export As Is';
-            if(document.getElementById('t-btn-cancel-prompt')) document.getElementById('t-btn-cancel-prompt').innerText = currentLang === 'zh' ? '取消' : 'Cancel';
-            if(document.getElementById('t-compare-outdated-text')) document.getElementById('t-compare-outdated-text').innerText = currentLang === 'zh' ? '⚠️ 參數已變更，決策報告已過時' : '⚠️ Parameters changed. Report outdated.';
-            if(document.getElementById('t-compare-regen-btn')) document.getElementById('t-compare-regen-btn').innerText = currentLang === 'zh' ? '🔄 重新分析最新決策' : '🔄 Analyze Latest Scenarios';
-
+            // 觸發重新渲染以套用新語系至圖表與動態 DOM
             if(typeof renderScenarioBar === "function") renderScenarioBar();
             if(typeof renderCompareGrid === "function" && document.getElementById('compareViewSection') && !document.getElementById('compareViewSection').classList.contains('hidden')) {
                 renderCompareGrid();
             }
-
             if(typeof calculateTCO === "function") calculateTCO();
             if(typeof forceRegenerateReport === "function") forceRegenerateReport();
         }
@@ -461,7 +435,13 @@
         function closeModal() { document.getElementById('drilldownModal').classList.add('hidden'); }
 
         window.onload = function() {
-            if(typeof dict !== 'undefined' && dict[currentLang]) { for (const key in dict[currentLang]) { const el = document.getElementById(key); if (el) el.innerHTML = dict[currentLang][key]; } }
+            // 初始載入時套用字典檔
+            if(typeof dict !== 'undefined' && dict[currentLang]) { 
+                for (const key in dict[currentLang]) { 
+                    const el = document.getElementById(key); 
+                    if (el) el.innerHTML = dict[currentLang][key]; 
+                } 
+            }
             if (typeof initScenarios === "function") { initScenarios(); }
             if (typeof loadStateFromURL === "function") { loadStateFromURL(); }
             
