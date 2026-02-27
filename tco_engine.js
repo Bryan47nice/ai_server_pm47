@@ -385,7 +385,10 @@ async function executePDFExport() {
         document.getElementById('pdfGaugeValueText').innerText = d.kwPerRack.toFixed(1) + " kW"; document.getElementById('pdfGaugeValueText').style.color = d.gaugeColor; document.getElementById('pdfGaugeStatusText').innerText = d.gaugeStatusText; document.getElementById('pdfGaugeStatusText').style.color = d.gaugeColor;
 
         drawGaugeChart(d.kwPerRack, d.gaugeColor, true); drawChart(d.labels, d.airData, d.liqData, true);
-        await new Promise(r => setTimeout(r, 150));
+        
+        // 🚀 關鍵修復：給予瀏覽器 400ms 的強制等待期，確保圖表與文字已在 DOM 中完全撐開
+        await new Promise(r => setTimeout(r, 400));
+        
         document.getElementById('pdfGaugeImg').src = gaugeChartInstance.toBase64Image(); document.getElementById('pdfLineImg').src = tcoChartInstance.toBase64Image();
         drawGaugeChart(d.kwPerRack, d.gaugeColor, false); drawChart(d.labels, d.airData, d.liqData, false);
 
@@ -399,12 +402,13 @@ async function executePDFExport() {
 
         syncToURL(); 
         const urlObj = new URL(window.location.href); urlObj.searchParams.set('tab', 'tco'); 
-        
-        // 🚀 將 PDF 頁尾 URL 改為視覺俐落的短網址遮罩，但保有原本強大的參數底層連結
         const cleanBaseUrl = urlObj.hostname + urlObj.pathname;
         const linkTextSuffix = isZh ? " (內含動態參數設定)" : " (Dynamic parameters included)";
         document.getElementById('pdfUrl').innerText = cleanBaseUrl + linkTextSuffix; 
         document.getElementById('pdfUrl').href = urlObj.toString(); 
+
+        // 再給一點點緩衝確保字體載入
+        await new Promise(r => setTimeout(r, 100));
 
         const canvas = await html2canvas(document.getElementById('pdfTemplate'), { scale: 2, useCORS: true, backgroundColor: '#f8fafc' });
         const { jsPDF } = window.jspdf; const pdf = new jsPDF('p', 'mm', 'a4');
