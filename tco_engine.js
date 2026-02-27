@@ -329,12 +329,36 @@ function drawChart(labels, airData, liqData) {
     });
 }
 
-// 🚀 完整升級版：動態高度與提案注入的 PDF 引擎
-async function exportToPDF() {
-    const btn = document.getElementById('btn-export-pdf');
+// 🚀 新增：開啟/關閉自訂檔名彈窗邏輯
+function openExportModal() {
+    const chipSelect = document.getElementById('chipType');
+    const chipName = chipSelect.options[chipSelect.selectedIndex].text;
+    const chipKey = chipName.match(/[a-zA-Z0-9]+/g)?.[1] || 'Chip';
+    const d = latestCalcData;
+    
+    // 自動帶入預設檔名
+    const defaultFilename = `TCO_Report_${chipKey}_${d.totalServers}Nodes`;
+    document.getElementById('exportFilename').value = defaultFilename;
+    
+    // 顯示彈窗
+    document.getElementById('exportModal').classList.remove('hidden');
+    document.getElementById('exportFilename').focus();
+}
+
+function closeExportModal() {
+    document.getElementById('exportModal').classList.add('hidden');
+}
+
+// 🚀 改寫：實際執行 PDF 匯出的引擎
+async function executePDFExport() {
+    const btn = document.getElementById('btn-confirm-export');
     const originalHtml = btn.innerHTML;
     const isZh = currentLang === 'zh';
     
+    let userFilename = document.getElementById('exportFilename').value.trim();
+    if (!userFilename) { userFilename = "TCO_Report"; }
+    
+    // 進入 Loading 狀態
     btn.innerHTML = `⏳ <span class="ml-1">${isZh ? '產出中...' : 'Generating...'}</span>`;
     btn.disabled = true;
 
@@ -348,20 +372,21 @@ async function exportToPDF() {
         const chipSelect = document.getElementById('chipType');
         const chipName = chipSelect.options[chipSelect.selectedIndex].text;
 
-        // 1. 填充基礎資訊 (Header & Params)
+        // 1. 填充雙欄式模板資料
         document.getElementById('pdfMainTitle').innerText = isZh ? 'AI 伺服器 TCO 分析報告' : 'AI Server TCO Analysis Report';
         document.getElementById('pdfDate').innerText = (isZh ? '報告生成日期：' : 'Generated on: ') + new Date().toLocaleDateString();
         
         document.getElementById('pdfParams').innerHTML = `
-            <div class="flex justify-between border-b border-gray-100 pb-1.5"><span class="text-slate-500">${isZh ? 'AI 伺服器型號' : 'Chip Model'}</span> <b class="text-slate-800">${chipName}</b></div>
-            <div class="flex justify-between border-b border-gray-100 pb-1.5"><span class="text-slate-500">${isZh ? '總伺服器數量' : 'Total Servers'}</span> <b class="text-slate-800">${d.totalServers} Nodes</b></div>
-            <div class="flex justify-between border-b border-gray-100 pb-1.5"><span class="text-slate-500">${isZh ? '電費費率' : 'Power Rate'}</span> <b class="text-slate-800">$${d.powerCost}/kWh</b></div>
-            <div class="flex justify-between border-b border-gray-100 pb-1.5"><span class="text-slate-500">${isZh ? '評估年限' : 'Eval Years'}</span> <b class="text-slate-800">${d.evalYears} Yrs</b></div>
-            <div class="flex justify-between border-b border-gray-100 pb-1.5"><span class="text-slate-500">${isZh ? '氣冷 PUE' : 'Air PUE'}</span> <b class="text-slate-800">${d.airPUE}</b></div>
-            <div class="flex justify-between"><span class="text-slate-500">${isZh ? '液冷 PUE' : 'Liquid PUE'}</span> <b class="text-slate-800">${d.liqPUE}</b></div>
+            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-slate-500 font-medium">${isZh ? 'AI 伺服器型號' : 'Chip Model'}</span> <b class="text-slate-800">${chipName}</b></div>
+            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-slate-500 font-medium">${isZh ? '總伺服器數量' : 'Total Servers'}</span> <b class="text-slate-800">${d.totalServers} Nodes</b></div>
+            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-slate-500 font-medium">${isZh ? '單機櫃節點數' : 'Nodes per Rack'}</span> <b class="text-slate-800">${d.kwPerRack / (parseFloat(chipSelect.value))} Nodes</b></div>
+            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-slate-500 font-medium">${isZh ? '單機櫃功耗' : 'Power per Rack'}</span> <b class="text-red-500">${d.kwPerRack.toFixed(1)} kW</b></div>
+            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-slate-500 font-medium">${isZh ? '電費費率' : 'Power Rate'}</span> <b class="text-slate-800">$${d.powerCost}/kWh</b></div>
+            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-slate-500 font-medium">${isZh ? '評估年限' : 'Eval Years'}</span> <b class="text-slate-800">${d.evalYears} Yrs</b></div>
+            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-slate-500 font-medium">${isZh ? '氣冷 PUE' : 'Air PUE'}</span> <b class="text-slate-800">${d.airPUE}</b></div>
+            <div class="flex justify-between"><span class="text-slate-500 font-medium">${isZh ? '液冷 PUE' : 'Liquid PUE'}</span> <b class="text-slate-800">${d.liqPUE}</b></div>
         `;
 
-        // 2. 贏家計分板 (加上皇冠與對比色)
         const isAirWinner = d.totalSavings <= 0;
         const bestOpt = isAirWinner ? (isZh ? '傳統氣冷方案 (Air)' : 'Air Cooling') : (isZh ? '強制液冷方案 (Liquid)' : 'Liquid Cooling');
         const winnerColor = isAirWinner ? 'text-blue-600' : 'text-red-600';
@@ -369,19 +394,19 @@ async function exportToPDF() {
         document.getElementById('pdfWinnerBoard').innerHTML = `
             <h3 class="text-lg font-bold text-indigo-900 tracking-wide">${isZh ? '👑 最佳 TCO 散熱方案' : '👑 Best TCO Solution'}</h3>
             <p class="text-2xl font-black mt-2 ${winnerColor}">${bestOpt}</p>
-            <div class="mt-5 flex justify-center gap-10 w-full border-t border-indigo-100 pt-4">
+            <div class="mt-6 flex justify-center gap-10 w-full border-t border-indigo-100 pt-5">
                 <div>
                     <p class="text-xs text-slate-500 uppercase tracking-wider font-bold">${isZh ? '5年總節省成本' : 'Total Savings'}</p>
-                    <p class="text-xl font-black text-green-600 mt-1">+$${Math.abs(d.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
+                    <p class="text-2xl font-black text-green-600 mt-1">+$${Math.abs(d.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
                 </div>
                 <div>
                     <p class="text-xs text-slate-500 uppercase tracking-wider font-bold">${isZh ? '黃金交叉回本點' : 'Breakeven Point'}</p>
-                    <p class="text-xl font-black text-purple-600 mt-1">${d.breakevenYear > 0 && d.breakevenYear !== Infinity ? d.breakevenYear.toFixed(1) + ' Yrs' : 'N/A'}</p>
+                    <p class="text-2xl font-black text-purple-600 mt-1">${d.breakevenYear > 0 && d.breakevenYear !== Infinity ? d.breakevenYear.toFixed(1) + ' Yrs' : 'N/A'}</p>
                 </div>
             </div>
         `;
 
-        // 3. 動態注入 AI Sales 提案 (若有的話)
+        // 3. 處理 AI 提案區塊
         const pitchSection = document.getElementById('pdfPitchSection');
         if (isReportGenerated && reportCache[currentLang]) {
             pitchSection.classList.remove('hidden');
@@ -391,40 +416,38 @@ async function exportToPDF() {
             pitchSection.classList.add('hidden');
         }
 
-        // 4. Chart 圖片化
+        // 4. Chart 圖片轉換
         document.getElementById('pdfGaugeImg').src = gaugeChartInstance.toBase64Image();
         document.getElementById('pdfLineImg').src = tcoChartInstance.toBase64Image();
         
-        // 5. URL 連結
         const urlObj = new URL(window.location.href);
         urlObj.searchParams.set('tab', 'tco'); 
         document.getElementById('pdfUrl').innerText = urlObj.toString();
         document.getElementById('pdfUrl').href = urlObj.toString();
 
-        // 6. html2canvas 繪製
+        // 5. html2canvas 繪製 (雙欄佈局)
         const targetEl = document.getElementById('pdfTemplate');
         const canvas = await html2canvas(targetEl, { 
             scale: 2, 
             useCORS: true,
-            backgroundColor: '#f8fafc' // 確保底色完美對應 Tailwind gray-50
+            backgroundColor: '#f8fafc' 
         });
         
         const imgData = canvas.toDataURL('image/png');
         
-        // 7. 動態長度 Infographic PDF 產生 (非標準 A4)
+        // 6. Infographic PDF 輸出
         const { jsPDF } = window.jspdf;
-        const pdfWidth = 210; // 固定寬度對標 A4 寬 (210mm)
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width; // 依照內容高度動態延伸
+        const pdfWidth = 210; 
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width; 
         
         const pdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
         
-        // 下載檔名
-        const dateStr = new Date().toISOString().slice(0,10).replace(/-/g, '');
-        const chipKey = chipName.match(/[a-zA-Z0-9]+/g)?.[1] || 'Chip';
-        const filename = `TCO_Report_${chipKey}_${d.totalServers}nodes_${dateStr}.pdf`;
-        
-        pdf.save(filename);
+        // 使用自訂檔名下載
+        pdf.save(`${userFilename}.pdf`);
+
+        // 匯出成功後關閉彈窗
+        closeExportModal();
 
     } catch (err) {
         console.error("PDF Export Error:", err);
