@@ -119,7 +119,7 @@ function calculateTCO() {
         evalYears, utilRate, totalServers, totalRacks, totalKw, powerCost, airPUE, liqPUE, kwPerRack,
         airCapExPerRack, liqCapExPerRack, totalAirCapEx, totalLiqCapEx,
         airOpExPerYear, liqOpExPerYear, labelsCount: labels.length,
-        breakevenYear: beYearRaw, totalSavings, winnerStr
+        breakevenYear: beYearRaw, totalSavings, winnerStr, gaugeColor, gaugeStatusText
     };
 
     drawChart(labels, airData, liqData);
@@ -290,57 +290,15 @@ function openDrilldownModal(dataIndex, labelStr) {
     document.getElementById('drilldownModal').classList.remove('hidden');
 }
 
-function drawChart(labels, airData, liqData) {
-    const ctx = document.getElementById('tcoChart').getContext('2d');
-    const isDark = document.documentElement.classList.contains('dark');
-    const textColor = isDark ? '#e5e7eb' : '#374151';
-    
-    const labelAir = currentLang === 'zh' ? '氣冷累積成本 (Air)' : 'Air Cooling TCO';
-    const labelLiq = currentLang === 'zh' ? '液冷累積成本 (Liquid)' : 'Liquid Cooling TCO';
-
-    if (tcoChartInstance) tcoChartInstance.destroy();
-    
-    tcoChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                { label: labelAir, data: airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 },
-                { label: labelLiq, data: liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 }
-            ]
-        },
-        options: { 
-            responsive: true, maintainAspectRatio: false,
-            onClick: (event) => {
-                const points = tcoChartInstance.getElementsAtEventForMode(event, 'index', { intersect: false }, true);
-                if (points.length) {
-                    const dataIndex = points[0].index;
-                    const labelStr = labels[dataIndex];
-                    openDrilldownModal(dataIndex, labelStr);
-                }
-            },
-            interaction: { mode: 'index', intersect: false },
-            plugins: { legend: { labels: { color: textColor } }, tooltip: { bodyFont: { size: 14 } } },
-            scales: { 
-                x: { ticks: { color: textColor } },
-                y: { ticks: { color: textColor }, title: { display: true, text: 'USD ($)', color: textColor } } 
-            } 
-        }
-    });
-}
-
-// 🚀 新增：開啟/關閉自訂檔名彈窗邏輯
 function openExportModal() {
     const chipSelect = document.getElementById('chipType');
     const chipName = chipSelect.options[chipSelect.selectedIndex].text;
     const chipKey = chipName.match(/[a-zA-Z0-9]+/g)?.[1] || 'Chip';
     const d = latestCalcData;
     
-    // 自動帶入預設檔名
     const defaultFilename = `TCO_Report_${chipKey}_${d.totalServers}Nodes`;
     document.getElementById('exportFilename').value = defaultFilename;
     
-    // 顯示彈窗
     document.getElementById('exportModal').classList.remove('hidden');
     document.getElementById('exportFilename').focus();
 }
@@ -349,7 +307,7 @@ function closeExportModal() {
     document.getElementById('exportModal').classList.add('hidden');
 }
 
-// 🚀 改寫：實際執行 PDF 匯出的引擎
+// 🚀 強大升級版：幽靈列印模式 (強制轉換黑圖截圖，再無縫復原)
 async function executePDFExport() {
     const btn = document.getElementById('btn-confirm-export');
     const originalHtml = btn.innerHTML;
@@ -358,7 +316,6 @@ async function executePDFExport() {
     let userFilename = document.getElementById('exportFilename').value.trim();
     if (!userFilename) { userFilename = "TCO_Report"; }
     
-    // 進入 Loading 狀態
     btn.innerHTML = `⏳ <span class="ml-1">${isZh ? '產出中...' : 'Generating...'}</span>`;
     btn.disabled = true;
 
@@ -372,7 +329,7 @@ async function executePDFExport() {
         const chipSelect = document.getElementById('chipType');
         const chipName = chipSelect.options[chipSelect.selectedIndex].text;
 
-        // 1. 填充雙欄式模板資料
+        // 1. 填充基礎文字資料
         document.getElementById('pdfMainTitle').innerText = isZh ? 'AI 伺服器 TCO 分析報告' : 'AI Server TCO Analysis Report';
         document.getElementById('pdfDate').innerText = (isZh ? '報告生成日期：' : 'Generated on: ') + new Date().toLocaleDateString();
         
@@ -406,7 +363,58 @@ async function executePDFExport() {
             </div>
         `;
 
-        // 3. 處理 AI 提案區塊
+        // 2. 補齊 PDF Gauge 的文字靈魂
+        document.getElementById('pdfGaugeValueText').innerText = d.kwPerRack.toFixed(1) + " kW";
+        document.getElementById('pdfGaugeValueText').style.color = d.gaugeColor;
+        document.getElementById('pdfGaugeStatusText').innerText = d.gaugeStatusText;
+        document.getElementById('pdfGaugeStatusText').style.color = d.gaugeColor;
+
+        // 🚀 3. 幽靈列印模式 (High-Contrast Print Mode)
+        // 紀錄使用者當前的圖表顏色 (可能是淺灰)
+        const origXColor = tcoChartInstance.options.scales.x.ticks.color;
+        const origYColor = tcoChartInstance.options.scales.y.ticks.color;
+        const origYTitleColor = tcoChartInstance.options.scales.y.title.color;
+        const origLegendColor = tcoChartInstance.options.plugins.legend.labels.color;
+        
+        if(!tcoChartInstance.options.scales.x.grid) tcoChartInstance.options.scales.x.grid = {};
+        if(!tcoChartInstance.options.scales.y.grid) tcoChartInstance.options.scales.y.grid = {};
+        const origXGridColor = tcoChartInstance.options.scales.x.grid.color;
+        const origYGridColor = tcoChartInstance.options.scales.y.grid.color;
+        
+        const origGaugeBgColor = gaugeChartInstance.data.datasets[0].backgroundColor[1];
+
+        // 強制替換為白底專用的「高對比深灰色」
+        const printFontColor = '#0f172a'; // 超深灰
+        const printGridColor = '#e2e8f0'; // 淺灰網格
+        
+        tcoChartInstance.options.scales.x.ticks.color = printFontColor;
+        tcoChartInstance.options.scales.x.grid.color = printGridColor;
+        tcoChartInstance.options.scales.y.ticks.color = printFontColor;
+        tcoChartInstance.options.scales.y.title.color = printFontColor;
+        tcoChartInstance.options.scales.y.grid.color = printGridColor;
+        tcoChartInstance.options.plugins.legend.labels.color = printFontColor;
+        tcoChartInstance.update('none'); // 無動畫瞬間更新
+        
+        gaugeChartInstance.data.datasets[0].backgroundColor[1] = '#e2e8f0';
+        gaugeChartInstance.update('none');
+
+        // 4. 在高對比模式下進行截圖
+        document.getElementById('pdfGaugeImg').src = gaugeChartInstance.toBase64Image();
+        document.getElementById('pdfLineImg').src = tcoChartInstance.toBase64Image();
+
+        // 🚀 5. 截圖完成，瞬間將顏色恢復成使用者的深/淺色模式，完美隱藏痕跡
+        tcoChartInstance.options.scales.x.ticks.color = origXColor;
+        tcoChartInstance.options.scales.x.grid.color = origXGridColor;
+        tcoChartInstance.options.scales.y.ticks.color = origYColor;
+        tcoChartInstance.options.scales.y.title.color = origYTitleColor;
+        tcoChartInstance.options.scales.y.grid.color = origYGridColor;
+        tcoChartInstance.options.plugins.legend.labels.color = origLegendColor;
+        tcoChartInstance.update('none');
+        
+        gaugeChartInstance.data.datasets[0].backgroundColor[1] = origGaugeBgColor;
+        gaugeChartInstance.update('none');
+
+        // 6. 處理 AI 提案區塊
         const pitchSection = document.getElementById('pdfPitchSection');
         if (isReportGenerated && reportCache[currentLang]) {
             pitchSection.classList.remove('hidden');
@@ -416,16 +424,12 @@ async function executePDFExport() {
             pitchSection.classList.add('hidden');
         }
 
-        // 4. Chart 圖片轉換
-        document.getElementById('pdfGaugeImg').src = gaugeChartInstance.toBase64Image();
-        document.getElementById('pdfLineImg').src = tcoChartInstance.toBase64Image();
-        
         const urlObj = new URL(window.location.href);
         urlObj.searchParams.set('tab', 'tco'); 
         document.getElementById('pdfUrl').innerText = urlObj.toString();
         document.getElementById('pdfUrl').href = urlObj.toString();
 
-        // 5. html2canvas 繪製 (雙欄佈局)
+        // 7. html2canvas 繪製
         const targetEl = document.getElementById('pdfTemplate');
         const canvas = await html2canvas(targetEl, { 
             scale: 2, 
@@ -435,7 +439,7 @@ async function executePDFExport() {
         
         const imgData = canvas.toDataURL('image/png');
         
-        // 6. Infographic PDF 輸出
+        // 8. 下載 PDF
         const { jsPDF } = window.jspdf;
         const pdfWidth = 210; 
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width; 
@@ -443,10 +447,8 @@ async function executePDFExport() {
         const pdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
         
-        // 使用自訂檔名下載
         pdf.save(`${userFilename}.pdf`);
 
-        // 匯出成功後關閉彈窗
         closeExportModal();
 
     } catch (err) {
