@@ -9,11 +9,16 @@ let latestCalcData = {};
 
 let isReportGenerated = false;
 
-// 🚀 狀態機與獨立快取陣列
+// 狀態機與獨立快取陣列
 let scenarios = [];
 let activeScenarioId = null;
 let isCompareMode = false;
 let compareChartInstances = {}; 
+
+// 🚀 比較模式專屬快取與狀態快照
+let compareReportCache = { zh: null, en: null };
+let compareStateSnapshot = null;
+let isCompareReportOutdated = false;
 
 const DEFAULT_PARAMS = {
     chip: "1",         
@@ -44,7 +49,7 @@ function initScenarios() {
             name: currentLang === 'zh' ? '情境 A' : 'Scenario A',
             params: null,
             results: null,
-            reportCache: { zh: null, en: null } // 🚀 賦予獨立快取空間
+            reportCache: { zh: null, en: null } 
         });
         activeScenarioId = scenarios[0].id;
     }
@@ -100,7 +105,6 @@ const syncToURL = () => {
 
 const debouncedSyncToURL = debounce(syncToURL, 300);
 
-// 🚀 渲染情境管理列 (加入直覺化 ✏️ 編輯按鈕)
 function renderScenarioBar() {
     const list = document.getElementById('scenarioList');
     list.innerHTML = '';
@@ -141,12 +145,11 @@ function addScenario() {
         name: name,
         params: JSON.parse(JSON.stringify(currentSc.params)),
         results: JSON.parse(JSON.stringify(currentSc.results)),
-        reportCache: { zh: null, en: null } // 繼承參數但不繼承上一份快取
+        reportCache: { zh: null, en: null } 
     });
     switchScenario(newId);
 }
 
-// 🚀 智慧切換情境 (保留快取、秒讀秒切)
 function switchScenario(id) {
     if (isCompareMode) return;
     activeScenarioId = id;
@@ -167,7 +170,6 @@ function switchScenario(id) {
         
         calculateTCO(); 
         
-        // 🚀 若記憶體中已有報告，瞬間還原 UI
         if (sc.reportCache && sc.reportCache[currentLang]) {
             renderReportFromData(sc.reportCache[currentLang]);
             document.getElementById('salesReportSection').classList.remove('hidden');
@@ -212,9 +214,33 @@ function toggleCompareMode() {
         pdfBtn.disabled = true; pdfBtn.title = currentLang === 'zh' ? '請退出比較模式再匯出' : 'Exit compare mode to export';
         copyBtn.disabled = true; copyBtn.title = currentLang === 'zh' ? '比較模式不支援分享' : 'Sharing disabled in compare';
         scenarioBar.classList.add('opacity-50', 'pointer-events-none');
-        document.getElementById('btnToggleCompare').innerHTML = `🔙 <span id="t-exit-compare" class="ml-1">${currentLang === 'zh' ? '退出比較，返回編輯' : 'Exit Compare'}</span>`;
+        document.getElementById('btnToggleCompare').innerHTML = `🔙 <span id="t-exit-compare" class="ml-1">${currentLang === 'zh' ? '退出比較' : 'Exit Compare'}</span>`;
+        
         renderCompareGrid();
-        document.getElementById('compareReportSection').classList.add('hidden'); // 重置跨方案報告
+
+        // 🚀 快照檢查機制：比對當前所有情境的參數與快照是否一致
+        const currentSnap = JSON.stringify(scenarios.map(s => s.params));
+        const hasCache = compareReportCache && compareReportCache[currentLang];
+
+        if (compareStateSnapshot && currentSnap !== compareStateSnapshot) {
+            isCompareReportOutdated = true;
+            if (hasCache) {
+                document.getElementById('compareReportSection').classList.remove('hidden');
+                document.getElementById('compareReportOutdated').classList.remove('hidden');
+                document.getElementById('compareReportSuccess').classList.add('hidden');
+            } else {
+                document.getElementById('compareReportSection').classList.add('hidden');
+            }
+        } else if (hasCache) {
+            isCompareReportOutdated = false;
+            document.getElementById('compareReportContent').innerText = compareReportCache[currentLang];
+            document.getElementById('compareReportSection').classList.remove('hidden');
+            document.getElementById('compareReportSuccess').classList.remove('hidden');
+            document.getElementById('compareReportOutdated').classList.add('hidden');
+        } else {
+            document.getElementById('compareReportSection').classList.add('hidden');
+        }
+
     } else {
         singleView.classList.remove('hidden'); compareView.classList.add('hidden');
         pdfBtn.disabled = false; pdfBtn.title = ''; copyBtn.disabled = false; copyBtn.title = '';
@@ -269,6 +295,46 @@ function renderCompareGrid() {
     });
 }
 
+function resetParameters() {
+    document.getElementById('chipType').value = DEFAULT_PARAMS.chip;
+    document.getElementById('totalServers').value = DEFAULT_PARAMS.servers;
+    document.getElementById('rackValInput').value = DEFAULT_PARAMS.nodes;
+    document.getElementById('serversPerRack').value = DEFAULT_PARAMS.nodes;
+    document.getElementById('powerCost').value = DEFAULT_PARAMS.cost;
+    document.getElementById('evalYears').value = DEFAULT_PARAMS.years;
+    document.getElementById('utilRate').value = DEFAULT_PARAMS.util;
+    document.getElementById('airPue').value = DEFAULT_PARAMS.air_pue;
+    document.getElementById('liqPue').value = DEFAULT_PARAMS.liq_pue;
+    document.getElementById('airCapex').value = DEFAULT_PARAMS.air_capex;
+    document.getElementById('liqCapex').value = DEFAULT_PARAMS.liq_capex;
+    
+    isReportGenerated = false;
+    document.getElementById('salesReportSection').classList.add('hidden');
+    syncToURL();
+    calculateTCO();
+}
+
+async function copyShareLink() {
+    const btn = document.getElementById('btn-copy-link');
+    const span = document.getElementById('t-copy-link');
+    const originalText = span.innerText;
+    syncToURL();
+
+    try {
+        await navigator.clipboard.writeText(window.location.href);
+        span.innerText = currentLang === 'zh' ? '已複製！' : 'Copied!';
+        btn.classList.add('bg-green-100', 'text-green-700', 'border-green-300', 'dark:bg-green-900', 'dark:text-green-300');
+        btn.classList.remove('bg-white', 'text-indigo-600', 'border-indigo-200', 'dark:bg-gray-700', 'dark:text-indigo-400');
+    } catch (err) {
+        span.innerText = currentLang === 'zh' ? '複製失敗' : 'Failed';
+    }
+    setTimeout(() => {
+        span.innerText = originalText;
+        btn.classList.remove('bg-green-100', 'text-green-700', 'border-green-300', 'dark:bg-green-900', 'dark:text-green-300');
+        btn.classList.add('bg-white', 'text-indigo-600', 'border-indigo-200', 'dark:bg-gray-700', 'dark:text-indigo-400');
+    }, 2000);
+}
+
 function calculateTCO() {
     const currentParams = {
         chip: document.getElementById('chipType').value,
@@ -285,13 +351,12 @@ function calculateTCO() {
 
     const activeSc = scenarios.find(s => s.id === activeScenarioId);
     
-    // 🚀 關鍵防呆：只有在參數「真的」被改變時，才清空該情境的報告快取
     if (activeSc) {
         if (!activeSc.params) {
             activeSc.params = currentParams;
         } else if (JSON.stringify(activeSc.params) !== JSON.stringify(currentParams)) {
             activeSc.params = currentParams;
-            activeSc.reportCache = { zh: null, en: null }; // 清空過期快取
+            activeSc.reportCache = { zh: null, en: null }; 
             if (isReportGenerated) document.getElementById('reportStateOutdated').classList.remove('hidden');
         }
     }
@@ -387,7 +452,6 @@ function calculateTCO() {
     drawChart(labels, airData, liqData);
     drawGaugeChart(kwPerRack, gaugeColor); 
     
-    // 更新當前情境的結果快照
     if (activeSc) activeSc.results = JSON.parse(JSON.stringify(latestCalcData)); 
 }
 
@@ -423,7 +487,6 @@ function generateSalesReport() {
     const activeSc = scenarios.find(s => s.id === activeScenarioId);
     section.classList.remove('hidden'); outdated.classList.add('hidden');
 
-    // 🚀 秒讀該情境專屬快取
     if (activeSc && activeSc.reportCache && activeSc.reportCache[currentLang]) {
         renderReportFromData(activeSc.reportCache[currentLang]);
         loading.classList.add('hidden'); success.classList.remove('hidden');
@@ -466,8 +529,6 @@ function generateSalesReport() {
                 : `Compared to the alternative, saves approx.\n🌍 ${d.co2SavedTons.toLocaleString(undefined, {maximumFractionDigits: 1})} Tons of CO2\nover ${d.evalYears} years.`;
 
             const generatedData = { pitch, obj, roi, esg, risk };
-            
-            // 🚀 將生成好的報告寫入情境專屬快取中
             if (activeSc) activeSc.reportCache[currentLang] = generatedData;
             renderReportFromData(generatedData);
             
@@ -477,13 +538,15 @@ function generateSalesReport() {
     }, 800);
 }
 
-// 🚀 全新：比較模式專屬的 AI 跨方案決策報告引擎
+// 🚀 比較模式：產出決策報告並「寫入快照與快取」
 function generateCompareReport() {
     const loading = document.getElementById('compareReportLoading');
     const success = document.getElementById('compareReportSuccess');
     const content = document.getElementById('compareReportContent');
+    const outdatedOverlay = document.getElementById('compareReportOutdated');
     
     document.getElementById('compareReportSection').classList.remove('hidden');
+    outdatedOverlay.classList.add('hidden');
     loading.classList.remove('hidden');
     success.classList.add('hidden');
     
@@ -510,11 +573,76 @@ function generateCompareReport() {
                 `After analyzing ${scenarios.length} scenarios, 【${bestSc.name}】 offers the highest TCO ROI.\n\nCompared to the most expensive option (【${worstSc.name}】), it saves an additional $${diff.toLocaleString(undefined, {maximumFractionDigits:0})} USD over ${bestSc.results.evalYears} years.\n\n👉 Executive Recommendation: We strongly advise adopting 【${bestSc.name}】 (${bestSc.results.kwPerRack.toFixed(1)}kW/rack with ${bestCooling}) as the project baseline to maximize compute density while minimizing OPEX.`;
         }
         
+        // 寫入全域快取與快照
+        compareReportCache[currentLang] = text;
+        compareStateSnapshot = JSON.stringify(scenarios.map(s => s.params));
+        isCompareReportOutdated = false;
+        
         content.innerText = text;
         loading.classList.add('hidden');
         success.classList.remove('hidden');
     }, 800);
 }
+
+// 🚀 比較模式：一鍵截圖防呆邏輯
+function exportComparePNG() {
+    if (!compareReportCache[currentLang] || isCompareReportOutdated) {
+        document.getElementById('exportPromptModal').classList.remove('hidden');
+    } else {
+        captureCompareView();
+    }
+}
+
+// 彈窗操作 1：產出報告並自動截圖
+async function generateAndExportCompare() {
+    closeExportPrompt();
+    generateCompareReport();
+    setTimeout(() => {
+        captureCompareView();
+    }, 900); // 給予 800ms 算繪期 + 100ms DOM 渲染緩衝
+}
+
+// 彈窗操作 2：強制略過報告直接截圖
+function forceExportCompare() {
+    closeExportPrompt();
+    captureCompareView();
+}
+
+function closeExportPrompt() {
+    document.getElementById('exportPromptModal').classList.add('hidden');
+}
+
+// 🚀 比較模式：執行 DOM 截圖 (隱藏所有干擾按鈕)
+async function captureCompareView() {
+    const btn = document.getElementById('btn-export-png');
+    const originalHtml = btn.innerHTML;
+    const isZh = currentLang === 'zh';
+    btn.innerHTML = `⏳ <span class="ml-1">${isZh ? '擷取中...' : 'Capturing...'}</span>`;
+    
+    // 拍攝前，先透過自訂 class 瞬間隱藏畫面上的操作按鈕
+    document.querySelectorAll('.capture-hide').forEach(el => el.classList.add('hidden'));
+
+    const targetEl = document.getElementById('compareViewSection');
+    try {
+        const canvas = await html2canvas(targetEl, { 
+            scale: 2, 
+            useCORS: true, 
+            backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : '#f8fafc' 
+        });
+        const link = document.createElement('a');
+        link.download = `TCO_Compare_Scenarios.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    } catch (err) {
+        console.error("Screenshot failed:", err);
+        alert(isZh ? '截圖失敗，請稍後再試。' : 'Screenshot failed.');
+    } finally {
+        // 拍攝完成，還原按鈕
+        document.querySelectorAll('.capture-hide').forEach(el => el.classList.remove('hidden'));
+        btn.innerHTML = originalHtml;
+    }
+}
+
 
 function openDrilldownModal(dataIndex, labelStr) {
     const d = latestCalcData; let actualYear = dataIndex; if (dataIndex === d.labelsCount - 1 && d.evalYears % 1 !== 0) { actualYear = d.evalYears; }
@@ -606,7 +734,6 @@ async function executePDFExport() {
 
         const reportContent = document.getElementById('pdfReportContent'); const noReportMsg = document.getElementById('pdfNoReportMsg');
         
-        // PDF 匯出時，從當前情境快取中讀取
         const activeSc = scenarios.find(s => s.id === activeScenarioId);
         if (isReportGenerated && activeSc && activeSc.reportCache[currentLang]) {
             const c = activeSc.reportCache[currentLang];
