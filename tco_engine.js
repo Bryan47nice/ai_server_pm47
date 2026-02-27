@@ -24,7 +24,7 @@ const DEFAULT_PARAMS = {
     liq_capex: 45000
 };
 
-// 🚀 Debounce 防抖動函式 (保護 URL 不被瘋狂洗版)
+// 🚀 Debounce 防抖動函式
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -38,14 +38,12 @@ function debounce(func, wait) {
 function loadStateFromURL() {
     const params = new URLSearchParams(window.location.search);
     
-    // 安全地覆寫欄位，若 URL 亂改或缺失則 fallback 回預設值
     const setVal = (id, paramKey, defaultVal, isFloat = false) => {
         let val = params.get(paramKey);
         if (val !== null && !isNaN(val)) {
             val = isFloat ? parseFloat(val) : parseInt(val);
             document.getElementById(id).value = val;
         } else if (val !== null && typeof val === 'string' && id === 'chipType') {
-            // 特別處理 select option (chip)
             const validOptions = ["1", "1.2", "1.8"];
             if(validOptions.includes(val)) document.getElementById(id).value = val;
         }
@@ -54,7 +52,6 @@ function loadStateFromURL() {
     setVal('chipType', 'chip', DEFAULT_PARAMS.chip, false);
     setVal('totalServers', 'servers', DEFAULT_PARAMS.servers, false);
     
-    // 處理滑桿連動
     let urlNodes = params.get('nodes');
     if (urlNodes !== null && !isNaN(urlNodes)) {
         let n = parseInt(urlNodes);
@@ -75,6 +72,10 @@ function loadStateFromURL() {
 // 🚀 將當前狀態靜默同步至 URL
 const syncToURL = () => {
     const url = new URL(window.location);
+    
+    // 💡 關鍵修復：強制寫入頁籤狀態，確保分享連結打開直接進入儀表板
+    url.searchParams.set('tab', 'tco'); 
+    
     url.searchParams.set('chip', document.getElementById('chipType').value);
     url.searchParams.set('servers', document.getElementById('totalServers').value);
     url.searchParams.set('nodes', document.getElementById('rackValInput').value);
@@ -89,7 +90,6 @@ const syncToURL = () => {
     window.history.replaceState({}, '', url);
 };
 
-// 使用防抖動包裝
 const debouncedSyncToURL = debounce(syncToURL, 300);
 
 // 🚀 一鍵還原預設值
@@ -115,7 +115,6 @@ async function copyShareLink() {
     const span = document.getElementById('t-copy-link');
     const originalText = span.innerText;
 
-    // 強制立即同步 URL 確保剪貼簿是最新的
     syncToURL();
 
     try {
@@ -128,7 +127,6 @@ async function copyShareLink() {
         console.error('Copy failed', err);
     }
 
-    // 2 秒後還原按鈕狀態
     setTimeout(() => {
         span.innerText = originalText;
         btn.classList.remove('bg-green-100', 'text-green-700', 'border-green-300', 'dark:bg-green-900', 'dark:text-green-300');
@@ -573,7 +571,6 @@ async function executePDFExport() {
             noReportMsg.classList.remove('hidden');
         }
 
-        // 🚀 PDF 頁尾連動：確保這裡抓取的是帶有完整參數的分享網址！
         syncToURL(); 
         const urlObj = new URL(window.location.href);
         urlObj.searchParams.set('tab', 'tco'); 
