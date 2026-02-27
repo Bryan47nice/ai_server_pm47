@@ -65,7 +65,6 @@
                         <p class="text-indigo-200 max-w-3xl mx-auto text-sm md:text-lg font-medium tracking-wide" id="t-about-hero-subtitle">4+ 年跨部門專案管理經驗 | TOEIC 910 (Gold) | 專注於模組化架構與高價值產品藍圖</p>
                     </div>
                 </div>
-
                 <div class="card bg-white dark:bg-gray-800 border-l-8 border-indigo-500 shadow-lg relative overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
                     <div class="absolute -top-6 right-2 md:right-8 opacity-10 text-[150px] leading-none font-serif text-indigo-500 dark:text-indigo-300 pointer-events-none">"</div>
                     <div class="relative z-10 p-2 md:p-4">
@@ -73,7 +72,6 @@
                         <p class="text-xl md:text-2xl font-black text-gray-800 dark:text-gray-100 leading-relaxed md:leading-normal" id="t-mission-text">「在 AI 基礎設施的爆發時代，成為橋接『軟體敏捷性 (Software Agility)』與『硬體可靠性 (Hardware Reliability)』的關鍵樞紐。」</p>
                     </div>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="card bg-white dark:bg-gray-800 border-t-4 border-indigo-500 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col">
                         <h3 class="text-lg md:text-xl font-black text-gray-800 dark:text-gray-100 mb-3" id="t-about-p1-title">🧩 模組化產品藍圖與需求管理</h3>
@@ -88,7 +86,6 @@
                         <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 flex-grow leading-relaxed" id="t-about-p3-desc">具備高度風險意識，不憑直覺行事。透過開發概念驗證 (PoC) 工具與專案儀表板，提前識別開發瓶頸，輔助管理層在規格與時程上進行精準取捨 (Trade-off)。</p>
                     </div>
                 </div>
-
                 <div class="mt-8 flex justify-center pb-10">
                     <button onclick="switchTab('tco')" class="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white px-8 py-4 rounded-full shadow-[0_0_20px_rgba(79,70,229,0.4)] transition-all transform hover:scale-105 font-black text-base md:text-xl flex items-center group">
                         <span id="t-about-cta">👉 立即體驗我的 PoC 專案：AI 伺服器 TCO 評估儀表板</span>
@@ -130,17 +127,6 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"><span id="t-servers-per-rack">單機櫃伺服器數量</span></label>
-                                <div class="group relative ml-2 flex items-center print:hidden">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 cursor-help hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block w-72 p-3 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-xl z-50 border border-gray-700">
-                                        <strong id="t-tt-title" class="block mb-1 text-blue-300">為什麼上限設定為 72 台？</strong>
-                                        <ul class="list-decimal pl-4 space-y-1 text-gray-200">
-                                            <li><b>空間極限：</b>機櫃已達空間飽和。</li>
-                                            <li><b>訊號極限：</b>GPU 銅線傳輸高度極限。</li>
-                                            <li><b>設施極限：</b>單櫃功耗達機房供電天花板。</li>
-                                        </ul>
-                                    </div>
-                                </div>
                             </div>
                             <input type="number" id="rackValInput" value="32" min="10" max="72" class="w-16 px-2 py-0.5 text-blue-600 dark:text-blue-400 font-bold border rounded-md dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 text-center" onchange="updateSliderFromInput(); calculateTCO()">
                         </div>
@@ -183,10 +169,6 @@
                     </div>
 
                     <div class="card bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700 flex flex-col relative">
-                        <div class="absolute top-4 right-4 flex items-center bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-[10px] md:text-xs px-2 py-1 rounded-full border border-blue-100 dark:border-blue-800 z-10 font-bold shadow-sm cursor-pointer hover:bg-blue-100 transition print:hidden">
-                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
-                            <span id="t-chart-hint">點擊圖表節點查看算式細節</span>
-                        </div>
                         <h2 id="t-chart-title" class="text-md font-semibold mb-4 text-center text-gray-700 dark:text-gray-200">5 年 TCO 累積成本比較 (CapEx + OpEx)</h2>
                         <div class="relative w-full flex-shrink-0 chart-container" style="height: 300px; min-height: 300px;"><canvas id="tcoChart"></canvas></div>
                         <div class="mt-6 flex justify-end print:hidden">
@@ -253,7 +235,7 @@
                         <div class="flex justify-center my-2 text-gray-400">⬇️</div>
                         <div><h3 id="t-c1-new-h" class="text-blue-600 dark:text-blue-400 text-sm font-bold">【現在】雲端伺服器產品企劃</h3><p id="t-c1-new-v" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Roadmap ➔ NPI ➔ MP</p><p id="t-c1-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-1">擬定符合市場需求的產品規格發展，並與 RD 合作掌控 NPI 研發時程。</p></div>
                     </div>
-                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -265,84 +247,107 @@
             <div class="bg-gray-50 dark:bg-gray-900 border-t dark:border-gray-700 p-4 flex justify-end space-x-3"><button onclick="closeExportModal()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-bold transition">取消</button><button id="btn-confirm-export" onclick="executePDFExport()" class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 font-bold shadow-md transition flex items-center">確認匯出</button></div>
         </div>
     </div>
-    
+
+    <div id="drilldownModal" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-4 print:hidden backdrop-blur-sm transition-opacity">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden border dark:border-gray-700 transform transition-transform">
+            <div class="bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-700 p-4 flex justify-between items-center">
+                <h3 class="text-lg font-bold flex items-center text-gray-800 dark:text-gray-100"><span id="modalYearLabel"></span></h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4 p-5 bg-blue-50/50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                    <h4 class="font-bold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-800 pb-2 text-lg flex items-center">💨 <span id="t-modal-air" class="ml-2">氣冷方案 (Air)</span></h4>
+                    <div><p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold mb-1" id="t-modal-capex-label-air">一次性建置成本 (CapEx)</p><p id="airCapexDetail" class="text-sm font-mono text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 p-2 rounded border dark:border-gray-700"></p></div>
+                    <div><p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold mb-1" id="t-modal-opex-label-air">累計營運成本 (OpEx)</p><p id="airOpexDetail" class="text-xs font-mono leading-relaxed text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded border dark:border-gray-700"></p></div>
+                    <div class="text-right border-t border-blue-200 dark:border-blue-800 pt-3"><p class="text-xs text-gray-500 dark:text-gray-400 font-bold" id="t-modal-total-air">該年度累積總成本</p><p id="airTotalDetail" class="text-2xl font-bold text-blue-600 dark:text-blue-400"></p></div>
+                </div>
+                <div class="space-y-4 p-5 bg-red-50/50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-900/30">
+                    <h4 class="font-bold text-red-700 dark:text-red-400 border-b border-red-200 dark:border-red-800 pb-2 text-lg flex items-center">💧 <span id="t-modal-liq" class="ml-2">液冷方案 (Liquid)</span></h4>
+                    <div><p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold mb-1" id="t-modal-capex-label-liq">一次性建置成本 (CapEx)</p><p id="liqCapexDetail" class="text-sm font-mono text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 p-2 rounded border dark:border-gray-700"></p></div>
+                    <div><p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold mb-1" id="t-modal-opex-label-liq">累計營運成本 (OpEx)</p><p id="liqOpexDetail" class="text-xs font-mono leading-relaxed text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded border dark:border-gray-700"></p></div>
+                    <div class="text-right border-t border-red-200 dark:border-red-800 pt-3"><p class="text-xs text-gray-500 dark:text-gray-400 font-bold" id="t-modal-total-liq">該年度累積總成本</p><p id="liqTotalDetail" class="text-2xl font-bold text-red-600 dark:text-red-400"></p></div>
+                </div>
+            </div>
+            <div id="modalDiff" class="bg-gray-100 dark:bg-gray-900 p-4 text-center text-lg font-bold text-gray-800 dark:text-gray-100 border-t dark:border-gray-700"></div>
+        </div>
+    </div>
+
     <button id="themeToggleBtn" onclick="toggleTheme()" class="print:hidden fixed bottom-4 right-4 bg-gray-800 dark:bg-yellow-400 text-white dark:text-gray-900 p-3 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center z-50"><span id="themeIcon" class="text-xl">☀️</span></button>
     
     <div id="pdfContainerWrapper" style="position: absolute; left: -9999px; top: 0; pointer-events: none;">
         <div id="pdfTemplate" class="bg-gray-50 text-gray-900 w-[960px] h-[1358px] flex flex-col font-sans relative box-border">
             
-            <div class="bg-gradient-to-r from-slate-900 to-indigo-900 text-white p-8 flex justify-between items-end shrink-0">
+            <div class="bg-gradient-to-r from-slate-900 to-indigo-900 text-white px-8 py-5 flex justify-between items-end shrink-0">
                 <div>
-                    <h1 class="text-3xl font-black tracking-tight" id="pdfMainTitle">AI Server TCO Analysis Report</h1>
-                    <p class="text-indigo-200 mt-1 text-base font-medium" id="pdfDate"></p>
+                    <h1 class="text-2xl font-black tracking-tight" id="pdfMainTitle">AI Server TCO Analysis Report</h1>
+                    <p class="text-indigo-200 mt-1 text-sm font-medium" id="pdfDate"></p>
                 </div>
-                <div class="text-right text-indigo-200 text-sm"><p id="pdfSubtitle">Generated by TCO Engine V2</p></div>
+                <div class="text-right text-indigo-200 text-xs"><p id="pdfSubtitle">Generated by TCO Engine V2</p></div>
             </div>
 
-            <div class="p-8 flex flex-col gap-6 flex-grow overflow-hidden">
+            <div class="px-8 py-5 flex flex-col gap-4 flex-grow overflow-hidden">
                 
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 shrink-0">
-                    <h2 class="text-base font-bold border-b border-gray-100 pb-2 mb-3 text-slate-800 flex items-center" id="pdfParamsTitle">⚙️ Configuration Parameters</h2>
-                    <div class="grid grid-cols-4 gap-4 text-[13px] text-slate-600" id="pdfParams"></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 shrink-0">
+                    <h2 class="text-sm font-bold border-b border-gray-100 pb-2 mb-2 text-slate-800 flex items-center" id="pdfParamsTitle">⚙️ Configuration Parameters</h2>
+                    <div class="grid grid-cols-4 gap-3 text-[12px] text-slate-600" id="pdfParams"></div>
                 </div>
 
-                <div class="flex gap-6 shrink-0 h-[160px]">
-                    <div class="w-[60%] bg-gradient-to-br from-indigo-50 to-white p-5 rounded-xl border border-indigo-100 flex justify-around items-center shadow-sm" id="pdfWinnerBoard"></div>
-                    <div class="w-[40%] bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center relative">
-                        <p class="text-xs text-slate-400 font-bold uppercase absolute top-4 left-4" id="pdfGaugeTitle">冷卻轉折點</p>
-                        <div class="flex justify-center h-[75px] overflow-hidden mt-3 w-full">
+                <div class="flex gap-4 shrink-0 h-[120px]">
+                    <div class="w-[60%] bg-gradient-to-br from-indigo-50 to-white p-4 rounded-xl border border-indigo-100 flex justify-around items-center shadow-sm" id="pdfWinnerBoard"></div>
+                    <div class="w-[40%] bg-white p-3 rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center relative">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase absolute top-3 left-3" id="pdfGaugeTitle">冷卻轉折點</p>
+                        <div class="flex justify-center h-[55px] overflow-hidden mt-3 w-full">
                             <img id="pdfGaugeImg" src="" class="h-full object-cover object-bottom" />
                         </div>
-                        <div class="text-center mt-2">
-                            <span id="pdfGaugeValueText" class="text-xl font-black leading-none tracking-tight block"></span>
-                            <span id="pdfGaugeStatusText" class="text-xs font-bold tracking-wide block mt-1"></span>
+                        <div class="text-center mt-1">
+                            <span id="pdfGaugeValueText" class="text-lg font-black leading-none tracking-tight block"></span>
+                            <span id="pdfGaugeStatusText" class="text-[10px] font-bold tracking-wide block mt-1"></span>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col shrink-0 h-[360px]">
-                    <h2 class="text-base font-bold border-b border-gray-100 pb-2 mb-4 text-slate-800 flex items-center shrink-0" id="pdfChartsTitle">📊 5-Year TCO Comparison</h2>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col shrink-0 h-[260px]">
+                    <h2 class="text-sm font-bold border-b border-gray-100 pb-2 mb-2 text-slate-800 flex items-center shrink-0" id="pdfChartsTitle">📊 5-Year TCO Comparison</h2>
                     <div class="w-full flex-grow relative flex justify-center">
                         <img id="pdfLineImg" src="" class="w-full h-full object-contain" />
                     </div>
                 </div>
 
-                <div id="pdfPitchSection" class="bg-white p-6 rounded-xl shadow-sm border border-indigo-200 border-t-8 border-t-indigo-500 flex flex-col flex-grow min-h-0">
-                    <h2 class="text-lg font-bold border-b border-indigo-50 pb-3 mb-4 text-indigo-900 flex items-center shrink-0" id="pdfPitchTitle">💡 AI Sales Battlecard</h2>
+                <div id="pdfPitchSection" class="bg-white p-5 rounded-xl shadow-sm border border-indigo-200 border-t-8 border-t-indigo-500 flex flex-col flex-grow">
+                    <h2 class="text-base font-bold border-b border-indigo-50 pb-2 mb-3 text-indigo-900 flex items-center shrink-0" id="pdfPitchTitle">💡 AI Sales Battlecard</h2>
                     
-                    <div id="pdfReportContent" class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm overflow-hidden h-full">
-                        <div class="flex flex-col h-full">
-                            <h3 class="font-bold text-indigo-600 mb-2 text-base" id="pdfElevatorTitle">🎯 Elevator Pitch</h3>
-                            <p id="pdfPitchText" class="text-slate-700 leading-relaxed text-justify text-[14px] flex-grow"></p>
+                    <div id="pdfReportContent" class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm h-full">
+                        <div class="flex flex-col">
+                            <h3 class="font-bold text-indigo-600 mb-1 text-sm" id="pdfElevatorTitle">🎯 Elevator Pitch</h3>
+                            <p id="pdfPitchText" class="text-slate-700 leading-relaxed text-justify text-[13px]"></p>
                         </div>
-                        <div class="flex flex-col h-full">
-                            <h3 class="font-bold text-red-600 mb-2 text-base" id="pdfObjectionTitle">🛡️ Objection Handling</h3>
-                            <p id="pdfObjText" class="text-slate-700 leading-relaxed text-justify text-[14px] flex-grow"></p>
+                        <div class="flex flex-col">
+                            <h3 class="font-bold text-red-600 mb-1 text-sm" id="pdfObjectionTitle">🛡️ Objection Handling</h3>
+                            <p id="pdfObjText" class="text-slate-700 leading-relaxed text-justify text-[13px]"></p>
                         </div>
                         
-                        <div class="col-span-2 grid grid-cols-3 gap-4 mt-auto">
-                            <div class="bg-blue-50/50 p-3 rounded border border-blue-100">
-                                <h3 id="pdfROITitle" class="text-xs font-bold text-blue-700 mb-1">💰 ROI Highlight</h3>
-                                <p id="pdfROIText" class="text-slate-800 font-bold"></p>
+                        <div class="col-span-2 grid grid-cols-3 gap-3 mt-auto">
+                            <div class="bg-blue-50/50 p-2 rounded border border-blue-100">
+                                <h3 id="pdfROITitle" class="text-[11px] font-bold text-blue-700 mb-1">💰 ROI Highlight</h3>
+                                <p id="pdfROIText" class="text-slate-800 font-bold text-[12px] whitespace-pre-line"></p>
                             </div>
-                            <div class="bg-green-50/50 p-3 rounded border border-green-100">
-                                <h3 id="pdfESGTitle" class="text-xs font-bold text-green-700 mb-1">🌱 ESG & Carbon</h3>
-                                <p id="pdfESGText" class="text-slate-700 leading-tight"></p>
+                            <div class="bg-green-50/50 p-2 rounded border border-green-100">
+                                <h3 id="pdfESGTitle" class="text-[11px] font-bold text-green-700 mb-1">🌱 ESG & Carbon</h3>
+                                <p id="pdfESGText" class="text-slate-700 leading-tight text-[12px] whitespace-pre-line"></p>
                             </div>
-                            <div class="bg-orange-50/50 p-3 rounded border border-orange-100">
-                                <h3 id="pdfRiskTitle" class="text-xs font-bold text-orange-700 mb-1">⏱️ Deployment Risk</h3>
-                                <p id="pdfRiskText" class="text-slate-700 leading-tight"></p>
+                            <div class="bg-orange-50/50 p-2 rounded border border-orange-100">
+                                <h3 id="pdfRiskTitle" class="text-[11px] font-bold text-orange-700 mb-1">⏱️ Deployment Risk</h3>
+                                <p id="pdfRiskText" class="text-slate-700 leading-tight text-[12px] whitespace-pre-line"></p>
                             </div>
                         </div>
                     </div>
-
-                    <div id="pdfNoReportMsg" class="hidden text-gray-400 text-sm italic text-center h-full flex items-center justify-center"></div>
+                    <div id="pdfNoReportMsg" class="hidden text-gray-400 text-sm italic text-center mt-6"></div>
                 </div>
             </div>
 
-            <div class="bg-slate-900 text-slate-400 p-6 text-center text-xs flex flex-col gap-1 shrink-0 mt-auto border-t-4 border-indigo-500">
-                <p class="font-bold text-slate-300 tracking-wide" id="pdfCopyright">Copyright © 2026 Bryan Jhuang. Designed for AI Server PM PoC.</p>
-                <p><span id="pdfDashboardLinkText">Interactive Dashboard available at:</span> <a id="pdfUrl" href="#" class="text-indigo-400 hover:text-indigo-300 underline break-all"></a></p>
+            <div class="bg-slate-900 text-slate-400 py-3 px-8 text-center text-[11px] flex justify-between items-center shrink-0 mt-auto border-t-4 border-indigo-500">
+                <p class="font-bold text-slate-300 tracking-wide" id="pdfCopyright">Copyright © 2026 Bryan Jhuang. PoC Design.</p>
+                <p><a id="pdfUrl" href="#" class="text-indigo-400 hover:text-indigo-300 underline font-mono"></a></p>
             </div>
         </div>
     </div>
@@ -371,7 +376,6 @@
             document.getElementById('t-copy-link').innerText = currentLang === 'zh' ? '複製連結' : 'Copy Link';
             document.getElementById('t-reset').innerText = currentLang === 'zh' ? '還原預設' : 'Reset Defaults';
             
-            // Web UI Report titles
             document.getElementById('t-report-roi').innerText = currentLang === 'zh' ? '💰 財務亮點 (ROI Highlight)' : '💰 ROI Highlight';
             document.getElementById('t-report-esg').innerText = currentLang === 'zh' ? '🌱 ESG 減碳效益 (Sustainability)' : '🌱 Sustainability & ESG';
             document.getElementById('t-report-risk').innerText = currentLang === 'zh' ? '⏱️ 建置風險與時程 (Deployment Risk)' : '⏱️ Deployment Risk';
@@ -406,7 +410,6 @@
             const targetTab = urlParams.get('tab');
             if (targetTab && ['about', 'tco', 'mindset'].includes(targetTab)) { switchTab(targetTab); }
             if (typeof calculateTCO === "function") { calculateTCO(); }
-            // 🚀 若 URL 帶有 report=1，自動生成報告
             if (urlParams.get('report') === '1' && typeof generateSalesReport === "function") { setTimeout(() => generateSalesReport(), 150); }
         };
     </script>
