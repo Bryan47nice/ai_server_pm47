@@ -8,13 +8,12 @@ let gaugeChartInstance = null;
 let latestCalcData = {}; 
 
 let isReportGenerated = false;
-let reportCache = { zh: null, en: null };
 
-// 🚀 情境管理全域變數 (In-Memory Data Store)
+// 🚀 狀態機與獨立快取陣列
 let scenarios = [];
 let activeScenarioId = null;
 let isCompareMode = false;
-let compareChartInstances = {}; // 存放比較模式中的多組圖表實體
+let compareChartInstances = {}; 
 
 const DEFAULT_PARAMS = {
     chip: "1",         
@@ -38,14 +37,14 @@ function debounce(func, wait) {
     };
 }
 
-// 🚀 初始化情境 A
 function initScenarios() {
     if (scenarios.length === 0) {
         scenarios.push({
             id: 'sc_' + Date.now(),
             name: currentLang === 'zh' ? '情境 A' : 'Scenario A',
             params: null,
-            results: null
+            results: null,
+            reportCache: { zh: null, en: null } // 🚀 賦予獨立快取空間
         });
         activeScenarioId = scenarios[0].id;
     }
@@ -54,7 +53,6 @@ function initScenarios() {
 
 function loadStateFromURL() {
     const params = new URLSearchParams(window.location.search);
-    
     const setVal = (id, paramKey, defaultVal, isFloat = false) => {
         let val = params.get(paramKey);
         if (val !== null && !isNaN(val)) {
@@ -68,15 +66,11 @@ function loadStateFromURL() {
 
     setVal('chipType', 'chip', DEFAULT_PARAMS.chip, false);
     setVal('totalServers', 'servers', DEFAULT_PARAMS.servers, false);
-    
     let urlNodes = params.get('nodes');
     if (urlNodes !== null && !isNaN(urlNodes)) {
-        let n = parseInt(urlNodes);
-        if (n < 10) n = 10; if (n > 72) n = 72;
-        document.getElementById('rackValInput').value = n;
-        document.getElementById('serversPerRack').value = n;
+        let n = parseInt(urlNodes); if (n < 10) n = 10; if (n > 72) n = 72;
+        document.getElementById('rackValInput').value = n; document.getElementById('serversPerRack').value = n;
     }
-
     setVal('powerCost', 'cost', DEFAULT_PARAMS.cost, true);
     setVal('evalYears', 'years', DEFAULT_PARAMS.years, true);
     setVal('utilRate', 'util', DEFAULT_PARAMS.util, false);
@@ -87,9 +81,7 @@ function loadStateFromURL() {
 }
 
 const syncToURL = () => {
-    // 比較模式下不更新 URL
     if (isCompareMode) return; 
-
     const url = new URL(window.location);
     url.searchParams.set('tab', 'tco'); 
     url.searchParams.set('chip', document.getElementById('chipType').value);
@@ -103,35 +95,12 @@ const syncToURL = () => {
     url.searchParams.set('air_capex', document.getElementById('airCapex').value);
     url.searchParams.set('liq_capex', document.getElementById('liqCapex').value);
     url.searchParams.set('report', isReportGenerated ? '1' : '0');
-    
     window.history.replaceState({}, '', url);
 };
 
 const debouncedSyncToURL = debounce(syncToURL, 300);
 
-// 🚀 將當前 DOM 參數與計算結果快照儲存至 Active Scenario
-function updateActiveScenario() {
-    if (!activeScenarioId || isCompareMode) return;
-    const scenario = scenarios.find(s => s.id === activeScenarioId);
-    if (scenario) {
-        scenario.params = {
-            chip: document.getElementById('chipType').value,
-            servers: document.getElementById('totalServers').value,
-            nodes: document.getElementById('rackValInput').value,
-            cost: document.getElementById('powerCost').value,
-            years: document.getElementById('evalYears').value,
-            util: document.getElementById('utilRate').value,
-            air_pue: document.getElementById('airPue').value,
-            liq_pue: document.getElementById('liqPue').value,
-            air_capex: document.getElementById('airCapex').value,
-            liq_capex: document.getElementById('liqCapex').value
-        };
-        // 深度拷貝結果陣列，避免被覆寫
-        scenario.results = JSON.parse(JSON.stringify(latestCalcData)); 
-    }
-}
-
-// 🚀 渲染情境管理列 UI
+// 🚀 渲染情境管理列 (加入直覺化 ✏️ 編輯按鈕)
 function renderScenarioBar() {
     const list = document.getElementById('scenarioList');
     list.innerHTML = '';
@@ -146,26 +115,19 @@ function renderScenarioBar() {
             : '';
 
         list.innerHTML += `
-            <div onclick="switchScenario('${sc.id}')" ondblclick="renameScenario('${sc.id}')" title="雙擊可重新命名 (Double click to rename)"
-                 class="${baseClass} px-4 py-1.5 rounded-full text-sm font-bold cursor-pointer transition-all flex items-center select-none shrink-0 border">
-                ${sc.name}
+            <div class="${baseClass} px-3 py-1.5 rounded-full text-sm font-bold cursor-pointer transition-all flex items-center select-none shrink-0 border" onclick="switchScenario('${sc.id}')">
+                <span class="mr-1">${sc.name}</span>
+                <span onclick="event.stopPropagation(); renameScenario('${sc.id}')" class="mx-1 hover:text-indigo-300 dark:hover:text-indigo-400 cursor-pointer text-xs transition" title="${currentLang === 'zh'?'重新命名':'Rename'}">✏️</span>
                 ${deleteBtn}
             </div>
         `;
     });
     
-    // 防呆：最多 4 組
     const addBtn = document.getElementById('btnAddScenario');
-    addBtn.disabled = scenarios.length >= 4;
-    addBtn.style.opacity = scenarios.length >= 4 ? '0.4' : '1';
-    addBtn.style.cursor = scenarios.length >= 4 ? 'not-allowed' : 'pointer';
-    
-    // 防呆：至少 2 組才能比較
-    const compBtn = document.getElementById('btnToggleCompare');
-    compBtn.disabled = scenarios.length < 2;
+    addBtn.disabled = scenarios.length >= 4; addBtn.style.opacity = scenarios.length >= 4 ? '0.4' : '1'; addBtn.style.cursor = scenarios.length >= 4 ? 'not-allowed' : 'pointer';
+    document.getElementById('btnToggleCompare').disabled = scenarios.length < 2;
 }
 
-// 🚀 新增情境 (複製當前參數)
 function addScenario() {
     if (scenarios.length >= 4) return;
     const newId = 'sc_' + Date.now();
@@ -178,14 +140,15 @@ function addScenario() {
         id: newId,
         name: name,
         params: JSON.parse(JSON.stringify(currentSc.params)),
-        results: JSON.parse(JSON.stringify(currentSc.results))
+        results: JSON.parse(JSON.stringify(currentSc.results)),
+        reportCache: { zh: null, en: null } // 繼承參數但不繼承上一份快取
     });
     switchScenario(newId);
 }
 
-// 🚀 切換情境 (還原參數至 DOM 並重算)
+// 🚀 智慧切換情境 (保留快取、秒讀秒切)
 function switchScenario(id) {
-    if (isCompareMode) return; // 比較模式下禁止切換底層
+    if (isCompareMode) return;
     activeScenarioId = id;
     const sc = scenarios.find(s => s.id === id);
     
@@ -203,6 +166,20 @@ function switchScenario(id) {
         document.getElementById('liqCapex').value = sc.params.liq_capex;
         
         calculateTCO(); 
+        
+        // 🚀 若記憶體中已有報告，瞬間還原 UI
+        if (sc.reportCache && sc.reportCache[currentLang]) {
+            renderReportFromData(sc.reportCache[currentLang]);
+            document.getElementById('salesReportSection').classList.remove('hidden');
+            document.getElementById('reportStateOutdated').classList.add('hidden');
+            document.getElementById('reportStateLoading').classList.add('hidden');
+            document.getElementById('reportStateSuccess').classList.remove('hidden');
+            isReportGenerated = true;
+        } else {
+            document.getElementById('salesReportSection').classList.add('hidden');
+            isReportGenerated = false;
+        }
+        syncToURL();
     }
     renderScenarioBar();
 }
@@ -210,24 +187,16 @@ function switchScenario(id) {
 function deleteScenario(id) {
     if (scenarios.length <= 1) return;
     scenarios = scenarios.filter(s => s.id !== id);
-    if (activeScenarioId === id) {
-        switchScenario(scenarios[scenarios.length - 1].id);
-    } else {
-        renderScenarioBar();
-    }
+    if (activeScenarioId === id) switchScenario(scenarios[scenarios.length - 1].id); else renderScenarioBar();
 }
 
 function renameScenario(id) {
     if (isCompareMode) return;
     const sc = scenarios.find(s => s.id === id);
     const newName = prompt(currentLang === 'zh' ? "請輸入情境名稱 (上限 15 字)：" : "Enter scenario name (max 15 chars):", sc.name);
-    if (newName && newName.trim() !== '') {
-        sc.name = newName.trim().substring(0, 15);
-        renderScenarioBar();
-    }
+    if (newName && newName.trim() !== '') { sc.name = newName.trim().substring(0, 15); renderScenarioBar(); }
 }
 
-// 🚀 雙軌模式切換引擎
 function toggleCompareMode() {
     if (scenarios.length < 2) return;
     isCompareMode = !isCompareMode;
@@ -239,55 +208,34 @@ function toggleCompareMode() {
     const scenarioBar = document.getElementById('scenarioBar');
     
     if (isCompareMode) {
-        updateActiveScenario();
-        
-        singleView.classList.add('hidden');
-        compareView.classList.remove('hidden');
-        
-        // 鎖死匯出與分享功能
-        pdfBtn.disabled = true;
-        pdfBtn.title = currentLang === 'zh' ? '請退出比較模式再匯出報告' : 'Exit compare mode to export';
-        copyBtn.disabled = true;
-        copyBtn.title = currentLang === 'zh' ? '比較模式不支援網址分享' : 'Sharing disabled in compare mode';
-        
+        singleView.classList.add('hidden'); compareView.classList.remove('hidden');
+        pdfBtn.disabled = true; pdfBtn.title = currentLang === 'zh' ? '請退出比較模式再匯出' : 'Exit compare mode to export';
+        copyBtn.disabled = true; copyBtn.title = currentLang === 'zh' ? '比較模式不支援分享' : 'Sharing disabled in compare';
         scenarioBar.classList.add('opacity-50', 'pointer-events-none');
         document.getElementById('btnToggleCompare').innerHTML = `🔙 <span id="t-exit-compare" class="ml-1">${currentLang === 'zh' ? '退出比較，返回編輯' : 'Exit Compare'}</span>`;
-        
         renderCompareGrid();
+        document.getElementById('compareReportSection').classList.add('hidden'); // 重置跨方案報告
     } else {
-        singleView.classList.remove('hidden');
-        compareView.classList.add('hidden');
-        
-        pdfBtn.disabled = false; pdfBtn.title = '';
-        copyBtn.disabled = false; copyBtn.title = '';
-        
+        singleView.classList.remove('hidden'); compareView.classList.add('hidden');
+        pdfBtn.disabled = false; pdfBtn.title = ''; copyBtn.disabled = false; copyBtn.title = '';
         scenarioBar.classList.remove('opacity-50', 'pointer-events-none');
         document.getElementById('btnToggleCompare').innerHTML = `📊 <span id="t-compare-mode" class="ml-1">${currentLang === 'zh' ? '進入比較模式' : 'Compare Mode'}</span>`;
-        
         calculateTCO();
     }
-    renderScenarioBar(); // 更新 Pill 顏色狀態
+    renderScenarioBar();
 }
 
-// 🚀 比較視圖的動態渲染引擎 (Dynamic Grid & Multi-Charts)
 function renderCompareGrid() {
-    const grid = document.getElementById('compareGrid');
-    grid.innerHTML = '';
-    
+    const grid = document.getElementById('compareGrid'); grid.innerHTML = '';
     const cols = scenarios.length;
     let gridClass = 'grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch';
-    if (cols === 3) gridClass += ' lg:grid-cols-3';
-    if (cols === 4) gridClass += ' lg:grid-cols-4';
+    if (cols === 3) gridClass += ' lg:grid-cols-3'; if (cols === 4) gridClass += ' lg:grid-cols-4';
     grid.className = gridClass;
     
-    // 清理舊的圖表實體避免記憶體流失
-    Object.values(compareChartInstances).forEach(c => c.destroy());
-    compareChartInstances = {};
+    Object.values(compareChartInstances).forEach(c => c.destroy()); compareChartInstances = {};
     
     scenarios.forEach(sc => {
-        const res = sc.results;
-        if (!res) return;
-        
+        const res = sc.results; if (!res) return;
         const isAirWinner = res.totalSavings <= 0;
         const winnerText = isAirWinner ? (currentLang === 'zh' ? '氣冷' : 'Air') : (currentLang === 'zh' ? '液冷' : 'Liquid');
         const winnerColor = isAirWinner ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400';
@@ -296,119 +244,70 @@ function renderCompareGrid() {
         const card = document.createElement('div');
         card.className = "bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 flex flex-col h-full transform transition hover:-translate-y-1 hover:shadow-lg";
         card.innerHTML = `
-            <div class="border-b border-gray-100 dark:border-gray-700 pb-3 mb-5">
-                <h3 class="text-xl font-black text-gray-800 dark:text-gray-100 flex items-center justify-between">
-                    <span class="truncate pr-2">${sc.name}</span>
-                    <span class="text-xs font-bold px-2.5 py-1 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 rounded-lg whitespace-nowrap">${res.kwPerRack.toFixed(1)} kW</span>
-                </h3>
-            </div>
-            
+            <div class="border-b border-gray-100 dark:border-gray-700 pb-3 mb-5"><h3 class="text-xl font-black text-gray-800 dark:text-gray-100 flex items-center justify-between"><span class="truncate pr-2">${sc.name}</span><span class="text-xs font-bold px-2.5 py-1 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 rounded-lg whitespace-nowrap">${res.kwPerRack.toFixed(1)} kW</span></h3></div>
             <div class="flex justify-between items-center mb-6 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
-                <div class="text-center w-1/3 border-r border-gray-200 dark:border-gray-700">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">${currentLang === 'zh' ? '最佳方案' : 'Best Opt.'}</p>
-                    <p class="text-lg font-black ${winnerColor}">${winnerText}</p>
-                </div>
-                <div class="text-center w-1/3 border-r border-gray-200 dark:border-gray-700 pl-2">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">${currentLang === 'zh' ? '總省下' : 'Savings'}</p>
-                    <p class="text-lg font-black text-green-600">+$${Math.abs(res.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
-                </div>
-                <div class="text-center w-1/3 pl-2">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">${currentLang === 'zh' ? '回本點' : 'Breakeven'}</p>
-                    <p class="text-lg font-black text-purple-600">${beText}</p>
-                </div>
+                <div class="text-center w-1/3 border-r border-gray-200 dark:border-gray-700"><p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">${currentLang === 'zh' ? '最佳方案' : 'Best Opt.'}</p><p class="text-lg font-black ${winnerColor}">${winnerText}</p></div>
+                <div class="text-center w-1/3 border-r border-gray-200 dark:border-gray-700 pl-2"><p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">${currentLang === 'zh' ? '總省下' : 'Savings'}</p><p class="text-lg font-black text-green-600">+$${Math.abs(res.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})}</p></div>
+                <div class="text-center w-1/3 pl-2"><p class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">${currentLang === 'zh' ? '回本點' : 'Breakeven'}</p><p class="text-lg font-black text-purple-600">${beText}</p></div>
             </div>
-            
-            <div class="w-full h-[220px] mt-auto relative">
-                <canvas id="compChart_${sc.id}"></canvas>
-            </div>
+            <div class="w-full h-[220px] mt-auto relative"><canvas id="compChart_${sc.id}"></canvas></div>
         `;
         grid.appendChild(card);
         
-        // 延遲繪圖確保 DOM 已掛載
         setTimeout(() => {
             const ctx = document.getElementById(`compChart_${sc.id}`).getContext('2d');
             const isDark = document.documentElement.classList.contains('dark');
-            const textColor = isDark ? '#9ca3af' : '#6b7280';
-            const gridColor = isDark ? '#374151' : '#f3f4f6';
-            
             compareChartInstances[sc.id] = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    labels: res.labels,
-                    datasets: [
+                data: { labels: res.labels, datasets: [
                         { label: 'Air', data: res.airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointRadius: 1, borderWidth: 2 },
                         { label: 'Liquid', data: res.liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1, pointRadius: 1, borderWidth: 2 }
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { bodyFont: { size: 12 } } },
-                    scales: { 
-                        x: { ticks: { color: textColor, font: {size: 9}, maxTicksLimit: 3 }, grid: { display: false } }, 
-                        y: { ticks: { color: textColor, maxTicksLimit: 5, font: {size: 9} }, grid: { color: gridColor } } 
-                    }
-                }
+                    ] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { bodyFont: { size: 12 } } }, scales: { x: { ticks: { color: isDark ? '#9ca3af' : '#6b7280', font: {size: 9}, maxTicksLimit: 3 }, grid: { display: false } }, y: { ticks: { color: isDark ? '#9ca3af' : '#6b7280', maxTicksLimit: 5, font: {size: 9} }, grid: { color: isDark ? '#374151' : '#f3f4f6' } } } }
             });
         }, 100);
     });
 }
 
-
-function resetParameters() {
-    document.getElementById('chipType').value = DEFAULT_PARAMS.chip;
-    document.getElementById('totalServers').value = DEFAULT_PARAMS.servers;
-    document.getElementById('rackValInput').value = DEFAULT_PARAMS.nodes;
-    document.getElementById('serversPerRack').value = DEFAULT_PARAMS.nodes;
-    document.getElementById('powerCost').value = DEFAULT_PARAMS.cost;
-    document.getElementById('evalYears').value = DEFAULT_PARAMS.years;
-    document.getElementById('utilRate').value = DEFAULT_PARAMS.util;
-    document.getElementById('airPue').value = DEFAULT_PARAMS.air_pue;
-    document.getElementById('liqPue').value = DEFAULT_PARAMS.liq_pue;
-    document.getElementById('airCapex').value = DEFAULT_PARAMS.air_capex;
-    document.getElementById('liqCapex').value = DEFAULT_PARAMS.liq_capex;
-    
-    isReportGenerated = false;
-    document.getElementById('salesReportSection').classList.add('hidden');
-    syncToURL();
-    calculateTCO();
-}
-
-async function copyShareLink() {
-    const btn = document.getElementById('btn-copy-link');
-    const span = document.getElementById('t-copy-link');
-    const originalText = span.innerText;
-    syncToURL();
-
-    try {
-        await navigator.clipboard.writeText(window.location.href);
-        span.innerText = currentLang === 'zh' ? '已複製！' : 'Copied!';
-        btn.classList.add('bg-green-100', 'text-green-700', 'border-green-300', 'dark:bg-green-900', 'dark:text-green-300');
-        btn.classList.remove('bg-white', 'text-indigo-600', 'border-indigo-200', 'dark:bg-gray-700', 'dark:text-indigo-400');
-    } catch (err) {
-        span.innerText = currentLang === 'zh' ? '複製失敗' : 'Failed';
-    }
-    setTimeout(() => {
-        span.innerText = originalText;
-        btn.classList.remove('bg-green-100', 'text-green-700', 'border-green-300', 'dark:bg-green-900', 'dark:text-green-300');
-        btn.classList.add('bg-white', 'text-indigo-600', 'border-indigo-200', 'dark:bg-gray-700', 'dark:text-indigo-400');
-    }, 2000);
-}
-
 function calculateTCO() {
-    const chipPower = parseFloat(document.getElementById('chipType').value);
-    const totalServers = parseInt(document.getElementById('totalServers').value);
-    const serversPerRack = parseInt(document.getElementById('rackValInput').value);
-    const powerCost = parseFloat(document.getElementById('powerCost').value);
-    const evalYears = parseFloat(document.getElementById('evalYears').value) || 5; 
-    const utilRate = parseFloat(document.getElementById('utilRate').value) / 100 || 0.8;
-    const airPUE = parseFloat(document.getElementById('airPue').value);
-    const liqPUE = parseFloat(document.getElementById('liqPue').value);
-    const airCapExPerRack = parseFloat(document.getElementById('airCapex').value);
-    const liqCapExPerRack = parseFloat(document.getElementById('liqCapex').value);
+    const currentParams = {
+        chip: document.getElementById('chipType').value,
+        servers: document.getElementById('totalServers').value,
+        nodes: document.getElementById('rackValInput').value,
+        cost: document.getElementById('powerCost').value,
+        years: document.getElementById('evalYears').value,
+        util: document.getElementById('utilRate').value,
+        air_pue: document.getElementById('airPue').value,
+        liq_pue: document.getElementById('liqPue').value,
+        air_capex: document.getElementById('airCapex').value,
+        liq_capex: document.getElementById('liqCapex').value
+    };
+
+    const activeSc = scenarios.find(s => s.id === activeScenarioId);
+    
+    // 🚀 關鍵防呆：只有在參數「真的」被改變時，才清空該情境的報告快取
+    if (activeSc) {
+        if (!activeSc.params) {
+            activeSc.params = currentParams;
+        } else if (JSON.stringify(activeSc.params) !== JSON.stringify(currentParams)) {
+            activeSc.params = currentParams;
+            activeSc.reportCache = { zh: null, en: null }; // 清空過期快取
+            if (isReportGenerated) document.getElementById('reportStateOutdated').classList.remove('hidden');
+        }
+    }
+
+    const chipPower = parseFloat(currentParams.chip);
+    const totalServers = parseInt(currentParams.servers);
+    const serversPerRack = parseInt(currentParams.nodes);
+    const powerCost = parseFloat(currentParams.cost);
+    const evalYears = parseFloat(currentParams.years) || 5; 
+    const utilRate = parseFloat(currentParams.util) / 100 || 0.8;
+    const airPUE = parseFloat(currentParams.air_pue);
+    const liqPUE = parseFloat(currentParams.liq_pue);
+    const airCapExPerRack = parseFloat(currentParams.air_capex);
+    const liqCapExPerRack = parseFloat(currentParams.liq_capex);
 
     debouncedSyncToURL();
-    reportCache = { zh: null, en: null };
-    if (isReportGenerated) document.getElementById('reportStateOutdated').classList.remove('hidden');
 
     const kwPerRack = serversPerRack * chipPower;
     const totalRacks = Math.ceil(totalServers / serversPerRack);
@@ -488,8 +387,8 @@ function calculateTCO() {
     drawChart(labels, airData, liqData);
     drawGaugeChart(kwPerRack, gaugeColor); 
     
-    // 🚀 計算完畢後，將最新資料寫回記憶體陣列
-    updateActiveScenario();
+    // 更新當前情境的結果快照
+    if (activeSc) activeSc.results = JSON.parse(JSON.stringify(latestCalcData)); 
 }
 
 function drawGaugeChart(kwPerRack, color, isPrintMode = false) {
@@ -521,10 +420,12 @@ function generateSalesReport() {
     const error = document.getElementById('reportStateError');
     const success = document.getElementById('reportStateSuccess');
 
+    const activeSc = scenarios.find(s => s.id === activeScenarioId);
     section.classList.remove('hidden'); outdated.classList.add('hidden');
 
-    if (reportCache[currentLang]) {
-        renderReportFromData(reportCache[currentLang]);
+    // 🚀 秒讀該情境專屬快取
+    if (activeSc && activeSc.reportCache && activeSc.reportCache[currentLang]) {
+        renderReportFromData(activeSc.reportCache[currentLang]);
         loading.classList.add('hidden'); success.classList.remove('hidden');
         isReportGenerated = true; syncToURL();
         return;
@@ -565,10 +466,53 @@ function generateSalesReport() {
                 : `Compared to the alternative, saves approx.\n🌍 ${d.co2SavedTons.toLocaleString(undefined, {maximumFractionDigits: 1})} Tons of CO2\nover ${d.evalYears} years.`;
 
             const generatedData = { pitch, obj, roi, esg, risk };
-            reportCache[currentLang] = generatedData; renderReportFromData(generatedData);
+            
+            // 🚀 將生成好的報告寫入情境專屬快取中
+            if (activeSc) activeSc.reportCache[currentLang] = generatedData;
+            renderReportFromData(generatedData);
+            
             loading.classList.add('hidden'); success.classList.remove('hidden');
             isReportGenerated = true; syncToURL();
         } catch (e) { loading.classList.add('hidden'); error.classList.remove('hidden'); console.error(e); }
+    }, 800);
+}
+
+// 🚀 全新：比較模式專屬的 AI 跨方案決策報告引擎
+function generateCompareReport() {
+    const loading = document.getElementById('compareReportLoading');
+    const success = document.getElementById('compareReportSuccess');
+    const content = document.getElementById('compareReportContent');
+    
+    document.getElementById('compareReportSection').classList.remove('hidden');
+    loading.classList.remove('hidden');
+    success.classList.add('hidden');
+    
+    setTimeout(() => {
+        let bestSc = scenarios[0];
+        let worstSc = scenarios[0];
+        const getCost = (sc) => Math.min(sc.results.airData[sc.results.airData.length-1], sc.results.liqData[sc.results.liqData.length-1]);
+        
+        scenarios.forEach(s => {
+            if (getCost(s) < getCost(bestSc)) bestSc = s;
+            if (getCost(s) > getCost(worstSc)) worstSc = s;
+        });
+        
+        const diff = getCost(worstSc) - getCost(bestSc);
+        const isZh = currentLang === 'zh';
+        const bestCooling = bestSc.results.winnerStr === 'air' ? (isZh ? '傳統氣冷' : 'Air Cooling') : (isZh ? '直接液冷' : 'Liquid Cooling');
+        
+        let text = '';
+        if (diff === 0 && bestSc.id === worstSc.id) {
+            text = isZh ? `目前各情境設定導致的成本過於相近，無顯著差異。建議您進一步拉開節點數或電費差距以利對比。` : `Current scenarios show similar costs. Adjust parameters to see a broader comparison difference.`;
+        } else {
+            text = isZh ? 
+                `經綜合評估畫面上 ${scenarios.length} 組決策情境，【${bestSc.name}】展現出最優異的 TCO 投資報酬率。\n\n對比成本最高的【${worstSc.name}】，在 ${bestSc.results.evalYears} 年生命週期內，預計可為企業額外省下高達 $${diff.toLocaleString(undefined, {maximumFractionDigits:0})} USD 的總營運支出。\n\n👉 戰略推薦：強烈建議將【${bestSc.name}】 (單櫃 ${bestSc.results.kwPerRack.toFixed(1)}kW 搭配 ${bestCooling}) 作為本專案的落地首選規格，這能在極大化算力密度的同時，將機房長期維運成本降至最低。` : 
+                `After analyzing ${scenarios.length} scenarios, 【${bestSc.name}】 offers the highest TCO ROI.\n\nCompared to the most expensive option (【${worstSc.name}】), it saves an additional $${diff.toLocaleString(undefined, {maximumFractionDigits:0})} USD over ${bestSc.results.evalYears} years.\n\n👉 Executive Recommendation: We strongly advise adopting 【${bestSc.name}】 (${bestSc.results.kwPerRack.toFixed(1)}kW/rack with ${bestCooling}) as the project baseline to maximize compute density while minimizing OPEX.`;
+        }
+        
+        content.innerText = text;
+        loading.classList.add('hidden');
+        success.classList.remove('hidden');
     }, 800);
 }
 
@@ -661,8 +605,12 @@ async function executePDFExport() {
         drawGaugeChart(d.kwPerRack, d.gaugeColor, false); drawChart(d.labels, d.airData, d.liqData, false);
 
         const reportContent = document.getElementById('pdfReportContent'); const noReportMsg = document.getElementById('pdfNoReportMsg');
-        if (isReportGenerated && reportCache[currentLang]) {
-            document.getElementById('pdfPitchText').innerText = reportCache[currentLang].pitch; document.getElementById('pdfObjText').innerText = reportCache[currentLang].obj; document.getElementById('pdfROIText').innerText = reportCache[currentLang].roi; document.getElementById('pdfESGText').innerText = reportCache[currentLang].esg; document.getElementById('pdfRiskText').innerText = reportCache[currentLang].risk;
+        
+        // PDF 匯出時，從當前情境快取中讀取
+        const activeSc = scenarios.find(s => s.id === activeScenarioId);
+        if (isReportGenerated && activeSc && activeSc.reportCache[currentLang]) {
+            const c = activeSc.reportCache[currentLang];
+            document.getElementById('pdfPitchText').innerText = c.pitch; document.getElementById('pdfObjText').innerText = c.obj; document.getElementById('pdfROIText').innerText = c.roi; document.getElementById('pdfESGText').innerText = c.esg; document.getElementById('pdfRiskText').innerText = c.risk;
             reportContent.classList.remove('hidden'); noReportMsg.classList.add('hidden');
         } else {
             reportContent.classList.add('hidden'); noReportMsg.classList.remove('hidden'); noReportMsg.innerText = isZh ? '(尚未生成業務教戰手冊，請於系統中點擊產出)' : '(Sales report not generated. Please generate it in the dashboard.)';
