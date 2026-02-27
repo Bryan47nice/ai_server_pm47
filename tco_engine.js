@@ -1,5 +1,5 @@
 // ==========================================
-// TCO Calculation Engine & Sales Report State
+// TCO Calculation Engine & Shareable State
 // ==========================================
 
 let currentLang = 'zh'; 
@@ -9,6 +9,133 @@ let latestCalcData = {};
 
 let isReportGenerated = false;
 let reportCache = { zh: null, en: null };
+
+// 🚀 預設參數防呆字典
+const DEFAULT_PARAMS = {
+    chip: "1",         // H100
+    servers: 100,
+    nodes: 32,
+    cost: 0.10,
+    years: 5,
+    util: 80,
+    air_pue: 1.40,
+    liq_pue: 1.15,
+    air_capex: 15000,
+    liq_capex: 45000
+};
+
+// 🚀 Debounce 防抖動函式 (保護 URL 不被瘋狂洗版)
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => { clearTimeout(timeout); func(...args); };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// 🚀 從 URL 解析並還原參數狀態
+function loadStateFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    
+    // 安全地覆寫欄位，若 URL 亂改或缺失則 fallback 回預設值
+    const setVal = (id, paramKey, defaultVal, isFloat = false) => {
+        let val = params.get(paramKey);
+        if (val !== null && !isNaN(val)) {
+            val = isFloat ? parseFloat(val) : parseInt(val);
+            document.getElementById(id).value = val;
+        } else if (val !== null && typeof val === 'string' && id === 'chipType') {
+            // 特別處理 select option (chip)
+            const validOptions = ["1", "1.2", "1.8"];
+            if(validOptions.includes(val)) document.getElementById(id).value = val;
+        }
+    };
+
+    setVal('chipType', 'chip', DEFAULT_PARAMS.chip, false);
+    setVal('totalServers', 'servers', DEFAULT_PARAMS.servers, false);
+    
+    // 處理滑桿連動
+    let urlNodes = params.get('nodes');
+    if (urlNodes !== null && !isNaN(urlNodes)) {
+        let n = parseInt(urlNodes);
+        if (n < 10) n = 10; if (n > 72) n = 72;
+        document.getElementById('rackValInput').value = n;
+        document.getElementById('serversPerRack').value = n;
+    }
+
+    setVal('powerCost', 'cost', DEFAULT_PARAMS.cost, true);
+    setVal('evalYears', 'years', DEFAULT_PARAMS.years, true);
+    setVal('utilRate', 'util', DEFAULT_PARAMS.util, false);
+    setVal('airPue', 'air_pue', DEFAULT_PARAMS.air_pue, true);
+    setVal('liqPue', 'liq_pue', DEFAULT_PARAMS.liq_pue, true);
+    setVal('airCapex', 'air_capex', DEFAULT_PARAMS.air_capex, true);
+    setVal('liqCapex', 'liq_capex', DEFAULT_PARAMS.liq_capex, true);
+}
+
+// 🚀 將當前狀態靜默同步至 URL
+const syncToURL = () => {
+    const url = new URL(window.location);
+    url.searchParams.set('chip', document.getElementById('chipType').value);
+    url.searchParams.set('servers', document.getElementById('totalServers').value);
+    url.searchParams.set('nodes', document.getElementById('rackValInput').value);
+    url.searchParams.set('cost', document.getElementById('powerCost').value);
+    url.searchParams.set('years', document.getElementById('evalYears').value);
+    url.searchParams.set('util', document.getElementById('utilRate').value);
+    url.searchParams.set('air_pue', document.getElementById('airPue').value);
+    url.searchParams.set('liq_pue', document.getElementById('liqPue').value);
+    url.searchParams.set('air_capex', document.getElementById('airCapex').value);
+    url.searchParams.set('liq_capex', document.getElementById('liqCapex').value);
+    
+    window.history.replaceState({}, '', url);
+};
+
+// 使用防抖動包裝
+const debouncedSyncToURL = debounce(syncToURL, 300);
+
+// 🚀 一鍵還原預設值
+function resetParameters() {
+    document.getElementById('chipType').value = DEFAULT_PARAMS.chip;
+    document.getElementById('totalServers').value = DEFAULT_PARAMS.servers;
+    document.getElementById('rackValInput').value = DEFAULT_PARAMS.nodes;
+    document.getElementById('serversPerRack').value = DEFAULT_PARAMS.nodes;
+    document.getElementById('powerCost').value = DEFAULT_PARAMS.cost;
+    document.getElementById('evalYears').value = DEFAULT_PARAMS.years;
+    document.getElementById('utilRate').value = DEFAULT_PARAMS.util;
+    document.getElementById('airPue').value = DEFAULT_PARAMS.air_pue;
+    document.getElementById('liqPue').value = DEFAULT_PARAMS.liq_pue;
+    document.getElementById('airCapex').value = DEFAULT_PARAMS.air_capex;
+    document.getElementById('liqCapex').value = DEFAULT_PARAMS.liq_capex;
+    
+    calculateTCO();
+}
+
+// 🚀 複製分享連結至剪貼簿
+async function copyShareLink() {
+    const btn = document.getElementById('btn-copy-link');
+    const span = document.getElementById('t-copy-link');
+    const originalText = span.innerText;
+
+    // 強制立即同步 URL 確保剪貼簿是最新的
+    syncToURL();
+
+    try {
+        await navigator.clipboard.writeText(window.location.href);
+        span.innerText = currentLang === 'zh' ? '已複製！' : 'Copied!';
+        btn.classList.add('bg-green-100', 'text-green-700', 'border-green-300', 'dark:bg-green-900', 'dark:text-green-300');
+        btn.classList.remove('bg-white', 'text-indigo-600', 'border-indigo-200', 'dark:bg-gray-700', 'dark:text-indigo-400');
+    } catch (err) {
+        span.innerText = currentLang === 'zh' ? '複製失敗' : 'Failed';
+        console.error('Copy failed', err);
+    }
+
+    // 2 秒後還原按鈕狀態
+    setTimeout(() => {
+        span.innerText = originalText;
+        btn.classList.remove('bg-green-100', 'text-green-700', 'border-green-300', 'dark:bg-green-900', 'dark:text-green-300');
+        btn.classList.add('bg-white', 'text-indigo-600', 'border-indigo-200', 'dark:bg-gray-700', 'dark:text-indigo-400');
+    }, 2000);
+}
+
 
 function calculateTCO() {
     const chipPower = parseFloat(document.getElementById('chipType').value);
@@ -21,6 +148,9 @@ function calculateTCO() {
     const liqPUE = parseFloat(document.getElementById('liqPue').value);
     const airCapExPerRack = parseFloat(document.getElementById('airCapex').value);
     const liqCapExPerRack = parseFloat(document.getElementById('liqCapex').value);
+
+    // 🚀 觸發網址靜默同步
+    debouncedSyncToURL();
 
     reportCache = { zh: null, en: null };
     
@@ -351,7 +481,6 @@ function closeExportModal() {
     document.getElementById('exportModal').classList.add('hidden');
 }
 
-// 🚀 執行 PDF 匯出：包含全面 i18n 翻譯與強制 A4 產出
 async function executePDFExport() {
     const btn = document.getElementById('btn-confirm-export');
     const originalHtml = btn.innerHTML;
@@ -373,7 +502,6 @@ async function executePDFExport() {
         const chipSelect = document.getElementById('chipType');
         const chipName = chipSelect.options[chipSelect.selectedIndex].text;
 
-        // 1. 全面雙語化翻譯 (i18n for PDF Elements)
         document.getElementById('pdfMainTitle').innerText = isZh ? 'AI 伺服器 TCO 分析報告' : 'AI Server TCO Analysis Report';
         document.getElementById('pdfDate').innerText = (isZh ? '報告生成日期：' : 'Generated on: ') + new Date().toLocaleDateString();
         document.getElementById('pdfSubtitle').innerText = isZh ? '由 TCO 運算引擎 V2 產生' : 'Generated by TCO Engine V2';
@@ -385,7 +513,6 @@ async function executePDFExport() {
         document.getElementById('pdfCopyright').innerText = isZh ? '版權所有 © 2026 Bryan Jhuang. 專為 AI 伺服器 PM 概念驗證設計。' : 'Copyright © 2026 Bryan Jhuang. Designed for AI Server PM PoC.';
         document.getElementById('pdfDashboardLinkText').innerText = isZh ? '完整互動式儀表板請見：' : 'Interactive Dashboard available at:';
 
-        // 2. 參數表 (水平橫向微縮排版)
         document.getElementById('pdfParams').innerHTML = `
             <div class="flex flex-col border-b border-gray-100 pb-1"><span class="text-slate-500 font-medium">${isZh ? 'AI 伺服器型號' : 'Chip Model'}</span> <b class="text-slate-800">${chipName}</b></div>
             <div class="flex flex-col border-b border-gray-100 pb-1"><span class="text-slate-500 font-medium">${isZh ? '總伺服器數量' : 'Total Servers'}</span> <b class="text-slate-800">${d.totalServers} Nodes</b></div>
@@ -397,7 +524,6 @@ async function executePDFExport() {
             <div class="flex flex-col"><span class="text-slate-500 font-medium">${isZh ? '液冷 PUE' : 'Liquid PUE'}</span> <b class="text-slate-800">${d.liqPUE}</b></div>
         `;
 
-        // 3. 贏家計分板 (置中橫向)
         const isAirWinner = d.totalSavings <= 0;
         const bestOpt = isAirWinner ? (isZh ? '傳統氣冷方案 (Air)' : 'Air Cooling') : (isZh ? '強制液冷方案 (Liquid)' : 'Liquid Cooling');
         const winnerColor = isAirWinner ? 'text-blue-600' : 'text-red-600';
@@ -422,7 +548,6 @@ async function executePDFExport() {
         document.getElementById('pdfGaugeStatusText').innerText = d.gaugeStatusText;
         document.getElementById('pdfGaugeStatusText').style.color = d.gaugeColor;
 
-        // 執行無痕重建法擷取圖表
         drawGaugeChart(d.kwPerRack, d.gaugeColor, true);
         drawChart(d.labels, d.airData, d.liqData, true);
         await new Promise(r => setTimeout(r, 150));
@@ -431,7 +556,6 @@ async function executePDFExport() {
         drawGaugeChart(d.kwPerRack, d.gaugeColor, false);
         drawChart(d.labels, d.airData, d.liqData, false);
 
-        // 4. 處理 AI 提案區塊
         const pitchText = document.getElementById('pdfPitchText');
         const objText = document.getElementById('pdfObjText');
         const noReportMsg = document.getElementById('pdfNoReportMsg');
@@ -443,19 +567,19 @@ async function executePDFExport() {
             objText.parentElement.classList.remove('hidden');
             noReportMsg.classList.add('hidden');
         } else {
-            // 未產生報告時的防呆顯示
             pitchText.parentElement.classList.add('hidden');
             objText.parentElement.classList.add('hidden');
             noReportMsg.innerText = isZh ? '(尚未生成業務教戰手冊，請於系統中點擊產出)' : '(Sales report not generated. Please generate it in the dashboard.)';
             noReportMsg.classList.remove('hidden');
         }
 
+        // 🚀 PDF 頁尾連動：確保這裡抓取的是帶有完整參數的分享網址！
+        syncToURL(); 
         const urlObj = new URL(window.location.href);
         urlObj.searchParams.set('tab', 'tco'); 
         document.getElementById('pdfUrl').innerText = urlObj.toString();
         document.getElementById('pdfUrl').href = urlObj.toString();
 
-        // 5. 轉換為 Canvas
         const targetEl = document.getElementById('pdfTemplate');
         const canvas = await html2canvas(targetEl, { 
             scale: 2, 
@@ -464,11 +588,10 @@ async function executePDFExport() {
         });
         const imgData = canvas.toDataURL('image/png');
         
-        // 🚀 6. 強制 A4 標準列印 (210mm x 297mm)
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth(); // 210mm
-        const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
+        const pdfWidth = pdf.internal.pageSize.getWidth(); 
+        const pdfHeight = pdf.internal.pageSize.getHeight(); 
         
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
         pdf.save(`${userFilename}.pdf`);
