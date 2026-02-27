@@ -246,8 +246,28 @@
                     </button>
                 </div>
 
-                <div id="compareGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+                <div id="compareGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch"></div>
+                
+                <div class="mt-6 flex justify-end print:hidden">
+                    <button onclick="generateCompareReport()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 rounded-xl shadow-md transition-colors font-bold text-sm md:text-base flex items-center group">
+                        🪄 <span id="t-btn-gen-compare-report" class="ml-2 group-hover:tracking-wider transition-all">產出跨方案 AI 決策報告</span>
+                    </button>
+                </div>
+                
+                <div id="compareReportSection" class="hidden mt-4 card bg-gradient-to-br from-indigo-50 to-white dark:from-gray-800 dark:to-gray-900 border border-indigo-200 dark:border-indigo-800">
+                    <div id="compareReportLoading" class="hidden flex flex-col items-center justify-center py-8">
+                        <svg class="animate-spin h-8 w-8 text-indigo-500 mb-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                        <p class="text-indigo-600 dark:text-indigo-400 font-bold animate-pulse text-sm">⏳ AI 正在分析各方案優劣，為您總結最佳決策...</p>
                     </div>
+                    <div id="compareReportSuccess" class="hidden">
+                        <div class="flex items-center text-indigo-800 dark:text-indigo-400 font-bold text-lg md:text-xl border-b border-indigo-200 dark:border-indigo-800 pb-2 mb-4">
+                            <span id="t-compare-report-title">💡 跨方案決策建議 (Executive Summary)</span>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-sm border-l-4 border-l-indigo-500">
+                            <p id="compareReportContent" class="text-sm md:text-base text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-line font-medium"></p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -277,7 +297,7 @@
             <div class="bg-gray-50 dark:bg-gray-900 border-t dark:border-gray-700 p-4 flex justify-end space-x-3"><button onclick="closeExportModal()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 font-bold transition">取消</button><button id="btn-confirm-export" onclick="executePDFExport()" class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 font-bold shadow-md transition flex items-center">確認匯出</button></div>
         </div>
     </div>
-
+    
     <div id="drilldownModal" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-4 print:hidden backdrop-blur-sm transition-opacity">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden border dark:border-gray-700 transform transition-transform">
             <div class="bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-700 p-4 flex justify-between items-center">
@@ -302,6 +322,8 @@
         </div>
     </div>
 
+    <button id="themeToggleBtn" onclick="toggleTheme()" class="print:hidden fixed bottom-4 right-4 bg-gray-800 dark:bg-yellow-400 text-white dark:text-gray-900 p-3 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center z-50"><span id="themeIcon" class="text-xl">☀️</span></button>
+    
     <div id="pdfContainerWrapper" style="position: absolute; left: -9999px; top: 0; pointer-events: none;">
         <div id="pdfTemplate" class="bg-gray-50 text-gray-900 w-[960px] h-[1358px] block font-sans relative box-border overflow-hidden">
             <div class="bg-gradient-to-r from-slate-900 to-indigo-900 text-white px-8 py-6 h-[100px] flex justify-between items-end box-border shrink-0">
@@ -355,20 +377,25 @@
             document.getElementById('t-report-esg').innerText = currentLang === 'zh' ? '🌱 ESG 減碳效益 (Sustainability)' : '🌱 Sustainability & ESG';
             document.getElementById('t-report-risk').innerText = currentLang === 'zh' ? '⏱️ 建置風險與時程 (Deployment Risk)' : '⏱️ Deployment Risk';
             
-            // 🚀 多語系：情境比較模式按鈕
             document.getElementById('t-add-scenario').innerText = currentLang === 'zh' ? '新增情境' : 'Add Scenario';
-            if(document.getElementById('t-compare-mode')) {
-                document.getElementById('t-compare-mode').innerText = currentLang === 'zh' ? '進入比較模式' : 'Compare Mode';
-            }
-            if(document.getElementById('t-exit-compare')) {
-                document.getElementById('t-exit-compare').innerText = currentLang === 'zh' ? '退出比較，返回編輯' : 'Exit Compare';
-            }
+            if(document.getElementById('t-compare-mode')) document.getElementById('t-compare-mode').innerText = currentLang === 'zh' ? '進入比較模式' : 'Compare Mode';
+            if(document.getElementById('t-exit-compare')) document.getElementById('t-exit-compare').innerText = currentLang === 'zh' ? '退出比較，返回編輯' : 'Exit Compare';
             document.getElementById('t-compare-title').innerText = currentLang === 'zh' ? '📊 決策面板：多情境並排比較' : '📊 Decision Board: Scenario Comparison';
             document.getElementById('t-compare-subtitle').innerText = currentLang === 'zh' ? '橫向比對不同建置參數下的投資報酬率與最佳散熱策略。' : 'Side-by-side ROI and cooling strategy comparison across different configs.';
+            
+            // 🚀 比較模式說帖按鈕雙語
+            if(document.getElementById('t-btn-gen-compare-report')) {
+                document.getElementById('t-btn-gen-compare-report').innerText = currentLang === 'zh' ? '產出跨方案 AI 決策報告' : 'Generate AI Executive Summary';
+            }
+            if(document.getElementById('t-compare-report-title')) {
+                document.getElementById('t-compare-report-title').innerText = currentLang === 'zh' ? '💡 跨方案決策建議 (Executive Summary)' : '💡 AI Executive Summary';
+            }
 
             if(typeof renderScenarioBar === "function") renderScenarioBar();
             if(typeof renderCompareGrid === "function" && document.getElementById('compareViewSection') && !document.getElementById('compareViewSection').classList.contains('hidden')) {
                 renderCompareGrid();
+                // 若有比較報告，清空強制重算
+                document.getElementById('compareReportSuccess').classList.add('hidden');
             }
 
             if(typeof calculateTCO === "function") calculateTCO();
@@ -397,8 +424,6 @@
 
         window.onload = function() {
             if(typeof dict !== 'undefined' && dict[currentLang]) { for (const key in dict[currentLang]) { const el = document.getElementById(key); if (el) el.innerHTML = dict[currentLang][key]; } }
-            
-            // 🚀 初始化情境管理引擎
             if (typeof initScenarios === "function") { initScenarios(); }
             if (typeof loadStateFromURL === "function") { loadStateFromURL(); }
             
