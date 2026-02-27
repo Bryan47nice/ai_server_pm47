@@ -115,21 +115,25 @@ function calculateTCO() {
     document.getElementById('gaugeStatusText').innerText = gaugeStatusText;
     document.getElementById('gaugeStatusText').style.color = gaugeColor;
 
+    // 🚀 將繪圖陣列綁定進 Cache 中，供列印模式重建使用
     latestCalcData = {
         evalYears, utilRate, totalServers, totalRacks, totalKw, powerCost, airPUE, liqPUE, kwPerRack,
         airCapExPerRack, liqCapExPerRack, totalAirCapEx, totalLiqCapEx,
         airOpExPerYear, liqOpExPerYear, labelsCount: labels.length,
-        breakevenYear: beYearRaw, totalSavings, winnerStr, gaugeColor, gaugeStatusText
+        breakevenYear: beYearRaw, totalSavings, winnerStr, gaugeColor, gaugeStatusText,
+        labels, airData, liqData 
     };
 
     drawChart(labels, airData, liqData);
     drawGaugeChart(kwPerRack, gaugeColor); 
 }
 
-function drawGaugeChart(kwPerRack, color) {
+// 🚀 加入 isPrintMode 安全重建參數
+function drawGaugeChart(kwPerRack, color, isPrintMode = false) {
     const ctx = document.getElementById('gaugeChart').getContext('2d');
     const isDark = document.documentElement.classList.contains('dark');
-    const bgColor = isDark ? '#374151' : '#e5e7eb'; 
+    // 列印模式強制使用淺灰底色，否則依照深淺色模式判斷
+    const bgColor = isPrintMode ? '#e2e8f0' : (isDark ? '#374151' : '#e5e7eb'); 
     
     const maxKw = 140;
     const currentVal = Math.min(kwPerRack, maxKw);
@@ -157,7 +161,8 @@ function drawGaugeChart(kwPerRack, color) {
                 legend: { display: false },
                 tooltip: { enabled: false } 
             },
-            animation: {
+            // 列印模式強制關閉動畫，確保瞬間完成渲染以供截圖
+            animation: isPrintMode ? false : {
                 animateScale: true,
                 animateRotate: true
             }
@@ -290,6 +295,53 @@ function openDrilldownModal(dataIndex, labelStr) {
     document.getElementById('drilldownModal').classList.remove('hidden');
 }
 
+// 🚀 加入 isPrintMode 安全重建參數
+function drawChart(labels, airData, liqData, isPrintMode = false) {
+    const ctx = document.getElementById('tcoChart').getContext('2d');
+    const isDark = document.documentElement.classList.contains('dark');
+    
+    // 依據是否為列印模式套用高對比顏色
+    const textColor = isPrintMode ? '#0f172a' : (isDark ? '#e5e7eb' : '#374151');
+    const gridColor = isPrintMode ? '#e2e8f0' : (isDark ? '#374151' : '#e5e7eb');
+    
+    const labelAir = currentLang === 'zh' ? '氣冷累積成本 (Air)' : 'Air Cooling TCO';
+    const labelLiq = currentLang === 'zh' ? '液冷累積成本 (Liquid)' : 'Liquid Cooling TCO';
+
+    // 銷毀現有圖表實體，準備安全重繪
+    if (tcoChartInstance) tcoChartInstance.destroy();
+    
+    tcoChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: labelAir, data: airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 },
+                { label: labelLiq, data: liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 }
+            ]
+        },
+        options: { 
+            responsive: true, maintainAspectRatio: false,
+            // 列印模式關閉動畫與懸停互動
+            animation: isPrintMode ? false : true,
+            onClick: (event) => {
+                if (isPrintMode) return;
+                const points = tcoChartInstance.getElementsAtEventForMode(event, 'index', { intersect: false }, true);
+                if (points.length) {
+                    const dataIndex = points[0].index;
+                    const labelStr = labels[dataIndex];
+                    openDrilldownModal(dataIndex, labelStr);
+                }
+            },
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { labels: { color: textColor } }, tooltip: { enabled: !isPrintMode, bodyFont: { size: 14 } } },
+            scales: { 
+                x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                y: { ticks: { color: textColor }, grid: { color: gridColor }, title: { display: true, text: 'USD ($)', color: textColor } } 
+            } 
+        }
+    });
+}
+
 function openExportModal() {
     const chipSelect = document.getElementById('chipType');
     const chipName = chipSelect.options[chipSelect.selectedIndex].text;
@@ -307,7 +359,7 @@ function closeExportModal() {
     document.getElementById('exportModal').classList.add('hidden');
 }
 
-// 🚀 強大升級版：幽靈列印模式 (強制轉換黑圖截圖，再無縫復原)
+// 🚀 終極修復：無痕重建法 (Safe Rebuild Mode)
 async function executePDFExport() {
     const btn = document.getElementById('btn-confirm-export');
     const originalHtml = btn.innerHTML;
@@ -329,7 +381,6 @@ async function executePDFExport() {
         const chipSelect = document.getElementById('chipType');
         const chipName = chipSelect.options[chipSelect.selectedIndex].text;
 
-        // 1. 填充基礎文字資料
         document.getElementById('pdfMainTitle').innerText = isZh ? 'AI 伺服器 TCO 分析報告' : 'AI Server TCO Analysis Report';
         document.getElementById('pdfDate').innerText = (isZh ? '報告生成日期：' : 'Generated on: ') + new Date().toLocaleDateString();
         
@@ -363,58 +414,26 @@ async function executePDFExport() {
             </div>
         `;
 
-        // 2. 補齊 PDF Gauge 的文字靈魂
         document.getElementById('pdfGaugeValueText').innerText = d.kwPerRack.toFixed(1) + " kW";
         document.getElementById('pdfGaugeValueText').style.color = d.gaugeColor;
         document.getElementById('pdfGaugeStatusText').innerText = d.gaugeStatusText;
         document.getElementById('pdfGaugeStatusText').style.color = d.gaugeColor;
 
-        // 🚀 3. 幽靈列印模式 (High-Contrast Print Mode)
-        // 紀錄使用者當前的圖表顏色 (可能是淺灰)
-        const origXColor = tcoChartInstance.options.scales.x.ticks.color;
-        const origYColor = tcoChartInstance.options.scales.y.ticks.color;
-        const origYTitleColor = tcoChartInstance.options.scales.y.title.color;
-        const origLegendColor = tcoChartInstance.options.plugins.legend.labels.color;
-        
-        if(!tcoChartInstance.options.scales.x.grid) tcoChartInstance.options.scales.x.grid = {};
-        if(!tcoChartInstance.options.scales.y.grid) tcoChartInstance.options.scales.y.grid = {};
-        const origXGridColor = tcoChartInstance.options.scales.x.grid.color;
-        const origYGridColor = tcoChartInstance.options.scales.y.grid.color;
-        
-        const origGaugeBgColor = gaugeChartInstance.data.datasets[0].backgroundColor[1];
+        // 🚀 執行無痕重建法：銷毀並以高對比模式重畫
+        drawGaugeChart(d.kwPerRack, d.gaugeColor, true);
+        drawChart(d.labels, d.airData, d.liqData, true);
 
-        // 強制替換為白底專用的「高對比深灰色」
-        const printFontColor = '#0f172a'; // 超深灰
-        const printGridColor = '#e2e8f0'; // 淺灰網格
-        
-        tcoChartInstance.options.scales.x.ticks.color = printFontColor;
-        tcoChartInstance.options.scales.x.grid.color = printGridColor;
-        tcoChartInstance.options.scales.y.ticks.color = printFontColor;
-        tcoChartInstance.options.scales.y.title.color = printFontColor;
-        tcoChartInstance.options.scales.y.grid.color = printGridColor;
-        tcoChartInstance.options.plugins.legend.labels.color = printFontColor;
-        tcoChartInstance.update('none'); // 無動畫瞬間更新
-        
-        gaugeChartInstance.data.datasets[0].backgroundColor[1] = '#e2e8f0';
-        gaugeChartInstance.update('none');
+        // 微小延遲確保 Canvas 已經完成瞬間渲染 (無動畫狀態)
+        await new Promise(r => setTimeout(r, 150));
 
-        // 4. 在高對比模式下進行截圖
+        // 擷取高畫質靜態圖
         document.getElementById('pdfGaugeImg').src = gaugeChartInstance.toBase64Image();
         document.getElementById('pdfLineImg').src = tcoChartInstance.toBase64Image();
 
-        // 🚀 5. 截圖完成，瞬間將顏色恢復成使用者的深/淺色模式，完美隱藏痕跡
-        tcoChartInstance.options.scales.x.ticks.color = origXColor;
-        tcoChartInstance.options.scales.x.grid.color = origXGridColor;
-        tcoChartInstance.options.scales.y.ticks.color = origYColor;
-        tcoChartInstance.options.scales.y.title.color = origYTitleColor;
-        tcoChartInstance.options.scales.y.grid.color = origYGridColor;
-        tcoChartInstance.options.plugins.legend.labels.color = origLegendColor;
-        tcoChartInstance.update('none');
-        
-        gaugeChartInstance.data.datasets[0].backgroundColor[1] = origGaugeBgColor;
-        gaugeChartInstance.update('none');
+        // 🚀 擷取完畢，無縫復原回原本的深淺色與互動模式
+        drawGaugeChart(d.kwPerRack, d.gaugeColor, false);
+        drawChart(d.labels, d.airData, d.liqData, false);
 
-        // 6. 處理 AI 提案區塊
         const pitchSection = document.getElementById('pdfPitchSection');
         if (isReportGenerated && reportCache[currentLang]) {
             pitchSection.classList.remove('hidden');
@@ -429,7 +448,6 @@ async function executePDFExport() {
         document.getElementById('pdfUrl').innerText = urlObj.toString();
         document.getElementById('pdfUrl').href = urlObj.toString();
 
-        // 7. html2canvas 繪製
         const targetEl = document.getElementById('pdfTemplate');
         const canvas = await html2canvas(targetEl, { 
             scale: 2, 
@@ -439,7 +457,6 @@ async function executePDFExport() {
         
         const imgData = canvas.toDataURL('image/png');
         
-        // 8. 下載 PDF
         const { jsPDF } = window.jspdf;
         const pdfWidth = 210; 
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width; 
