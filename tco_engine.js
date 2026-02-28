@@ -9,13 +9,11 @@ let latestCalcData = {};
 
 let isReportGenerated = false;
 
-// 狀態機與獨立快取陣列
 let scenarios = [];
 let activeScenarioId = null;
 let isCompareMode = false;
 let compareChartInstances = {}; 
 
-// 比較模式專屬快取與狀態快照
 let compareReportCache = { zh: null, en: null };
 let compareStateSnapshot = null;
 let isCompareReportOutdated = false;
@@ -199,6 +197,7 @@ function renameScenario(id) {
     if (newName && newName.trim() !== '') { sc.name = newName.trim().substring(0, 15); renderScenarioBar(); }
 }
 
+// 🚀 核心修復：使用動態群組來控制 Navbar 的按鈕顯示
 function toggleCompareMode() {
     if (scenarios.length < 2) return;
     isCompareMode = !isCompareMode;
@@ -207,13 +206,21 @@ function toggleCompareMode() {
     const compareView = document.getElementById('compareViewSection');
     const pdfBtn = document.getElementById('btn-export-pdf');
     const copyBtn = document.getElementById('btn-copy-link');
-    const scenarioBar = document.getElementById('scenarioBar');
+    const scenarioList = document.getElementById('scenarioList');
+    
+    const editGroup = document.getElementById('scenarioEditGroup');
+    const compareGroup = document.getElementById('scenarioCompareGroup');
     
     if (isCompareMode) {
-        singleView.classList.add('hidden'); compareView.classList.remove('hidden');
+        singleView.classList.add('hidden'); 
+        compareView.classList.remove('hidden');
+        
+        editGroup.classList.add('hidden');
+        compareGroup.classList.remove('hidden');
+        scenarioList.classList.add('opacity-50', 'pointer-events-none');
+        
         pdfBtn.disabled = true; pdfBtn.title = currentLang === 'zh' ? '請退出比較模式再匯出' : 'Exit compare mode to export';
         copyBtn.disabled = true; copyBtn.title = currentLang === 'zh' ? '比較模式不支援分享' : 'Sharing disabled in compare';
-        scenarioBar.classList.add('opacity-50', 'pointer-events-none');
         
         renderCompareGrid();
 
@@ -223,8 +230,6 @@ function toggleCompareMode() {
         if (compareStateSnapshot && currentSnap !== compareStateSnapshot) {
             isCompareReportOutdated = true;
             document.getElementById('compareReportSection').classList.remove('hidden');
-            
-            // 🚀 隱藏成功區塊，顯示警告區塊 (Block)
             document.getElementById('compareReportSuccess').classList.add('hidden');
             document.getElementById('compareReportLoading').classList.add('hidden');
             document.getElementById('compareReportOutdated').classList.remove('hidden');
@@ -240,9 +245,14 @@ function toggleCompareMode() {
         }
 
     } else {
-        singleView.classList.remove('hidden'); compareView.classList.add('hidden');
+        singleView.classList.remove('hidden'); 
+        compareView.classList.add('hidden');
+        
+        editGroup.classList.remove('hidden');
+        compareGroup.classList.add('hidden');
+        scenarioList.classList.remove('opacity-50', 'pointer-events-none');
+        
         pdfBtn.disabled = false; pdfBtn.title = ''; copyBtn.disabled = false; copyBtn.title = '';
-        scenarioBar.classList.remove('opacity-50', 'pointer-events-none');
         calculateTCO();
     }
     renderScenarioBar();
@@ -602,32 +612,34 @@ function closeExportPrompt() {
     document.getElementById('exportPromptModal').classList.add('hidden');
 }
 
-// 🚀 核心修復：強制捲動歸零並套用畫框防護
+// 🚀 核心修復：拔除 windowY 硬限制，並加入呼吸空間 (Padding) 畫框
 async function captureCompareView() {
     const btn = document.getElementById('btn-export-png');
     const originalHtml = btn.innerHTML;
     const isZh = currentLang === 'zh';
     btn.innerHTML = `⏳ <span class="ml-1">${isZh ? '擷取中...' : 'Capturing...'}</span>`;
     
-    // 1. 儲存原始捲動位置，並強制跳轉至最頂部 (消滅截圖位移地雷)
+    // 強制置頂以避免滾動導致的錯位
     const originalScrollY = window.scrollY;
     window.scrollTo(0, 0);
 
-    // 2. 隱藏不必要的按鈕，並為截圖容器加掛邊距與底色畫框
+    // 隱藏不必要的按鈕，並動態加上高級感的 padding 畫框
     document.querySelectorAll('.capture-hide').forEach(el => el.classList.add('hidden'));
     const targetEl = document.getElementById('compareCaptureArea');
-    targetEl.classList.add('p-4', 'md:p-8', 'bg-gray-50', 'dark:bg-gray-900'); 
+    const isDark = document.documentElement.classList.contains('dark');
+    
+    // 注入 p-8 確保標題不被切掉且四邊有呼吸空間
+    targetEl.classList.add('p-8');
+    if (isDark) { targetEl.classList.add('bg-gray-900'); } else { targetEl.classList.add('bg-gray-50'); }
 
     try {
-        // 給予瀏覽器 150ms 執行 Reflow 確保畫面穩定
         await new Promise(r => setTimeout(r, 150)); 
         
+        // 🚀 拔除 windowY，讓 html2canvas 自然偵測元素的真實 Y 座標
         const canvas = await html2canvas(targetEl, { 
             scale: 2, 
             useCORS: true, 
-            backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : '#f8fafc',
-            windowY: 0, // 強制 html2canvas 從絕對座標 0 開始繪製
-            scrollY: 0
+            backgroundColor: isDark ? '#111827' : '#f8fafc'
         });
         
         const link = document.createElement('a');
@@ -638,9 +650,9 @@ async function captureCompareView() {
         console.error("Screenshot failed:", err);
         alert(isZh ? '截圖失敗，請稍後再試。' : 'Screenshot failed.');
     } finally {
-        // 3. 卸除畫框、還原按鈕，並捲回原本的位置
+        // 還原畫框與按鈕
         document.querySelectorAll('.capture-hide').forEach(el => el.classList.remove('hidden'));
-        targetEl.classList.remove('p-4', 'md:p-8', 'bg-gray-50', 'dark:bg-gray-900');
+        targetEl.classList.remove('p-8', 'bg-gray-900', 'bg-gray-50');
         window.scrollTo(0, originalScrollY);
         btn.innerHTML = originalHtml;
     }
@@ -687,13 +699,11 @@ function openExportModal() {
 }
 function closeExportModal() { document.getElementById('exportModal').classList.add('hidden'); }
 
-// 🚀 核心修復：匯出 PDF 時亦強制歸零捲動座標
 async function executePDFExport() {
     const btn = document.getElementById('btn-confirm-export'); const originalHtml = btn.innerHTML; const isZh = currentLang === 'zh';
     let userFilename = document.getElementById('exportFilename').value.trim() || "TCO_Report";
     btn.innerHTML = `⏳ <span class="ml-1">${isZh ? '產出中...' : 'Generating...'}</span>`; btn.disabled = true;
 
-    // 紀錄並重置捲動座標防走鐘
     const originalScrollY = window.scrollY;
     window.scrollTo(0, 0);
 
@@ -764,7 +774,7 @@ async function executePDFExport() {
             scale: 2, 
             useCORS: true, 
             backgroundColor: '#ffffff',
-            windowY: 0, // 強制鎖死 Y 軸
+            windowY: 0, 
             scrollY: 0
         });
         const { jsPDF } = window.jspdf; const pdf = new jsPDF('p', 'mm', 'a4');
@@ -774,7 +784,7 @@ async function executePDFExport() {
     } catch (err) { 
         alert(isZh ? '匯出失敗，請檢查設定。' : 'Export failed.'); console.error(err); 
     } finally { 
-        window.scrollTo(0, originalScrollY); // 還原捲動位置
+        window.scrollTo(0, originalScrollY); 
         btn.innerHTML = originalHtml; btn.disabled = false; 
     }
 }
