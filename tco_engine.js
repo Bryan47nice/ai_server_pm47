@@ -893,7 +893,6 @@ function startTour() {
 
     currentTourStep = 0;
     
-    // 確保 DOM 存在再開啟，避免 JS Crash
     const overlay = document.getElementById('tourOverlay');
     const tooltip = document.getElementById('tourTooltip');
     if(overlay) { overlay.classList.remove('hidden'); overlay.classList.add('block'); }
@@ -911,62 +910,61 @@ function renderTourStep() {
     
     if (!targetEl) { endTour(); return; }
 
+    // 1. 觸發平滑滾動
     targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    // 🚀 防彈層 1：即使字典檔壞掉，也不會引發 ReferenceError 讓畫面卡死
-    try {
-        const titleText = (typeof dict !== 'undefined' && dict[currentLang]) ? dict[currentLang][step.titleKey] : step.titleKey;
-        const descText = (typeof dict !== 'undefined' && dict[currentLang]) ? dict[currentLang][step.descKey] : '載入中...';
-        
-        document.getElementById('tourTitle').innerHTML = titleText;
-        document.getElementById('tourDesc').innerHTML = descText;
-
-        document.getElementById('tourPrevBtn').style.display = currentTourStep === 0 ? 'none' : 'block';
-        if (currentTourStep === tourStepsConfig.length - 1) {
-            const finishText = (typeof dict !== 'undefined' && dict[currentLang]) ? dict[currentLang]['t-tour-finish'] : 'Finish';
-            document.getElementById('tourNextBtn').innerHTML = `<span id="t-tour-finish">${finishText}</span>`;
-        } else {
-            const nextText = (typeof dict !== 'undefined' && dict[currentLang]) ? dict[currentLang]['t-tour-next'] : 'Next';
-            document.getElementById('tourNextBtn').innerHTML = `<span id="t-tour-next">${nextText}</span>`;
-        }
-    } catch(e) {
-        console.warn("Tour i18n warning:", e);
-    }
-
+    // 🚀 核心修復：將文字更新與座標計算「同步」放入 setTimeout 中
     setTimeout(() => {
-        // 🚀 防彈層 2：確保 Spotlight 座標一定會被計算，若失敗自動救援
         try {
+            // --- A. 更新多語系文字與按鈕狀態 ---
+            const titleText = (typeof dict !== 'undefined' && dict[currentLang]) ? dict[currentLang][step.titleKey] : step.titleKey;
+            const descText = (typeof dict !== 'undefined' && dict[currentLang]) ? dict[currentLang][step.descKey] : '載入中...';
+            
+            document.getElementById('tourTitle').innerHTML = titleText;
+            document.getElementById('tourDesc').innerHTML = descText;
+
+            document.getElementById('tourPrevBtn').style.display = currentTourStep === 0 ? 'none' : 'block';
+            if (currentTourStep === tourStepsConfig.length - 1) {
+                const finishText = (typeof dict !== 'undefined' && dict[currentLang]) ? dict[currentLang]['t-tour-finish'] : 'Finish';
+                document.getElementById('tourNextBtn').innerHTML = `<span id="t-tour-finish">${finishText}</span>`;
+            } else {
+                const nextText = (typeof dict !== 'undefined' && dict[currentLang]) ? dict[currentLang]['t-tour-next'] : 'Next';
+                document.getElementById('tourNextBtn').innerHTML = `<span id="t-tour-next">${nextText}</span>`;
+            }
+
+            // --- B. 計算並更新絕對座標 ---
             const rect = targetEl.getBoundingClientRect();
             const spotlight = document.getElementById('tourSpotlight');
-            if (!spotlight) return;
-            
-            const padding = 12; 
-            
-            spotlight.style.top = `${rect.top - padding}px`;
-            spotlight.style.left = `${rect.left - padding}px`;
-            spotlight.style.width = `${rect.width + padding * 2}px`;
-            spotlight.style.height = `${rect.height + padding * 2}px`;
+            if (spotlight) {
+                const padding = 12; 
+                spotlight.style.top = `${rect.top - padding}px`;
+                spotlight.style.left = `${rect.left - padding}px`;
+                spotlight.style.width = `${rect.width + padding * 2}px`;
+                spotlight.style.height = `${rect.height + padding * 2}px`;
+            }
 
             const tooltip = document.getElementById('tourTooltip');
-            if (!tooltip) return;
-            const tooltipRect = tooltip.getBoundingClientRect();
-            
-            let topPos = rect.bottom + padding + 16;
-            if (topPos + tooltipRect.height > window.innerHeight) {
-                topPos = rect.top - padding - tooltipRect.height - 16;
-            }
-            
-            let leftPos = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-            if (leftPos < 20) leftPos = 20;
-            if (leftPos + tooltipRect.width > window.innerWidth - 20) leftPos = window.innerWidth - tooltipRect.width - 20;
+            if (tooltip) {
+                const tooltipRect = tooltip.getBoundingClientRect();
+                const padding = 12;
+                
+                let topPos = rect.bottom + padding + 16;
+                if (topPos + tooltipRect.height > window.innerHeight) {
+                    topPos = rect.top - padding - tooltipRect.height - 16;
+                }
+                
+                let leftPos = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+                if (leftPos < 20) leftPos = 20;
+                if (leftPos + tooltipRect.width > window.innerWidth - 20) leftPos = window.innerWidth - tooltipRect.width - 20;
 
-            tooltip.style.top = `${topPos}px`;
-            tooltip.style.left = `${leftPos}px`;
+                tooltip.style.top = `${topPos}px`;
+                tooltip.style.left = `${leftPos}px`;
+            }
         } catch(e) {
-            console.error("Tour layout calculation error:", e);
-            endTour(); // 若計算崩潰，主動關閉遮罩自救
+            console.error("Tour layout sync error:", e);
+            endTour(); 
         }
-    }, 350); 
+    }, 350); // 確保在 scrollIntoView 動畫完成的同一瞬間，文字與框線一起變換
 }
 
 function nextTourStep() {
