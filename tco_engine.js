@@ -868,3 +868,127 @@ async function executePDFExport() {
         btn.innerHTML = originalHtml; btn.disabled = false; 
     }
 }
+
+
+// ==========================================
+// 🚀 Interactive Guided Tour Engine (Zero-dependency)
+// ==========================================
+
+const tourStepsConfig = [
+    { targetId: 'scenarioBar', titleKey: 't-tour-s1-title', descKey: 't-tour-s1-desc' },
+    { targetId: 'tcoParamsArea', titleKey: 't-tour-s2-title', descKey: 't-tour-s2-desc' },
+    { targetId: 'tcoGaugeCard', titleKey: 't-tour-s3-title', descKey: 't-tour-s3-desc' },
+    { targetId: 'tcoChartCard', titleKey: 't-tour-s4-title', descKey: 't-tour-s4-desc' },
+    { targetId: 'tcoActionButtons', titleKey: 't-tour-s5-title', descKey: 't-tour-s5-desc' }
+];
+
+let currentTourStep = 0;
+
+function startTour() {
+    // 雙重防線：手機版或非 TCO 頁面絕對不啟動
+    if (window.innerWidth < 1024) return;
+    const tcoWrapper = document.getElementById('wrapper-tco');
+    if (!tcoWrapper || tcoWrapper.classList.contains('hidden')) return;
+
+    // 若在比較模式，強制退回單一編輯模式確保目標元素可見
+    if (isCompareMode) toggleCompareMode();
+
+    currentTourStep = 0;
+    document.getElementById('tourOverlay').classList.remove('hidden');
+    document.getElementById('tourOverlay').classList.add('block');
+    document.getElementById('tourTooltip').classList.remove('hidden');
+    document.getElementById('tourTooltip').classList.add('flex');
+    
+    // 禁用背景滾動
+    document.body.style.overflow = 'hidden';
+    
+    // 監聽 Esc 鍵退出
+    document.addEventListener('keydown', handleTourEsc);
+
+    renderTourStep();
+}
+
+function renderTourStep() {
+    const step = tourStepsConfig[currentTourStep];
+    const targetEl = document.getElementById(step.targetId);
+    
+    if (!targetEl) { endTour(); return; }
+
+    // 1. 自動滾動至目標中央
+    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // 2. 寫入多語系文字 (瞬間命中 Cache，零 Token)
+    document.getElementById('tourTitle').innerHTML = dict[currentLang][step.titleKey];
+    document.getElementById('tourDesc').innerHTML = dict[currentLang][step.descKey];
+
+    // 3. 更新按鈕狀態
+    document.getElementById('tourPrevBtn').style.display = currentTourStep === 0 ? 'none' : 'block';
+    if (currentTourStep === tourStepsConfig.length - 1) {
+        document.getElementById('tourNextBtn').innerHTML = `<span id="t-tour-finish">${dict[currentLang]['t-tour-finish']}</span>`;
+    } else {
+        document.getElementById('tourNextBtn').innerHTML = `<span id="t-tour-next">${dict[currentLang]['t-tour-next']}</span>`;
+    }
+
+    // 4. 等待滾動結束後，精準計算 Spotlight 座標
+    setTimeout(() => {
+        const rect = targetEl.getBoundingClientRect();
+        const spotlight = document.getElementById('tourSpotlight');
+        const padding = 12; // 給予高亮區一點呼吸空間
+        
+        spotlight.style.top = `${rect.top - padding}px`;
+        spotlight.style.left = `${rect.left - padding}px`;
+        spotlight.style.width = `${rect.width + padding * 2}px`;
+        spotlight.style.height = `${rect.height + padding * 2}px`;
+
+        // 5. 動態定位 Tooltip 氣泡
+        const tooltip = document.getElementById('tourTooltip');
+        const tooltipRect = tooltip.getBoundingClientRect();
+        
+        // 預設放在目標下方，若超出視窗底部則放到上方
+        let topPos = rect.bottom + padding + 16;
+        if (topPos + tooltipRect.height > window.innerHeight) {
+            topPos = rect.top - padding - tooltipRect.height - 16;
+        }
+        
+        // 水平置中於目標，若超出左右視窗則貼齊邊緣
+        let leftPos = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+        if (leftPos < 20) leftPos = 20;
+        if (leftPos + tooltipRect.width > window.innerWidth - 20) leftPos = window.innerWidth - tooltipRect.width - 20;
+
+        tooltip.style.top = `${topPos}px`;
+        tooltip.style.left = `${leftPos}px`;
+        
+    }, 350); // 確保 scrollIntoView 動畫已完成
+}
+
+function nextTourStep() {
+    if (currentTourStep < tourStepsConfig.length - 1) {
+        currentTourStep++;
+        renderTourStep();
+    } else {
+        endTour();
+    }
+}
+
+function prevTourStep() {
+    if (currentTourStep > 0) {
+        currentTourStep--;
+        renderTourStep();
+    }
+}
+
+function endTour() {
+    document.getElementById('tourOverlay').classList.add('hidden');
+    document.getElementById('tourOverlay').classList.remove('block');
+    document.getElementById('tourTooltip').classList.add('hidden');
+    document.getElementById('tourTooltip').classList.remove('flex');
+    document.body.style.overflow = 'auto'; // 還原背景滾動
+    document.removeEventListener('keydown', handleTourEsc);
+    
+    // 寫入 localStorage，確保下次進來不再自動打擾
+    localStorage.setItem('bryan_tour_completed', 'true');
+}
+
+function handleTourEsc(e) {
+    if (e.key === 'Escape') endTour();
+}
