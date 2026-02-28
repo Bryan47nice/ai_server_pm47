@@ -98,6 +98,23 @@ const dict = {
         't-c1-new-h': '【現在】雲端伺服器產品企劃',
         't-c1-new-v': 'Roadmap ➔ NPI ➔ MP',
         't-c1-new-d': '擬定符合市場需求的產品規格發展，並與 RD 合作掌控 NPI 研發時程。'
+            
+        // Tour Section   
+        't-tour-btn': '❓ 導覽',
+        't-tour-skip': '跳過',
+        't-tour-prev': '上一步',
+        't-tour-next': '下一步',
+        't-tour-finish': '🎉 開始探索',
+        't-tour-s1-title': '1. 情境控制台',
+        't-tour-s1-desc': '這裡是情境控制台，您可以新增多組方案，或點擊進入『比較模式』。',
+        't-tour-s2-title': '2. 核心參數設定',
+        't-tour-s2-desc': '嘗試拖動滑桿調整「單機櫃伺服器數量」，右側所有財務數據會瞬間即時連動。',
+        't-tour-s3-title': '3. 冷卻轉折點智慧判定',
+        't-tour-s3-desc': '這個動態儀表會根據物理極限，智慧判斷目前該用氣冷還是強制轉液冷。',
+        't-tour-s4-title': '4. TCO 累積成本分析',
+        't-tour-s4-desc': '試著點擊圖表上的「⭐ 交叉點」或任意年份，可以下鑽查看該年度的詳細算式與勝敗判定！',
+        't-tour-s5-title': '5. 業務說帖與匯出',
+        't-tour-s5-desc': '最後，別忘了體驗右下角的「產出 Sales 提案報告」與「匯出圖卡」功能。'
     },
     en: {
         't-tab-about': '👤 About Me',
@@ -198,5 +215,22 @@ const dict = {
         't-c1-new-h': '[Now] Cloud Server Planning',
         't-c1-new-v': 'Roadmap ➔ NPI ➔ MP',
         't-c1-new-d': 'Formulate product specs meeting market needs and co-manage NPI schedule with RD.'
+
+        // Tour Section   
+        't-tour-btn': '❓ Tour',
+        't-tour-skip': 'Skip',
+        't-tour-prev': 'Prev',
+        't-tour-next': 'Next',
+        't-tour-finish': '🎉 Explore',
+        't-tour-s1-title': '1. Scenario Console',
+        't-tour-s1-desc': 'Manage your scenarios here. Add multiple options or enter Compare Mode.',
+        't-tour-s2-title': '2. Core Parameters',
+        't-tour-s2-desc': 'Try dragging the slider to adjust nodes per rack. All financial data updates instantly.',
+        't-tour-s3-title': '3. Cooling Threshold',
+        't-tour-s3-desc': 'This gauge smartly recommends Air or Liquid cooling based on physical power limits.',
+        't-tour-s4-title': '4. TCO Accumulation',
+        't-tour-s4-desc': 'Click the "⭐ Breakeven" or any year node on the chart to drill down into detailed math and ROI.',
+        't-tour-s5-title': '5. Sales Enablement',
+        't-tour-s5-desc': 'Finally, don\'t forget to generate AI Sales Battlecards and export your presentation!'
     }
 };
