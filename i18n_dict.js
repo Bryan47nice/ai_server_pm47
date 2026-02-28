@@ -7,7 +7,6 @@ const dict = {
         't-copy-link': '複製連結',
         't-export': '匯出 PDF',
         
-        // About Me Section
         't-about-hero-title': '以軟體敏捷思維，貫通產品規劃與 NPI 落地的資深 PM',
         't-about-hero-subtitle': '4+ 年跨部門專案管理經驗 | TOEIC 910 (Gold) | 專注於模組化架構與高價值產品藍圖',
         't-mission-title': '🎯 使命宣言 (Mission)',
@@ -20,7 +19,6 @@ const dict = {
         't-about-p3-desc': '具備高度風險意識，不憑直覺行事。透過開發概念驗證 (PoC) 工具與專案儀表板，提前識別開發瓶頸，輔助管理層在規格與時程上進行精準取捨 (Trade-off)。',
         't-about-cta': '👉 立即體驗我的 PoC 專案：AI 伺服器 TCO 評估儀表板',
 
-        // TCO Calculator Section
         't-add-scenario': '新增情境',
         't-compare-mode': '進入比較模式',
         't-exit-compare': '退出比較',
@@ -33,7 +31,6 @@ const dict = {
         't-total-servers': '總伺服器數量 (台)',
         't-power-rate': '電費費率 (USD/kWh)',
         't-servers-per-rack': '單機櫃伺服器數量',
-        't-tt-title': '為什麼上限設定為 72 台？',
         't-power-per-rack': '單櫃功耗:',
         't-total-racks': '總機櫃:',
         't-adv-settings': '進階環境設定 (Advanced)',
@@ -46,7 +43,6 @@ const dict = {
         't-liq-capex': '液冷單櫃 CapEx ($)',
         't-liq-total-capex': '總 CapEx:',
 
-        // Dashboard Results
         't-rec-title': '冷卻技術轉折點',
         't-breakeven-title': '黃金交叉點',
         't-gauge-warning': '警告：已達 GB200 高密度功耗門檻！強烈建議切換至 DLC 液冷方案。',
@@ -62,7 +58,6 @@ const dict = {
         't-report-esg': '🌱 ESG 減碳效益 (Sustainability)',
         't-report-risk': '⏱️ 建置風險與時程 (Deployment Risk)',
 
-        // Compare View
         't-compare-title': '📊 決策面板：多情境並排比較',
         't-compare-subtitle': '橫向比對不同建置參數下的投資報酬率與最佳散熱策略。',
         't-export-png': '匯出比較圖卡',
@@ -71,14 +66,12 @@ const dict = {
         't-compare-regen-btn': '🔄 重新分析最新決策',
         't-compare-report-title': '💡 跨方案決策建議 (Executive Summary)',
 
-        // Export Prompt
         't-export-prompt-title': '💡 溫馨提示',
         't-export-prompt-desc': '您尚未產出 / 更新 AI 跨方案決策報告。建議您附上高階總結，讓這份截圖更有說服力。',
         't-btn-gen-export': '🪄 產出報告並匯出',
         't-btn-force-export': '直接匯出當前畫面',
         't-btn-cancel-prompt': '取消',
 
-        // Drilldown Modal
         't-modal-air': '氣冷方案 (Air)',
         't-modal-liq': '液冷方案 (Liquid)',
         't-modal-capex-label-air': '一次性建置成本 (CapEx)',
@@ -88,7 +81,6 @@ const dict = {
         't-modal-total-air': '該年度累積總成本',
         't-modal-total-liq': '該年度累積總成本',
         
-        // Mindset Section
         't-hero-title': '專案管理的核心：載體不同，邏輯一致',
         't-hero-sub': '「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 Product Planning 流程加速的引擎。」',
         't-c1-tag': '1. 產品藍圖與生命週期',
@@ -97,9 +89,8 @@ const dict = {
         't-c1-old-d': '定義需求並透過敏捷衝刺，確保軟體功能如期交付上線。',
         't-c1-new-h': '【現在】雲端伺服器產品企劃',
         't-c1-new-v': 'Roadmap ➔ NPI ➔ MP',
-        't-c1-new-d': '擬定符合市場需求的產品規格發展，並與 RD 合作掌控 NPI 研發時程。'
-            
-        // Tour Section   
+        't-c1-new-d': '擬定符合市場需求的產品規格發展，並與 RD 合作掌控 NPI 研發時程。',
+
         't-tour-btn': '❓ 導覽',
         't-tour-skip': '跳過',
         't-tour-prev': '上一步',
@@ -124,7 +115,6 @@ const dict = {
         't-copy-link': 'Copy Link',
         't-export': 'Export PDF',
         
-        // About Me Section
         't-about-hero-title': 'Bridging Product Planning & NPI with an Agile Software Mindset',
         't-about-hero-subtitle': '4+ Yrs Cross-functional PM | TOEIC 910 (Gold) | Focus on Modular Architecture',
         't-mission-title': '🎯 Mission Statement',
@@ -137,7 +127,6 @@ const dict = {
         't-about-p3-desc': 'Highly risk-aware, never acting solely on intuition. Build PoC tools and dashboards to identify bottlenecks early, assisting management in precise trade-offs.',
         't-about-cta': '👉 Try My PoC: AI Server TCO Dashboard',
 
-        // TCO Calculator Section
         't-add-scenario': 'Add Scenario',
         't-compare-mode': 'Compare Mode',
         't-exit-compare': 'Exit Compare',
@@ -150,7 +139,6 @@ const dict = {
         't-total-servers': 'Total Servers (Nodes)',
         't-power-rate': 'Power Rate (USD/kWh)',
         't-servers-per-rack': 'Nodes per Rack',
-        't-tt-title': 'Why cap at 72 nodes?',
         't-power-per-rack': 'Power/Rack:',
         't-total-racks': 'Total Racks:',
         't-adv-settings': 'Advanced Configurations',
@@ -163,7 +151,6 @@ const dict = {
         't-liq-capex': 'Liquid CapEx/Rack ($)',
         't-liq-total-capex': 'Total CapEx:',
 
-        // Dashboard Results
         't-rec-title': 'Cooling Threshold',
         't-breakeven-title': 'Breakeven Point',
         't-gauge-warning': 'Warning: GB200 high-density threshold reached! DLC highly recommended.',
@@ -179,7 +166,6 @@ const dict = {
         't-report-esg': '🌱 Sustainability & ESG',
         't-report-risk': '⏱️ Deployment Risk',
 
-        // Compare View
         't-compare-title': '📊 Decision Board: Scenario Comparison',
         't-compare-subtitle': 'Side-by-side ROI and cooling strategy comparison across different configs.',
         't-export-png': 'Export PNG',
@@ -188,14 +174,12 @@ const dict = {
         't-compare-regen-btn': '🔄 Analyze Latest Scenarios',
         't-compare-report-title': '💡 AI Executive Summary',
 
-        // Export Prompt
         't-export-prompt-title': '💡 Quick Tip',
         't-export-prompt-desc': 'Decision report is missing or outdated. Add an executive summary to make this comparison more persuasive.',
         't-btn-gen-export': '🪄 Generate & Export',
         't-btn-force-export': 'Export As Is',
         't-btn-cancel-prompt': 'Cancel',
 
-        // Drilldown Modal
         't-modal-air': 'Air Cooling (Air)',
         't-modal-liq': 'Liquid Cooling (DLC)',
         't-modal-capex-label-air': 'Upfront CapEx',
@@ -205,7 +189,6 @@ const dict = {
         't-modal-total-air': 'Total Cumulative Cost',
         't-modal-total-liq': 'Total Cumulative Cost',
         
-        // Mindset Section
         't-hero-title': 'Core PM Logic Remains the Same Across Domains',
         't-hero-sub': '"Transforming agile software mindset into an engine that accelerates AI server hardware product planning."',
         't-c1-tag': '1. Roadmap & Lifecycle',
@@ -214,9 +197,8 @@ const dict = {
         't-c1-old-d': 'Define requirements and use agile sprints to ensure software features are delivered on time.',
         't-c1-new-h': '[Now] Cloud Server Planning',
         't-c1-new-v': 'Roadmap ➔ NPI ➔ MP',
-        't-c1-new-d': 'Formulate product specs meeting market needs and co-manage NPI schedule with RD.'
+        't-c1-new-d': 'Formulate product specs meeting market needs and co-manage NPI schedule with RD.',
 
-        // Tour Section   
         't-tour-btn': '❓ Tour',
         't-tour-skip': 'Skip',
         't-tour-prev': 'Prev',
