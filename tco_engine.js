@@ -15,7 +15,7 @@ let activeScenarioId = null;
 let isCompareMode = false;
 let compareChartInstances = {}; 
 
-// 🚀 比較模式專屬快取與狀態快照
+// 比較模式專屬快取與狀態快照
 let compareReportCache = { zh: null, en: null };
 let compareStateSnapshot = null;
 let isCompareReportOutdated = false;
@@ -214,23 +214,21 @@ function toggleCompareMode() {
         pdfBtn.disabled = true; pdfBtn.title = currentLang === 'zh' ? '請退出比較模式再匯出' : 'Exit compare mode to export';
         copyBtn.disabled = true; copyBtn.title = currentLang === 'zh' ? '比較模式不支援分享' : 'Sharing disabled in compare';
         scenarioBar.classList.add('opacity-50', 'pointer-events-none');
-        document.getElementById('btnToggleCompare').innerHTML = `🔙 <span id="t-exit-compare" class="ml-1">${currentLang === 'zh' ? '退出比較' : 'Exit Compare'}</span>`;
         
         renderCompareGrid();
 
-        // 🚀 快照檢查機制：比對當前所有情境的參數與快照是否一致
         const currentSnap = JSON.stringify(scenarios.map(s => s.params));
         const hasCache = compareReportCache && compareReportCache[currentLang];
 
         if (compareStateSnapshot && currentSnap !== compareStateSnapshot) {
             isCompareReportOutdated = true;
-            if (hasCache) {
-                document.getElementById('compareReportSection').classList.remove('hidden');
-                document.getElementById('compareReportOutdated').classList.remove('hidden');
-                document.getElementById('compareReportSuccess').classList.add('hidden');
-            } else {
-                document.getElementById('compareReportSection').classList.add('hidden');
-            }
+            document.getElementById('compareReportSection').classList.remove('hidden');
+            
+            // 🚀 隱藏成功區塊，顯示警告區塊 (Block)
+            document.getElementById('compareReportSuccess').classList.add('hidden');
+            document.getElementById('compareReportLoading').classList.add('hidden');
+            document.getElementById('compareReportOutdated').classList.remove('hidden');
+            
         } else if (hasCache) {
             isCompareReportOutdated = false;
             document.getElementById('compareReportContent').innerText = compareReportCache[currentLang];
@@ -245,7 +243,6 @@ function toggleCompareMode() {
         singleView.classList.remove('hidden'); compareView.classList.add('hidden');
         pdfBtn.disabled = false; pdfBtn.title = ''; copyBtn.disabled = false; copyBtn.title = '';
         scenarioBar.classList.remove('opacity-50', 'pointer-events-none');
-        document.getElementById('btnToggleCompare').innerHTML = `📊 <span id="t-compare-mode" class="ml-1">${currentLang === 'zh' ? '進入比較模式' : 'Compare Mode'}</span>`;
         calculateTCO();
     }
     renderScenarioBar();
@@ -538,7 +535,6 @@ function generateSalesReport() {
     }, 800);
 }
 
-// 🚀 比較模式：產出決策報告並「寫入快照與快取」
 function generateCompareReport() {
     const loading = document.getElementById('compareReportLoading');
     const success = document.getElementById('compareReportSuccess');
@@ -573,7 +569,6 @@ function generateCompareReport() {
                 `After analyzing ${scenarios.length} scenarios, 【${bestSc.name}】 offers the highest TCO ROI.\n\nCompared to the most expensive option (【${worstSc.name}】), it saves an additional $${diff.toLocaleString(undefined, {maximumFractionDigits:0})} USD over ${bestSc.results.evalYears} years.\n\n👉 Executive Recommendation: We strongly advise adopting 【${bestSc.name}】 (${bestSc.results.kwPerRack.toFixed(1)}kW/rack with ${bestCooling}) as the project baseline to maximize compute density while minimizing OPEX.`;
         }
         
-        // 寫入全域快取與快照
         compareReportCache[currentLang] = text;
         compareStateSnapshot = JSON.stringify(scenarios.map(s => s.params));
         isCompareReportOutdated = false;
@@ -584,7 +579,6 @@ function generateCompareReport() {
     }, 800);
 }
 
-// 🚀 比較模式：一鍵截圖防呆邏輯
 function exportComparePNG() {
     if (!compareReportCache[currentLang] || isCompareReportOutdated) {
         document.getElementById('exportPromptModal').classList.remove('hidden');
@@ -593,16 +587,12 @@ function exportComparePNG() {
     }
 }
 
-// 彈窗操作 1：產出報告並自動截圖
 async function generateAndExportCompare() {
     closeExportPrompt();
     generateCompareReport();
-    setTimeout(() => {
-        captureCompareView();
-    }, 900); // 給予 800ms 算繪期 + 100ms DOM 渲染緩衝
+    setTimeout(() => { captureCompareView(); }, 900); 
 }
 
-// 彈窗操作 2：強制略過報告直接截圖
 function forceExportCompare() {
     closeExportPrompt();
     captureCompareView();
@@ -612,23 +602,34 @@ function closeExportPrompt() {
     document.getElementById('exportPromptModal').classList.add('hidden');
 }
 
-// 🚀 比較模式：執行 DOM 截圖 (隱藏所有干擾按鈕)
+// 🚀 核心修復：強制捲動歸零並套用畫框防護
 async function captureCompareView() {
     const btn = document.getElementById('btn-export-png');
     const originalHtml = btn.innerHTML;
     const isZh = currentLang === 'zh';
     btn.innerHTML = `⏳ <span class="ml-1">${isZh ? '擷取中...' : 'Capturing...'}</span>`;
     
-    // 拍攝前，先透過自訂 class 瞬間隱藏畫面上的操作按鈕
-    document.querySelectorAll('.capture-hide').forEach(el => el.classList.add('hidden'));
+    // 1. 儲存原始捲動位置，並強制跳轉至最頂部 (消滅截圖位移地雷)
+    const originalScrollY = window.scrollY;
+    window.scrollTo(0, 0);
 
-    const targetEl = document.getElementById('compareViewSection');
+    // 2. 隱藏不必要的按鈕，並為截圖容器加掛邊距與底色畫框
+    document.querySelectorAll('.capture-hide').forEach(el => el.classList.add('hidden'));
+    const targetEl = document.getElementById('compareCaptureArea');
+    targetEl.classList.add('p-4', 'md:p-8', 'bg-gray-50', 'dark:bg-gray-900'); 
+
     try {
+        // 給予瀏覽器 150ms 執行 Reflow 確保畫面穩定
+        await new Promise(r => setTimeout(r, 150)); 
+        
         const canvas = await html2canvas(targetEl, { 
             scale: 2, 
             useCORS: true, 
-            backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : '#f8fafc' 
+            backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : '#f8fafc',
+            windowY: 0, // 強制 html2canvas 從絕對座標 0 開始繪製
+            scrollY: 0
         });
+        
         const link = document.createElement('a');
         link.download = `TCO_Compare_Scenarios.png`;
         link.href = canvas.toDataURL('image/png');
@@ -637,8 +638,10 @@ async function captureCompareView() {
         console.error("Screenshot failed:", err);
         alert(isZh ? '截圖失敗，請稍後再試。' : 'Screenshot failed.');
     } finally {
-        // 拍攝完成，還原按鈕
+        // 3. 卸除畫框、還原按鈕，並捲回原本的位置
         document.querySelectorAll('.capture-hide').forEach(el => el.classList.remove('hidden'));
+        targetEl.classList.remove('p-4', 'md:p-8', 'bg-gray-50', 'dark:bg-gray-900');
+        window.scrollTo(0, originalScrollY);
         btn.innerHTML = originalHtml;
     }
 }
@@ -684,10 +687,15 @@ function openExportModal() {
 }
 function closeExportModal() { document.getElementById('exportModal').classList.add('hidden'); }
 
+// 🚀 核心修復：匯出 PDF 時亦強制歸零捲動座標
 async function executePDFExport() {
     const btn = document.getElementById('btn-confirm-export'); const originalHtml = btn.innerHTML; const isZh = currentLang === 'zh';
     let userFilename = document.getElementById('exportFilename').value.trim() || "TCO_Report";
     btn.innerHTML = `⏳ <span class="ml-1">${isZh ? '產出中...' : 'Generating...'}</span>`; btn.disabled = true;
+
+    // 紀錄並重置捲動座標防走鐘
+    const originalScrollY = window.scrollY;
+    window.scrollTo(0, 0);
 
     try {
         if (!window.jspdf || !window.html2canvas) { alert(isZh ? "PDF 套件載入中，請稍後再試。" : "PDF loading..."); return; }
@@ -720,8 +728,8 @@ async function executePDFExport() {
 
         const isAirWinner = d.totalSavings <= 0; const bestOpt = isAirWinner ? (isZh ? '傳統氣冷方案 (Air)' : 'Air Cooling') : (isZh ? '強制液冷方案 (Liquid)' : 'Liquid Cooling');
         document.getElementById('pdfWinnerBoard').innerHTML = `
-            <div class="text-center border-r border-indigo-100 pr-6 w-1/3"><h3 class="text-sm font-bold text-indigo-900 tracking-wide">${isZh ? '👑 最佳 TCO 散熱方案' : '👑 Best TCO Solution'}</h3><p class="text-2xl font-black mt-1 ${isAirWinner ? 'text-blue-600' : 'text-red-600'}">${bestOpt}</p></div>
-            <div class="text-center border-r border-indigo-100 px-6 w-1/3"><p class="text-xs text-slate-500 uppercase tracking-wider font-bold">${isZh ? '5年總節省成本' : 'Total Savings'}</p><p class="text-2xl font-black text-green-600 mt-1">+$${Math.abs(d.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})}</p></div>
+            <div class="text-center border-r border-gray-200 pr-6 w-1/3"><h3 class="text-sm font-bold text-indigo-900 tracking-wide">${isZh ? '👑 最佳 TCO 散熱方案' : '👑 Best TCO Solution'}</h3><p class="text-2xl font-black mt-1 ${isAirWinner ? 'text-blue-600' : 'text-red-600'}">${bestOpt}</p></div>
+            <div class="text-center border-r border-gray-200 px-6 w-1/3"><p class="text-xs text-slate-500 uppercase tracking-wider font-bold">${isZh ? '5年總節省成本' : 'Total Savings'}</p><p class="text-2xl font-black text-green-600 mt-1">+$${Math.abs(d.totalSavings).toLocaleString(undefined, {maximumFractionDigits: 0})}</p></div>
             <div class="text-center pl-6 w-1/3"><p class="text-xs text-slate-500 uppercase tracking-wider font-bold">${isZh ? '黃金交叉回本點' : 'Breakeven Point'}</p><p class="text-2xl font-black text-purple-600 mt-1">${d.breakevenYear > 0 && d.breakevenYear !== Infinity ? d.breakevenYear.toFixed(1) + ' Yrs' : 'N/A'}</p></div>
         `;
 
@@ -752,10 +760,21 @@ async function executePDFExport() {
 
         await new Promise(r => setTimeout(r, 100));
 
-        const canvas = await html2canvas(document.getElementById('pdfTemplate'), { scale: 2, useCORS: true, backgroundColor: '#f8fafc' });
+        const canvas = await html2canvas(document.getElementById('pdfTemplate'), { 
+            scale: 2, 
+            useCORS: true, 
+            backgroundColor: '#ffffff',
+            windowY: 0, // 強制鎖死 Y 軸
+            scrollY: 0
+        });
         const { jsPDF } = window.jspdf; const pdf = new jsPDF('p', 'mm', 'a4');
         pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
         pdf.save(`${userFilename}.pdf`); closeExportModal();
 
-    } catch (err) { alert(isZh ? '匯出失敗，請檢查設定。' : 'Export failed.'); console.error(err); } finally { btn.innerHTML = originalHtml; btn.disabled = false; }
+    } catch (err) { 
+        alert(isZh ? '匯出失敗，請檢查設定。' : 'Export failed.'); console.error(err); 
+    } finally { 
+        window.scrollTo(0, originalScrollY); // 還原捲動位置
+        btn.innerHTML = originalHtml; btn.disabled = false; 
+    }
 }
