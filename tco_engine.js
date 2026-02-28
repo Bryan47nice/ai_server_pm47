@@ -871,7 +871,7 @@ async function executePDFExport() {
 
 
 // ==========================================
-// 🚀 Interactive Guided Tour Engine (Zero-dependency)
+// 🚀 Interactive Guided Tour Engine (Zero-dependency & Bulletproof)
 // ==========================================
 
 const tourStepsConfig = [
@@ -885,24 +885,21 @@ const tourStepsConfig = [
 let currentTourStep = 0;
 
 function startTour() {
-    // 雙重防線：手機版或非 TCO 頁面絕對不啟動
     if (window.innerWidth < 1024) return;
     const tcoWrapper = document.getElementById('wrapper-tco');
     if (!tcoWrapper || tcoWrapper.classList.contains('hidden')) return;
 
-    // 若在比較模式，強制退回單一編輯模式確保目標元素可見
     if (isCompareMode) toggleCompareMode();
 
     currentTourStep = 0;
-    document.getElementById('tourOverlay').classList.remove('hidden');
-    document.getElementById('tourOverlay').classList.add('block');
-    document.getElementById('tourTooltip').classList.remove('hidden');
-    document.getElementById('tourTooltip').classList.add('flex');
     
-    // 禁用背景滾動
+    // 確保 DOM 存在再開啟，避免 JS Crash
+    const overlay = document.getElementById('tourOverlay');
+    const tooltip = document.getElementById('tourTooltip');
+    if(overlay) { overlay.classList.remove('hidden'); overlay.classList.add('block'); }
+    if(tooltip) { tooltip.classList.remove('hidden'); tooltip.classList.add('flex'); }
+    
     document.body.style.overflow = 'hidden';
-    
-    // 監聽 Esc 鍵退出
     document.addEventListener('keydown', handleTourEsc);
 
     renderTourStep();
@@ -914,51 +911,62 @@ function renderTourStep() {
     
     if (!targetEl) { endTour(); return; }
 
-    // 1. 自動滾動至目標中央
     targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    // 2. 寫入多語系文字 (瞬間命中 Cache，零 Token)
-    document.getElementById('tourTitle').innerHTML = dict[currentLang][step.titleKey];
-    document.getElementById('tourDesc').innerHTML = dict[currentLang][step.descKey];
+    // 🚀 防彈層 1：即使字典檔壞掉，也不會引發 ReferenceError 讓畫面卡死
+    try {
+        const titleText = (typeof dict !== 'undefined' && dict[currentLang]) ? dict[currentLang][step.titleKey] : step.titleKey;
+        const descText = (typeof dict !== 'undefined' && dict[currentLang]) ? dict[currentLang][step.descKey] : '載入中...';
+        
+        document.getElementById('tourTitle').innerHTML = titleText;
+        document.getElementById('tourDesc').innerHTML = descText;
 
-    // 3. 更新按鈕狀態
-    document.getElementById('tourPrevBtn').style.display = currentTourStep === 0 ? 'none' : 'block';
-    if (currentTourStep === tourStepsConfig.length - 1) {
-        document.getElementById('tourNextBtn').innerHTML = `<span id="t-tour-finish">${dict[currentLang]['t-tour-finish']}</span>`;
-    } else {
-        document.getElementById('tourNextBtn').innerHTML = `<span id="t-tour-next">${dict[currentLang]['t-tour-next']}</span>`;
+        document.getElementById('tourPrevBtn').style.display = currentTourStep === 0 ? 'none' : 'block';
+        if (currentTourStep === tourStepsConfig.length - 1) {
+            const finishText = (typeof dict !== 'undefined' && dict[currentLang]) ? dict[currentLang]['t-tour-finish'] : 'Finish';
+            document.getElementById('tourNextBtn').innerHTML = `<span id="t-tour-finish">${finishText}</span>`;
+        } else {
+            const nextText = (typeof dict !== 'undefined' && dict[currentLang]) ? dict[currentLang]['t-tour-next'] : 'Next';
+            document.getElementById('tourNextBtn').innerHTML = `<span id="t-tour-next">${nextText}</span>`;
+        }
+    } catch(e) {
+        console.warn("Tour i18n warning:", e);
     }
 
-    // 4. 等待滾動結束後，精準計算 Spotlight 座標
     setTimeout(() => {
-        const rect = targetEl.getBoundingClientRect();
-        const spotlight = document.getElementById('tourSpotlight');
-        const padding = 12; // 給予高亮區一點呼吸空間
-        
-        spotlight.style.top = `${rect.top - padding}px`;
-        spotlight.style.left = `${rect.left - padding}px`;
-        spotlight.style.width = `${rect.width + padding * 2}px`;
-        spotlight.style.height = `${rect.height + padding * 2}px`;
+        // 🚀 防彈層 2：確保 Spotlight 座標一定會被計算，若失敗自動救援
+        try {
+            const rect = targetEl.getBoundingClientRect();
+            const spotlight = document.getElementById('tourSpotlight');
+            if (!spotlight) return;
+            
+            const padding = 12; 
+            
+            spotlight.style.top = `${rect.top - padding}px`;
+            spotlight.style.left = `${rect.left - padding}px`;
+            spotlight.style.width = `${rect.width + padding * 2}px`;
+            spotlight.style.height = `${rect.height + padding * 2}px`;
 
-        // 5. 動態定位 Tooltip 氣泡
-        const tooltip = document.getElementById('tourTooltip');
-        const tooltipRect = tooltip.getBoundingClientRect();
-        
-        // 預設放在目標下方，若超出視窗底部則放到上方
-        let topPos = rect.bottom + padding + 16;
-        if (topPos + tooltipRect.height > window.innerHeight) {
-            topPos = rect.top - padding - tooltipRect.height - 16;
+            const tooltip = document.getElementById('tourTooltip');
+            if (!tooltip) return;
+            const tooltipRect = tooltip.getBoundingClientRect();
+            
+            let topPos = rect.bottom + padding + 16;
+            if (topPos + tooltipRect.height > window.innerHeight) {
+                topPos = rect.top - padding - tooltipRect.height - 16;
+            }
+            
+            let leftPos = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+            if (leftPos < 20) leftPos = 20;
+            if (leftPos + tooltipRect.width > window.innerWidth - 20) leftPos = window.innerWidth - tooltipRect.width - 20;
+
+            tooltip.style.top = `${topPos}px`;
+            tooltip.style.left = `${leftPos}px`;
+        } catch(e) {
+            console.error("Tour layout calculation error:", e);
+            endTour(); // 若計算崩潰，主動關閉遮罩自救
         }
-        
-        // 水平置中於目標，若超出左右視窗則貼齊邊緣
-        let leftPos = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-        if (leftPos < 20) leftPos = 20;
-        if (leftPos + tooltipRect.width > window.innerWidth - 20) leftPos = window.innerWidth - tooltipRect.width - 20;
-
-        tooltip.style.top = `${topPos}px`;
-        tooltip.style.left = `${leftPos}px`;
-        
-    }, 350); // 確保 scrollIntoView 動畫已完成
+    }, 350); 
 }
 
 function nextTourStep() {
@@ -978,14 +986,13 @@ function prevTourStep() {
 }
 
 function endTour() {
-    document.getElementById('tourOverlay').classList.add('hidden');
-    document.getElementById('tourOverlay').classList.remove('block');
-    document.getElementById('tourTooltip').classList.add('hidden');
-    document.getElementById('tourTooltip').classList.remove('flex');
-    document.body.style.overflow = 'auto'; // 還原背景滾動
-    document.removeEventListener('keydown', handleTourEsc);
+    const overlay = document.getElementById('tourOverlay');
+    const tooltip = document.getElementById('tourTooltip');
+    if(overlay) { overlay.classList.add('hidden'); overlay.classList.remove('block'); }
+    if(tooltip) { tooltip.classList.add('hidden'); tooltip.classList.remove('flex'); }
     
-    // 寫入 localStorage，確保下次進來不再自動打擾
+    document.body.style.overflow = 'auto'; 
+    document.removeEventListener('keydown', handleTourEsc);
     localStorage.setItem('bryan_tour_completed', 'true');
 }
 
