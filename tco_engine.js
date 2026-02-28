@@ -895,8 +895,12 @@ function startTour() {
     
     const overlay = document.getElementById('tourOverlay');
     const tooltip = document.getElementById('tourTooltip');
+    const spotlight = document.getElementById('tourSpotlight');
+    
     if(overlay) { overlay.classList.remove('hidden'); overlay.classList.add('block'); }
-    if(tooltip) { tooltip.classList.remove('hidden'); tooltip.classList.add('flex'); }
+    // 啟動時先將氣泡與高亮設為透明，避免看到閃爍
+    if(tooltip) { tooltip.classList.remove('hidden'); tooltip.classList.add('flex'); tooltip.style.opacity = '0'; }
+    if(spotlight) { spotlight.style.opacity = '0'; }
     
     document.body.style.overflow = 'hidden';
     document.addEventListener('keydown', handleTourEsc);
@@ -910,10 +914,17 @@ function renderTourStep() {
     
     if (!targetEl) { endTour(); return; }
 
-    // 1. 觸發平滑滾動
+    const spotlight = document.getElementById('tourSpotlight');
+    const tooltip = document.getElementById('tourTooltip');
+
+    // 1. 啟動「隱身術」：先讓氣泡與遮罩變透明，避免看到飛行軌跡
+    if (spotlight) spotlight.style.opacity = '0';
+    if (tooltip) tooltip.style.opacity = '0';
+
+    // 2. 觸發平滑滾動
     targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    // 🚀 核心修復：將文字更新與座標計算「同步」放入 setTimeout 中
+    // 3. 等待滾動與淡出動畫完成 (350ms)
     setTimeout(() => {
         try {
             // --- A. 更新多語系文字與按鈕狀態 ---
@@ -932,9 +943,9 @@ function renderTourStep() {
                 document.getElementById('tourNextBtn').innerHTML = `<span id="t-tour-next">${nextText}</span>`;
             }
 
-            // --- B. 計算並更新絕對座標 ---
+            // --- B. 在隱身狀態下瞬間更新絕對座標 ---
             const rect = targetEl.getBoundingClientRect();
-            const spotlight = document.getElementById('tourSpotlight');
+            
             if (spotlight) {
                 const padding = 12; 
                 spotlight.style.top = `${rect.top - padding}px`;
@@ -943,7 +954,6 @@ function renderTourStep() {
                 spotlight.style.height = `${rect.height + padding * 2}px`;
             }
 
-            const tooltip = document.getElementById('tourTooltip');
             if (tooltip) {
                 const tooltipRect = tooltip.getBoundingClientRect();
                 const padding = 12;
@@ -960,11 +970,18 @@ function renderTourStep() {
                 tooltip.style.top = `${topPos}px`;
                 tooltip.style.left = `${leftPos}px`;
             }
+
+            // 4. 座標更新完畢，給予 DOM 50ms 重繪，然後解除隱身術 (淡入)
+            setTimeout(() => {
+                if (spotlight) spotlight.style.opacity = '1';
+                if (tooltip) tooltip.style.opacity = '1';
+            }, 50);
+
         } catch(e) {
             console.error("Tour layout sync error:", e);
             endTour(); 
         }
-    }, 350); // 確保在 scrollIntoView 動畫完成的同一瞬間，文字與框線一起變換
+    }, 350); 
 }
 
 function nextTourStep() {
@@ -986,10 +1003,18 @@ function prevTourStep() {
 function endTour() {
     const overlay = document.getElementById('tourOverlay');
     const tooltip = document.getElementById('tourTooltip');
-    if(overlay) { overlay.classList.add('hidden'); overlay.classList.remove('block'); }
-    if(tooltip) { tooltip.classList.add('hidden'); tooltip.classList.remove('flex'); }
+    const spotlight = document.getElementById('tourSpotlight');
     
-    document.body.style.overflow = 'auto'; 
+    // 退場時也順滑淡出
+    if(tooltip) tooltip.style.opacity = '0';
+    if(spotlight) spotlight.style.opacity = '0';
+    
+    setTimeout(() => {
+        if(overlay) { overlay.classList.add('hidden'); overlay.classList.remove('block'); }
+        if(tooltip) { tooltip.classList.add('hidden'); tooltip.classList.remove('flex'); }
+        document.body.style.overflow = 'auto'; 
+    }, 300);
+
     document.removeEventListener('keydown', handleTourEsc);
     localStorage.setItem('bryan_tour_completed', 'true');
 }
