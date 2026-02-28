@@ -470,6 +470,7 @@
             if (typeof initScenarios === "function") { initScenarios(); }
             if (typeof loadStateFromURL === "function") { loadStateFromURL(); }
             
+            // 🚀 修正：加上 URL 前綴
             const urlParams = new URLSearchParams(window.location.search);
             const targetTab = urlParams.get('tab') || 'about';
             if (['about', 'tco', 'mindset'].includes(targetTab)) { switchTab(targetTab); }
@@ -479,3 +480,4 @@
     </script>
 </body>
 </html>
+
