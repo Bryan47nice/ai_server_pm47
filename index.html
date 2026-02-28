@@ -120,7 +120,7 @@
             </div>
 
             <div id="singleViewSection" class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-[fadeIn_0.3s_ease-in-out]">
-                <div class="card col-span-1 flex flex-col gap-4 bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700 h-fit">
+                <div id="tcoParamsArea" class="card col-span-1 flex flex-col gap-4 bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700 h-fit transition-all duration-300">
                     <div class="flex justify-between items-end border-b border-gray-200 dark:border-gray-700 pb-2">
                         <h2 id="t-basic-settings" class="text-lg font-semibold">基礎參數設定</h2>
                         <button onclick="resetParameters()" class="text-xs text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition flex items-center mb-1">
@@ -172,7 +172,7 @@
 
                 <div class="col-span-1 lg:grid-cols-2 lg:col-span-2 flex flex-col gap-6">
                     <div class="grid grid-cols-3 gap-4">
-                        <div class="card flex flex-col items-center justify-between bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-3 px-2 shadow-inner overflow-hidden relative group">
+                        <div id="tcoGaugeCard" class="card flex flex-col items-center justify-between bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-3 px-2 shadow-inner overflow-hidden relative group transition-all duration-300">
                             <p id="t-rec-title" class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold z-10">冷卻技術轉折點</p>
                             <div class="relative w-full flex justify-center items-end mt-2" style="height: 65px;"><canvas id="gaugeChart" class="absolute bottom-0 w-full h-full"></canvas></div>
                             <div class="flex flex-col items-center z-10 mt-1"><span id="gaugeValueText" class="text-lg md:text-xl font-black leading-none tracking-tight">0 kW</span><span id="gaugeStatusText" class="text-[10px] md:text-xs font-bold mt-0.5 tracking-wide">Air</span></div>
@@ -191,10 +191,10 @@
                         <p class="text-xs md:text-sm font-bold flex items-center"><span class="mr-2 text-lg">⚠️</span><span id="t-gauge-warning">警告：已達 GB200 高密度功耗門檻！強烈建議切換至 DLC 液冷方案。</span></p>
                     </div>
 
-                    <div class="card bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700 flex flex-col relative">
+                    <div id="tcoChartCard" class="card bg-white dark:bg-gray-800 border border-transparent dark:border-gray-700 flex flex-col relative transition-all duration-300">
                         <h2 id="t-chart-title" class="text-md font-semibold mb-4 text-center text-gray-700 dark:text-gray-200">5 年 TCO 累積成本比較 (CapEx + OpEx)</h2>
                         <div class="relative w-full flex-shrink-0 chart-container" style="height: 300px; min-height: 300px;"><canvas id="tcoChart"></canvas></div>
-                        <div class="mt-6 flex justify-end print:hidden">
+                        <div id="tcoActionButtons" class="mt-6 flex justify-end print:hidden transition-all duration-300 rounded-lg">
                             <button onclick="generateSalesReport()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg shadow-md transition-colors font-bold text-sm flex items-center">
                                 🪄 <span id="t-btn-gen-report">產出 Sales 提案報告</span>
                             </button>
@@ -245,22 +245,17 @@
             </div>
 
             <div id="compareViewSection" class="hidden animate-[fadeIn_0.4s_ease-in-out]">
-                
                 <div id="compareCaptureArea" class="rounded-2xl transition-all duration-300">
-                    
                     <div class="mb-6 p-5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-xl border border-blue-100 dark:border-gray-700 shadow-sm flex flex-col justify-center">
                         <h3 class="text-xl font-black text-indigo-900 dark:text-indigo-300" id="t-compare-title">📊 決策面板：多情境並排比較</h3>
                         <p class="text-sm text-indigo-600 dark:text-indigo-400 mt-1" id="t-compare-subtitle">橫向比對不同建置參數下的投資報酬率與最佳散熱策略。</p>
                     </div>
-
                     <div id="compareGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch"></div>
-                    
                     <div class="mt-6 flex justify-end print:hidden capture-hide">
                         <button onclick="generateCompareReport()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 rounded-xl shadow-md transition-colors font-bold text-sm md:text-base flex items-center group">
                             🪄 <span id="t-btn-gen-compare-report" class="ml-2 group-hover:tracking-wider transition-all">產出跨方案 AI 決策報告</span>
                         </button>
                     </div>
-                    
                     <div id="compareReportSection" class="hidden mt-4">
                         <div id="compareReportOutdated" class="hidden bg-red-50 dark:bg-red-900/20 p-6 rounded-xl border border-red-200 dark:border-red-800 text-center shadow-sm">
                             <p id="t-compare-outdated-text" class="text-red-500 dark:text-red-400 font-bold mb-4">⚠️ 參數已變更，決策報告已過時</p>
@@ -281,8 +276,8 @@
                             <p class="text-indigo-600 dark:text-indigo-400 font-bold animate-pulse text-sm">⏳ AI 正在分析各方案優劣，為您總結最佳決策...</p>
                         </div>
                     </div>
-                    
-                </div> </div>
+                </div> 
+            </div>
 
         </div>
 
@@ -325,7 +320,7 @@
             </div>
         </div>
     </div>
-
+    
     <div id="exportModal" class="fixed inset-0 bg-black/60 z-[110] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden border dark:border-gray-700 transform transition-transform">
             <div class="bg-indigo-50 dark:bg-indigo-900/30 border-b border-indigo-100 dark:border-gray-700 p-5"><h3 class="text-lg font-bold flex items-center text-indigo-900 dark:text-indigo-200">📄 匯出 TCO 分析報告</h3><p class="text-sm text-indigo-600 dark:text-indigo-400 mt-1">請為您的報告自訂專屬名稱，以利後續歸檔與傳閱。</p></div>
@@ -357,7 +352,7 @@
             <div id="modalDiff" class="bg-gray-100 dark:bg-gray-900 p-4 text-center text-lg font-bold text-gray-800 dark:text-gray-100 border-t dark:border-gray-700"></div>
         </div>
     </div>
-
+    
     <div id="pdfContainerWrapper" style="position: absolute; left: -9999px; top: 0; pointer-events: none;">
         <div id="pdfTemplate" class="bg-white text-gray-900 w-[960px] h-[1358px] block font-sans relative box-border overflow-hidden">
             <div class="bg-slate-900 text-white px-8 py-6 h-[100px] flex justify-between items-end box-border shrink-0">
@@ -384,6 +379,26 @@
         </div>
     </div>
 
+    <button id="tourStartBtn" onclick="startTour()" class="print:hidden fixed bottom-20 right-4 bg-indigo-600 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform hidden lg:flex items-center justify-center z-50 font-bold text-sm">
+        <span id="t-tour-btn">❓ 導覽</span>
+    </button>
+    <button id="themeToggleBtn" onclick="toggleTheme()" class="print:hidden fixed bottom-4 right-4 bg-gray-800 dark:bg-yellow-400 text-white dark:text-gray-900 p-3 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center z-50"><span id="themeIcon" class="text-xl">☀️</span></button>
+
+    <div id="tourOverlay" class="fixed inset-0 z-[130] hidden pointer-events-none transition-opacity duration-300">
+        <div id="tourSpotlight" class="absolute bg-transparent transition-all duration-300 ease-in-out pointer-events-auto shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] rounded-lg"></div>
+    </div>
+    <div id="tourTooltip" class="fixed z-[140] hidden w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-indigo-200 dark:border-indigo-800 transition-all duration-300 transform p-5 flex-col gap-2">
+        <h3 id="tourTitle" class="text-lg font-black text-indigo-700 dark:text-indigo-400"></h3>
+        <p id="tourDesc" class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"></p>
+        <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+            <button onclick="endTour()" class="text-xs text-gray-500 hover:text-gray-800 dark:hover:text-white transition font-medium"><span id="t-tour-skip">跳過</span></button>
+            <div class="flex gap-2">
+                <button id="tourPrevBtn" onclick="prevTourStep()" class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded text-xs font-bold hover:bg-gray-200 dark:hover:bg-gray-600 transition"><span id="t-tour-prev">上一步</span></button>
+                <button id="tourNextBtn" onclick="nextTourStep()" class="px-3 py-1.5 bg-indigo-600 text-white rounded text-xs font-bold hover:bg-indigo-500 transition"><span id="t-tour-next">下一步</span></button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function updateInputFromSlider() { document.getElementById('rackValInput').value = document.getElementById('serversPerRack').value; }
         function updateSliderFromInput() { let val = parseInt(document.getElementById('rackValInput').value); if(isNaN(val) || val < 10) val = 10; if(val > 72) val = 72; document.getElementById('rackValInput').value = val; document.getElementById('serversPerRack').value = val; }
@@ -401,6 +416,11 @@
                 } 
             }
             
+            // 🚀 若導覽進行中切換語系，瞬間重繪氣泡文字 (從本地 Cache 讀取)
+            if (typeof renderTourStep === "function" && document.getElementById('tourOverlay').classList.contains('block')) {
+                renderTourStep();
+            }
+
             if(typeof renderScenarioBar === "function") renderScenarioBar();
             if(typeof renderCompareGrid === "function" && document.getElementById('compareViewSection') && !document.getElementById('compareViewSection').classList.contains('hidden')) {
                 renderCompareGrid();
@@ -424,9 +444,20 @@
                 if (t === tabName) { btn.className = 'tab-active pb-2 text-sm md:text-lg transition-colors duration-200'; wrapper.classList.remove('hidden'); wrapper.classList.add('block'); } 
                 else { btn.className = 'tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200'; wrapper.classList.remove('block'); wrapper.classList.add('hidden'); }
             });
-            if (tabName === 'tco') { exportBtn.classList.remove('hidden'); copyBtn.classList.remove('hidden'); if (typeof calculateTCO === "function") setTimeout(() => calculateTCO(), 50); } 
-            else { exportBtn.classList.add('hidden'); copyBtn.classList.add('hidden'); }
+            
+            if (tabName === 'tco') { 
+                exportBtn.classList.remove('hidden'); copyBtn.classList.remove('hidden'); 
+                if (typeof calculateTCO === "function") setTimeout(() => calculateTCO(), 50); 
+                
+                // 🚀 TCO 頁籤專屬觸發邏輯：載入後延遲 0.6 秒觸發導覽
+                if (window.innerWidth >= 1024 && !localStorage.getItem('bryan_tour_completed')) {
+                    setTimeout(() => startTour(), 600);
+                }
+            } else { 
+                exportBtn.classList.add('hidden'); copyBtn.classList.add('hidden'); 
+            }
         }
+        
         function closeModal() { document.getElementById('drilldownModal').classList.add('hidden'); }
 
         window.onload = function() {
@@ -440,8 +471,8 @@
             if (typeof loadStateFromURL === "function") { loadStateFromURL(); }
             
             const urlParams = new URLSearchParams(window.location.search);
-            const targetTab = urlParams.get('tab');
-            if (targetTab && ['about', 'tco', 'mindset'].includes(targetTab)) { switchTab(targetTab); }
+            const targetTab = urlParams.get('tab') || 'about';
+            if (['about', 'tco', 'mindset'].includes(targetTab)) { switchTab(targetTab); }
             if (typeof calculateTCO === "function") { calculateTCO(); }
             if (urlParams.get('report') === '1' && typeof generateSalesReport === "function") { setTimeout(() => generateSalesReport(), 150); }
         };
