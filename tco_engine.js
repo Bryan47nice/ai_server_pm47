@@ -9,11 +9,13 @@ let latestCalcData = {};
 
 let isReportGenerated = false;
 
+// 狀態機與獨立快取陣列
 let scenarios = [];
 let activeScenarioId = null;
 let isCompareMode = false;
 let compareChartInstances = {}; 
 
+// 比較模式專屬快取與狀態快照
 let compareReportCache = { zh: null, en: null };
 let compareStateSnapshot = null;
 let isCompareReportOutdated = false;
@@ -197,7 +199,6 @@ function renameScenario(id) {
     if (newName && newName.trim() !== '') { sc.name = newName.trim().substring(0, 15); renderScenarioBar(); }
 }
 
-// 🚀 核心修復：使用動態群組來控制 Navbar 的按鈕顯示
 function toggleCompareMode() {
     if (scenarios.length < 2) return;
     isCompareMode = !isCompareMode;
@@ -290,11 +291,15 @@ function renderCompareGrid() {
         setTimeout(() => {
             const ctx = document.getElementById(`compChart_${sc.id}`).getContext('2d');
             const isDark = document.documentElement.classList.contains('dark');
+            
+            // 讓小圖表也吃得到特別放大的黃金交叉點
+            let radii = res.pointRadii || res.labels.map(() => 1);
+            
             compareChartInstances[sc.id] = new Chart(ctx, {
                 type: 'line',
                 data: { labels: res.labels, datasets: [
-                        { label: 'Air', data: res.airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointRadius: 1, borderWidth: 2 },
-                        { label: 'Liquid', data: res.liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1, pointRadius: 1, borderWidth: 2 }
+                        { label: 'Air', data: res.airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointRadius: radii, borderWidth: 2 },
+                        { label: 'Liquid', data: res.liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1, pointRadius: radii, borderWidth: 2 }
                     ] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { bodyFont: { size: 12 } } }, scales: { x: { ticks: { color: isDark ? '#9ca3af' : '#6b7280', font: {size: 9}, maxTicksLimit: 3 }, grid: { display: false } }, y: { ticks: { color: isDark ? '#9ca3af' : '#6b7280', maxTicksLimit: 5, font: {size: 9} }, grid: { color: isDark ? '#374151' : '#f3f4f6' } } } }
             });
@@ -400,24 +405,57 @@ function calculateTCO() {
     const liqTotalKwh = totalKw * liqPUE * utilRate * hoursPerYear * evalYears;
     const co2SavedTons = Math.abs(airTotalKwh - liqTotalKwh) * 0.5 / 1000;
 
-    let airData = []; let liqData = []; let labels = [];
-    const maxIntYear = Math.floor(evalYears);
-
-    for (let i = 0; i <= maxIntYear; i++) {
-        labels.push(i === 0 ? (currentLang === 'zh' ? '第0年 (建置期)' : 'Year 0 (CapEx)') : (currentLang === 'zh' ? `第${i}年` : `Year ${i}`));
-        airData.push(totalAirCapEx + (airOpExPerYear * i));
-        liqData.push(totalLiqCapEx + (liqOpExPerYear * i));
-    }
-    if (evalYears % 1 !== 0) {
-        labels.push(currentLang === 'zh' ? `第${evalYears}年` : `Year ${evalYears}`);
-        airData.push(totalAirCapEx + (airOpExPerYear * evalYears));
-        liqData.push(totalLiqCapEx + (liqOpExPerYear * evalYears));
-    }
-
     const finalAirCost = totalAirCapEx + (airOpExPerYear * evalYears);
     const finalLiqCost = totalLiqCapEx + (liqOpExPerYear * evalYears);
     const totalSavings = finalAirCost - finalLiqCost;
+    
+    // 取得精準的黃金交叉年份
     const beYearRaw = (totalLiqCapEx - totalAirCapEx) / (airOpExPerYear - liqOpExPerYear);
+
+    // 🚀 NEW: 動態安插黃金交叉點 (Data Point Injection)
+    let rawYears = [];
+    const maxIntYear = Math.floor(evalYears);
+    for (let i = 0; i <= maxIntYear; i++) {
+        rawYears.push(i);
+    }
+    // 如果評估年限不是整數，加入最後一年
+    if (evalYears % 1 !== 0 && !rawYears.includes(evalYears)) {
+        rawYears.push(evalYears);
+    }
+    
+    let hasBreakevenPoint = false;
+    // 如果交叉點落在評估區間內，硬塞入陣列中
+    if (beYearRaw > 0 && beYearRaw < evalYears && !rawYears.includes(beYearRaw)) {
+        rawYears.push(beYearRaw);
+        hasBreakevenPoint = true;
+    }
+    
+    // 重新按時間排序，確保折線圖順序正確
+    rawYears.sort((a, b) => a - b);
+    
+    let airData = []; let liqData = []; let labels = [];
+    let pointRadii = []; // 讓交叉點視覺放大的陣列
+
+    rawYears.forEach(y => {
+        // 判斷是否為剛好命中的交叉點 (處理浮點數誤差)
+        const isThisPointBreakeven = hasBreakevenPoint && Math.abs(y - beYearRaw) < 0.001;
+
+        if (y === 0) {
+            labels.push(currentLang === 'zh' ? '第0年 (建置期)' : 'Year 0 (CapEx)');
+        } else if (isThisPointBreakeven) {
+            labels.push(currentLang === 'zh' ? `⭐ 交叉點 (${y.toFixed(1)}年)` : `⭐ Breakeven (${y.toFixed(1)}Y)`);
+        } else if (evalYears % 1 !== 0 && Math.abs(y - evalYears) < 0.001) {
+            labels.push(currentLang === 'zh' ? `第${y}年 (期末)` : `Year ${y} (End)`);
+        } else {
+            labels.push(currentLang === 'zh' ? `第${y}年` : `Year ${y}`);
+        }
+        
+        airData.push(totalAirCapEx + (airOpExPerYear * y));
+        liqData.push(totalLiqCapEx + (liqOpExPerYear * y));
+        
+        // 如果是交叉點，節點半徑變大(5)，其餘預設(1)
+        pointRadii.push(isThisPointBreakeven ? 5 : 1);
+    });
 
     const isAirWinner = totalSavings <= 0;
     const absSavings = Math.abs(totalSavings);
@@ -448,15 +486,16 @@ function calculateTCO() {
     document.getElementById('gaugeStatusText').innerText = gaugeStatusText;
     document.getElementById('gaugeStatusText').style.color = gaugeColor;
 
+    // 將真實精確年份陣列 (yearPoints) 與點半徑存入快取中
     latestCalcData = {
         evalYears, utilRate, totalServers, totalRacks, totalKw, powerCost, airPUE, liqPUE, kwPerRack,
         airCapExPerRack, liqCapExPerRack, totalAirCapEx, totalLiqCapEx,
         airOpExPerYear, liqOpExPerYear, labelsCount: labels.length,
         breakevenYear: beYearRaw, totalSavings, winnerStr, gaugeColor, gaugeStatusText, co2SavedTons,
-        labels, airData, liqData 
+        labels, airData, liqData, yearPoints: rawYears, pointRadii
     };
 
-    drawChart(labels, airData, liqData);
+    drawChart(labels, airData, liqData, pointRadii);
     drawGaugeChart(kwPerRack, gaugeColor); 
     
     if (activeSc) activeSc.results = JSON.parse(JSON.stringify(latestCalcData)); 
@@ -612,39 +651,29 @@ function closeExportPrompt() {
     document.getElementById('exportPromptModal').classList.add('hidden');
 }
 
-// 🚀 核心修正：採用 DOM 包裝與隔離 Reflow 策略
 async function captureCompareView() {
     const btn = document.getElementById('btn-export-png');
     const originalHtml = btn.innerHTML;
     const isZh = currentLang === 'zh';
     btn.innerHTML = `⏳ <span class="ml-1">${isZh ? '擷取中...' : 'Capturing...'}</span>`;
     
-    // 儲存原始捲動位置，並強制置頂 (消滅位移)
     const originalScrollY = window.scrollY;
     window.scrollTo(0, 0);
 
-    // 隱藏不必要的按鈕
     document.querySelectorAll('.capture-hide').forEach(el => el.classList.add('hidden'));
     const targetEl = document.getElementById('compareCaptureArea');
     const isDark = document.documentElement.classList.contains('dark');
     const bgColorClass = isDark ? 'bg-gray-900' : 'bg-gray-50';
 
-    // 🚀 核心修正：創建臨時包裝器，強制 Reflow 完成
     const captureWrapper = document.createElement('div');
-    captureWrapper.id = 'captureWrapper'; // 可選，用於調試
+    captureWrapper.id = 'captureWrapper'; 
     captureWrapper.className = `${bgColorClass} p-8 flex flex-col rounded-2xl w-full h-auto`;
 
-    // 將 targetEl 的子節點移入包裝器
     Array.from(targetEl.childNodes).forEach(node => captureWrapper.appendChild(node));
-
-    // 將包裝器作為 targetEl 的單一子節點
     targetEl.appendChild(captureWrapper);
 
     try {
-        // 給予 150ms 執行明確的 Reflow (與之前 commit 保持一致)
         await new Promise(r => setTimeout(r, 150)); 
-        
-        // 🚀 拔除 windowY 硬限制，讓 html2canvas 自然偵測座標 (與之前 commit 保持一致)
         const canvas = await html2canvas(targetEl, { 
             scale: 2, 
             useCORS: true, 
@@ -659,55 +688,86 @@ async function captureCompareView() {
         console.error("Screenshot failed:", err);
         alert(isZh ? '截圖失敗，請稍後再試。' : 'Screenshot failed.');
     } finally {
-        // 🚀 還原 DOM：將內容移回，刪除包裝器
         const targetEl = document.getElementById('compareCaptureArea');
         const captureWrapper = document.getElementById('captureWrapper');
 
         if (captureWrapper) {
-            // 從包裝器移回子節點到 targetEl
             Array.from(captureWrapper.childNodes).forEach(node => targetEl.appendChild(node));
-            // 刪除包裝器
             targetEl.removeChild(captureWrapper);
         }
-
-        // 還原按鈕
         document.querySelectorAll('.capture-hide').forEach(el => el.classList.remove('hidden'));
-        // 還原捲動位置 (與之前 commit 保持一致)
         window.scrollTo(0, originalScrollY);
         btn.innerHTML = originalHtml;
     }
 }
 
-
+// 🚀 核心修復：完美讀取精確年份與平手狀態判定
 function openDrilldownModal(dataIndex, labelStr) {
-    const d = latestCalcData; let actualYear = dataIndex; if (dataIndex === d.labelsCount - 1 && d.evalYears % 1 !== 0) { actualYear = d.evalYears; }
+    const d = latestCalcData; 
+    // 透過 dataIndex 反查真實的浮點數年份 (例如 3.4)
+    const actualYear = d.yearPoints[dataIndex]; 
+    
     document.getElementById('modalYearLabel').innerText = (currentLang === 'zh' ? '成本結構拆解：' : 'Cost Breakdown: ') + labelStr;
-    const airOpex = d.airOpExPerYear * actualYear; const airTotal = d.totalAirCapEx + airOpex;
+    
+    // 文字顯示防呆：整數顯示 "3年"，浮點數顯示 "3.4年"
+    let yearTextZH = actualYear === Math.floor(actualYear) ? `${actualYear}年` : `${actualYear.toFixed(1)}年`;
+    let yearTextEN = actualYear === Math.floor(actualYear) ? `${actualYear} Yrs` : `${actualYear.toFixed(1)} Yrs`;
+
+    const airOpex = d.airOpExPerYear * actualYear; 
+    const airTotal = d.totalAirCapEx + airOpex;
     document.getElementById('airCapexDetail').innerText = `${d.totalRacks} Racks × $${d.airCapExPerRack.toLocaleString()}`;
-    if (actualYear === 0) { document.getElementById('airOpexDetail').innerText = currentLang === 'zh' ? "建置初期，尚無營運電費產生。" : "No OpEx in Year 0."; } 
-    else { document.getElementById('airOpexDetail').innerHTML = currentLang === 'zh' ? `總功耗 ${d.totalKw}kW × <b>PUE ${d.airPUE}</b><br>× 稼動率 ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${actualYear}年</b>` : `Total Pwr ${d.totalKw}kW × <b>PUE ${d.airPUE}</b><br>× Util. ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${actualYear} Yrs</b>`; }
+    if (actualYear === 0) { 
+        document.getElementById('airOpexDetail').innerText = currentLang === 'zh' ? "建置初期，尚無營運電費產生。" : "No OpEx in Year 0."; 
+    } else { 
+        document.getElementById('airOpexDetail').innerHTML = currentLang === 'zh' ? `總功耗 ${d.totalKw}kW × <b>PUE ${d.airPUE}</b><br>× 稼動率 ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${yearTextZH}</b>` : `Total Pwr ${d.totalKw}kW × <b>PUE ${d.airPUE}</b><br>× Util. ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${yearTextEN}</b>`; 
+    }
     document.getElementById('airTotalDetail').innerText = "$" + airTotal.toLocaleString(undefined, {maximumFractionDigits: 0});
     
-    const liqOpex = d.liqOpExPerYear * actualYear; const liqTotal = d.totalLiqCapEx + liqOpex;
+    const liqOpex = d.liqOpExPerYear * actualYear; 
+    const liqTotal = d.totalLiqCapEx + liqOpex;
     document.getElementById('liqCapexDetail').innerText = `${d.totalRacks} Racks × $${d.liqCapExPerRack.toLocaleString()}`;
-    if (actualYear === 0) { document.getElementById('liqOpexDetail').innerText = currentLang === 'zh' ? "建置初期，尚無營運電費產生。" : "No OpEx in Year 0."; } 
-    else { document.getElementById('liqOpexDetail').innerHTML = currentLang === 'zh' ? `總功耗 ${d.totalKw}kW × <b>PUE ${d.liqPUE}</b><br>× 稼動率 ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${actualYear}年</b>` : `Total Pwr ${d.totalKw}kW × <b>PUE ${d.liqPUE}</b><br>× Util. ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${actualYear} Yrs</b>`; }
+    if (actualYear === 0) { 
+        document.getElementById('liqOpexDetail').innerText = currentLang === 'zh' ? "建置初期，尚無營運電費產生。" : "No OpEx in Year 0."; 
+    } else { 
+        document.getElementById('liqOpexDetail').innerHTML = currentLang === 'zh' ? `總功耗 ${d.totalKw}kW × <b>PUE ${d.liqPUE}</b><br>× 稼動率 ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${yearTextZH}</b>` : `Total Pwr ${d.totalKw}kW × <b>PUE ${d.liqPUE}</b><br>× Util. ${d.utilRate*100}% × 8760hrs<br>× $${d.powerCost}/kWh × <b>${yearTextEN}</b>`; 
+    }
     document.getElementById('liqTotalDetail').innerText = "$" + liqTotal.toLocaleString(undefined, {maximumFractionDigits: 0});
     
-    const diff = Math.abs(airTotal - liqTotal); let winnerText = "";
-    if (airTotal < liqTotal) { winnerText = currentLang === 'zh' ? `🏆 氣冷勝出 (節省 $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})` : `🏆 Air Wins (Save $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})`; document.getElementById('modalDiff').className = "bg-blue-100 dark:bg-blue-900/40 p-4 text-center text-lg font-bold text-blue-800 dark:text-blue-300 border-t border-blue-200 dark:border-blue-800"; } 
-    else if (liqTotal < airTotal) { winnerText = currentLang === 'zh' ? `🏆 液冷勝出 (節省 $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})` : `🏆 Liquid Wins (Save $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})`; document.getElementById('modalDiff').className = "bg-red-100 dark:bg-red-900/40 p-4 text-center text-lg font-bold text-red-800 dark:text-red-300 border-t border-red-200 dark:border-red-800"; } 
-    else { winnerText = currentLang === 'zh' ? "⚖️ 成本平手" : "⚖️ Break-even Point"; document.getElementById('modalDiff').className = "bg-gray-100 dark:bg-gray-900 p-4 text-center text-lg font-bold text-gray-800 dark:text-gray-100 border-t dark:border-gray-700"; }
-    document.getElementById('modalDiff').innerText = winnerText; document.getElementById('drilldownModal').classList.remove('hidden');
+    // 為了避免 JS 浮點數微小誤差，進行四捨五入後再判定勝負
+    const roundedAir = Math.round(airTotal);
+    const roundedLiq = Math.round(liqTotal);
+    const diff = Math.abs(roundedAir - roundedLiq); 
+    
+    let winnerText = "";
+    if (roundedAir < roundedLiq) { 
+        winnerText = currentLang === 'zh' ? `🏆 氣冷勝出 (節省 $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})` : `🏆 Air Wins (Save $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})`; 
+        document.getElementById('modalDiff').className = "bg-blue-100 dark:bg-blue-900/40 p-4 text-center text-lg font-bold text-blue-800 dark:text-blue-300 border-t border-blue-200 dark:border-blue-800"; 
+    } else if (roundedLiq < roundedAir) { 
+        winnerText = currentLang === 'zh' ? `🏆 液冷勝出 (節省 $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})` : `🏆 Liquid Wins (Save $${diff.toLocaleString(undefined, {maximumFractionDigits: 0})})`; 
+        document.getElementById('modalDiff').className = "bg-red-100 dark:bg-red-900/40 p-4 text-center text-lg font-bold text-red-800 dark:text-red-300 border-t border-red-200 dark:border-red-800"; 
+    } else { 
+        // 🚀 命中黃金交叉的專屬紫色面板
+        winnerText = currentLang === 'zh' ? "⚖️ 黃金交叉 (成本平手)" : "⚖️ Breakeven (Costs Tied)"; 
+        document.getElementById('modalDiff').className = "bg-purple-100 dark:bg-purple-900/40 p-4 text-center text-lg font-bold text-purple-800 dark:text-purple-300 border-t border-purple-200 dark:border-purple-800"; 
+    }
+    
+    document.getElementById('modalDiff').innerText = winnerText; 
+    document.getElementById('drilldownModal').classList.remove('hidden');
 }
 
-function drawChart(labels, airData, liqData, isPrintMode = false) {
+function drawChart(labels, airData, liqData, pointRadii = null, isPrintMode = false) {
     const ctx = document.getElementById('tcoChart').getContext('2d'); const isDark = document.documentElement.classList.contains('dark');
     const textColor = isPrintMode ? '#0f172a' : (isDark ? '#e5e7eb' : '#374151'); const gridColor = isPrintMode ? '#e2e8f0' : (isDark ? '#374151' : '#e5e7eb');
     if (tcoChartInstance) tcoChartInstance.destroy();
+    
+    const radiusArray = pointRadii || labels.map(() => 1);
+
     tcoChartInstance = new Chart(ctx, {
         type: 'line',
-        data: { labels: labels, datasets: [ { label: currentLang === 'zh' ? '氣冷累積成本 (Air)' : 'Air Cooling TCO', data: airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 }, { label: currentLang === 'zh' ? '液冷累積成本 (Liquid)' : 'Liquid Cooling TCO', data: liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1, pointHoverRadius: 8, pointHitRadius: 10 } ] },
+        data: { labels: labels, datasets: [ 
+            { label: currentLang === 'zh' ? '氣冷累積成本 (Air)' : 'Air Cooling TCO', data: airData, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.1, pointRadius: radiusArray, pointHoverRadius: 8, pointHitRadius: 10, borderWidth: 2 }, 
+            { label: currentLang === 'zh' ? '液冷累積成本 (Liquid)' : 'Liquid Cooling TCO', data: liqData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.1, pointRadius: radiusArray, pointHoverRadius: 8, pointHitRadius: 10, borderWidth: 2 } 
+        ] },
         options: { responsive: true, maintainAspectRatio: false, animation: isPrintMode ? false : true, onClick: (event) => { if (isPrintMode) return; const points = tcoChartInstance.getElementsAtEventForMode(event, 'index', { intersect: false }, true); if (points.length) openDrilldownModal(points[0].index, labels[points[0].index]); }, interaction: { mode: 'index', intersect: false }, plugins: { legend: { labels: { color: textColor } }, tooltip: { enabled: !isPrintMode, bodyFont: { size: 14 } } }, scales: { x: { ticks: { color: textColor }, grid: { color: gridColor } }, y: { ticks: { color: textColor }, grid: { color: gridColor }, title: { display: true, text: 'USD ($)', color: textColor } } } }
     });
 }
@@ -765,10 +825,10 @@ async function executePDFExport() {
 
         document.getElementById('pdfGaugeValueText').innerText = d.kwPerRack.toFixed(1) + " kW"; document.getElementById('pdfGaugeValueText').style.color = d.gaugeColor; document.getElementById('pdfGaugeStatusText').innerText = d.gaugeStatusText; document.getElementById('pdfGaugeStatusText').style.color = d.gaugeColor;
 
-        drawGaugeChart(d.kwPerRack, d.gaugeColor, true); drawChart(d.labels, d.airData, d.liqData, true);
+        drawGaugeChart(d.kwPerRack, d.gaugeColor, true); drawChart(d.labels, d.airData, d.liqData, d.pointRadii, true);
         await new Promise(r => setTimeout(r, 400));
         document.getElementById('pdfGaugeImg').src = gaugeChartInstance.toBase64Image(); document.getElementById('pdfLineImg').src = tcoChartInstance.toBase64Image();
-        drawGaugeChart(d.kwPerRack, d.gaugeColor, false); drawChart(d.labels, d.airData, d.liqData, false);
+        drawGaugeChart(d.kwPerRack, d.gaugeColor, false); drawChart(d.labels, d.airData, d.liqData, d.pointRadii, false);
 
         const reportContent = document.getElementById('pdfReportContent'); const noReportMsg = document.getElementById('pdfNoReportMsg');
         
