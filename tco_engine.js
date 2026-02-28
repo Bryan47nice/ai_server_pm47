@@ -612,30 +612,39 @@ function closeExportPrompt() {
     document.getElementById('exportPromptModal').classList.add('hidden');
 }
 
-// 🚀 核心修復：拔除 windowY 硬限制，並加入呼吸空間 (Padding) 畫框
+// 🚀 核心修正：採用 DOM 包裝與隔離 Reflow 策略
 async function captureCompareView() {
     const btn = document.getElementById('btn-export-png');
     const originalHtml = btn.innerHTML;
     const isZh = currentLang === 'zh';
     btn.innerHTML = `⏳ <span class="ml-1">${isZh ? '擷取中...' : 'Capturing...'}</span>`;
     
-    // 強制置頂以避免滾動導致的錯位
+    // 儲存原始捲動位置，並強制置頂 (消滅位移)
     const originalScrollY = window.scrollY;
     window.scrollTo(0, 0);
 
-    // 隱藏不必要的按鈕，並動態加上高級感的 padding 畫框
+    // 隱藏不必要的按鈕
     document.querySelectorAll('.capture-hide').forEach(el => el.classList.add('hidden'));
     const targetEl = document.getElementById('compareCaptureArea');
     const isDark = document.documentElement.classList.contains('dark');
-    
-    // 注入 p-8 確保標題不被切掉且四邊有呼吸空間
-    targetEl.classList.add('p-8');
-    if (isDark) { targetEl.classList.add('bg-gray-900'); } else { targetEl.classList.add('bg-gray-50'); }
+    const bgColorClass = isDark ? 'bg-gray-900' : 'bg-gray-50';
+
+    // 🚀 核心修正：創建臨時包裝器，強制 Reflow 完成
+    const captureWrapper = document.createElement('div');
+    captureWrapper.id = 'captureWrapper'; // 可選，用於調試
+    captureWrapper.className = `${bgColorClass} p-8 flex flex-col rounded-2xl w-full h-auto`;
+
+    // 將 targetEl 的子節點移入包裝器
+    Array.from(targetEl.childNodes).forEach(node => captureWrapper.appendChild(node));
+
+    // 將包裝器作為 targetEl 的單一子節點
+    targetEl.appendChild(captureWrapper);
 
     try {
+        // 給予 150ms 執行明確的 Reflow (與之前 commit 保持一致)
         await new Promise(r => setTimeout(r, 150)); 
         
-        // 🚀 拔除 windowY，讓 html2canvas 自然偵測元素的真實 Y 座標
+        // 🚀 拔除 windowY 硬限制，讓 html2canvas 自然偵測座標 (與之前 commit 保持一致)
         const canvas = await html2canvas(targetEl, { 
             scale: 2, 
             useCORS: true, 
@@ -650,9 +659,20 @@ async function captureCompareView() {
         console.error("Screenshot failed:", err);
         alert(isZh ? '截圖失敗，請稍後再試。' : 'Screenshot failed.');
     } finally {
-        // 還原畫框與按鈕
+        // 🚀 還原 DOM：將內容移回，刪除包裝器
+        const targetEl = document.getElementById('compareCaptureArea');
+        const captureWrapper = document.getElementById('captureWrapper');
+
+        if (captureWrapper) {
+            // 從包裝器移回子節點到 targetEl
+            Array.from(captureWrapper.childNodes).forEach(node => targetEl.appendChild(node));
+            // 刪除包裝器
+            targetEl.removeChild(captureWrapper);
+        }
+
+        // 還原按鈕
         document.querySelectorAll('.capture-hide').forEach(el => el.classList.remove('hidden'));
-        targetEl.classList.remove('p-8', 'bg-gray-900', 'bg-gray-50');
+        // 還原捲動位置 (與之前 commit 保持一致)
         window.scrollTo(0, originalScrollY);
         btn.innerHTML = originalHtml;
     }
