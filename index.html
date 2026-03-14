@@ -46,6 +46,7 @@
                     <button id="btn-tab-about" onclick="switchTab('about')" class="tab-active pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-about">👤 關於我 (About Me)</span></button>
                     <button id="btn-tab-tco" onclick="switchTab('tco')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-tco">📊 AI 伺服器 TCO 評估儀表板</span></button>
                     <button id="btn-tab-mindset" onclick="switchTab('mindset')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-mindset">🧠 產品企劃：專案管理思維對照</span></button>
+                    <button id="btn-tab-npi" onclick="switchTab('npi')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-npi">🏭 NPI 流程卡點</span></button>
                 </div>
                 <div class="flex items-center space-x-3 mb-2">
                     <div class="text-sm font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 px-3 py-1.5 rounded-full shadow-sm mr-2 hidden md:block"><span id="t-author">製作者：莊仕祺 (Bryan)</span></div>
@@ -342,6 +343,203 @@
             </div>
         </div>
 
+        <div id="wrapper-npi" class="hidden">
+            <div class="flex flex-col gap-6">
+
+                <!-- Header -->
+                <div class="card bg-gradient-to-r from-orange-900 to-amber-800 dark:from-orange-950 dark:to-amber-950 text-white text-center py-8 relative overflow-hidden shadow-xl border-b-4 border-orange-500">
+                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')]"></div>
+                    <div class="relative z-10 px-4">
+                        <h2 id="t-npi-title" class="text-2xl md:text-3xl font-black mb-3 tracking-tight">🏭 AI Server NPI 流程卡點 — PJM 視角</h2>
+                        <p id="t-npi-subtitle" class="text-orange-200 max-w-3xl mx-auto font-medium text-sm md:text-base tracking-wide">從 RFQ 到量產，識別每個階段的高風險卡點，確保 NPI 時程準時落地。</p>
+                    </div>
+                </div>
+
+                <!-- Timeline Selector -->
+                <div class="card bg-white dark:bg-gray-800 overflow-x-auto">
+                    <h3 id="t-npi-timeline-title" class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-5">NPI 里程碑時間軸 — 點擊各階段查看 PJM 卡點分析</h3>
+                    <div class="relative min-w-[560px]">
+                        <div class="absolute top-5 left-[10%] right-[10%] h-1 bg-gradient-to-r from-orange-400 via-yellow-400 via-green-400 to-indigo-400 rounded-full"></div>
+                        <div class="flex justify-between relative z-10">
+                            <div class="flex flex-col items-center w-1/5 cursor-pointer group" onclick="selectNpiPhase('rfq')">
+                                <div id="npi-dot-rfq" class="w-10 h-10 rounded-full bg-orange-400 border-4 border-white dark:border-gray-800 flex items-center justify-center text-white font-black text-sm shadow-lg group-hover:scale-110 transition-transform">1</div>
+                                <span id="t-npi-rfq-badge" class="text-xs font-bold text-orange-600 dark:text-orange-400 mt-2 text-center">RFQ / 規劃</span>
+                                <span id="t-npi-rfq-period" class="text-xs text-gray-400 font-mono">M-18~M-12</span>
+                            </div>
+                            <div class="flex flex-col items-center w-1/5 cursor-pointer group" onclick="selectNpiPhase('dvt')">
+                                <div id="npi-dot-dvt" class="w-10 h-10 rounded-full bg-yellow-500 border-4 border-white dark:border-gray-800 flex items-center justify-center text-white font-black text-sm shadow-lg group-hover:scale-110 transition-transform">2</div>
+                                <span id="t-npi-dvt-badge" class="text-xs font-bold text-yellow-600 dark:text-yellow-400 mt-2 text-center">DVT</span>
+                                <span id="t-npi-dvt-period" class="text-xs text-gray-400 font-mono">M-12~M-8</span>
+                            </div>
+                            <div class="flex flex-col items-center w-1/5 cursor-pointer group" onclick="selectNpiPhase('evt')">
+                                <div id="npi-dot-evt" class="w-10 h-10 rounded-full bg-green-500 border-4 border-white dark:border-gray-800 flex items-center justify-center text-white font-black text-sm shadow-lg group-hover:scale-110 transition-transform">3</div>
+                                <span id="t-npi-evt-badge" class="text-xs font-bold text-green-600 dark:text-green-400 mt-2 text-center">EVT</span>
+                                <span id="t-npi-evt-period" class="text-xs text-gray-400 font-mono">M-8~M-5</span>
+                            </div>
+                            <div class="flex flex-col items-center w-1/5 cursor-pointer group" onclick="selectNpiPhase('pvt')">
+                                <div id="npi-dot-pvt" class="w-10 h-10 rounded-full bg-blue-500 border-4 border-white dark:border-gray-800 flex items-center justify-center text-white font-black text-sm shadow-lg group-hover:scale-110 transition-transform">4</div>
+                                <span id="t-npi-pvt-badge" class="text-xs font-bold text-blue-600 dark:text-blue-400 mt-2 text-center">PVT</span>
+                                <span id="t-npi-pvt-period" class="text-xs text-gray-400 font-mono">M-5~M-2</span>
+                            </div>
+                            <div class="flex flex-col items-center w-1/5 cursor-pointer group" onclick="selectNpiPhase('mp')">
+                                <div id="npi-dot-mp" class="w-10 h-10 rounded-full bg-indigo-500 border-4 border-white dark:border-gray-800 flex items-center justify-center text-white font-black text-sm shadow-lg group-hover:scale-110 transition-transform">5</div>
+                                <span id="t-npi-mp-badge" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 mt-2 text-center">MP 量產</span>
+                                <span id="t-npi-mp-period" class="text-xs text-gray-400 font-mono">M-0+</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase Detail Panels -->
+                <div id="npi-panel-rfq" class="card bg-white dark:bg-gray-800 border-l-8 border-orange-400 animate-[fadeIn_0.3s_ease-in-out]">
+                    <div class="flex flex-wrap items-center gap-3 mb-5">
+                        <span class="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 text-xs font-bold px-3 py-1.5 rounded-full">🟠 RFQ / 規劃（M-18 ~ M-12）</span>
+                        <h3 id="t-npi-rfq-title" class="text-lg md:text-xl font-black text-gray-800 dark:text-gray-100">需求確認與資源排程</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div><h4 id="t-npi-tasks-label" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 pb-1 border-b border-indigo-100 dark:border-indigo-900">📋 PJM 核心任務</h4>
+                            <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-rfq-task-1">確認客戶規格書 (Customer Spec) 與訂單意向書 (LOI)</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-rfq-task-2">規劃初版 BOM 架構與目標成本 (COG Target)</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-rfq-task-3">ODM/JDM 廠商選定與 NDA / 商務條款洽談</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-rfq-task-4">制定跨部門 NPI 里程碑計畫表 (Master Schedule)</span></li></ul>
+                        </div>
+                        <div><h4 id="t-npi-bn-label" class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 pb-1 border-b border-yellow-100 dark:border-yellow-900">⚠️ 常見卡點</h4>
+                            <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-rfq-bn-1">客戶規格書版本反覆，BOM 架構難以確定</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-rfq-bn-2">多個並行專案搶人，關鍵 RD 人力無法及時到位</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-rfq-bn-3">ODM 廠報價週期過長，影響成本決策時程</span></li></ul>
+                        </div>
+                        <div><h4 id="t-npi-risk-label" class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-3 pb-1 border-b border-red-100 dark:border-red-900">🔴 高風險警示</h4>
+                            <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 border border-red-200 dark:border-red-900/40"><p id="t-npi-rfq-risk" class="text-sm text-red-700 dark:text-red-300 leading-relaxed">規格未凍結即下單 Long Lead Time 零件，後續 Design Change 產生高額 ECO 成本</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="npi-panel-dvt" class="hidden card bg-white dark:bg-gray-800 border-l-8 border-yellow-400 animate-[fadeIn_0.3s_ease-in-out]">
+                    <div class="flex flex-wrap items-center gap-3 mb-5">
+                        <span class="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 text-xs font-bold px-3 py-1.5 rounded-full">🟡 DVT — Design Verification Test（M-12 ~ M-8）</span>
+                        <h3 id="t-npi-dvt-title" class="text-lg md:text-xl font-black text-gray-800 dark:text-gray-100">設計驗證與關鍵零件認証</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div><h4 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 pb-1 border-b border-indigo-100 dark:border-indigo-900">📋 PJM 核心任務</h4>
+                            <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-task-1">追蹤 EE / ME / Thermal 設計進度，主持每週 Issue Review 會議</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-task-2">確認 GPU / CPU / HBM 等關鍵零件的 AVL 認証狀態</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-task-3">下單 Long Lead Time 零件並建立交期追蹤看板</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-task-4">制定 DVT 測試計畫，預約 SIT 實驗室資源</span></li></ul>
+                        </div>
+                        <div><h4 class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 pb-1 border-b border-yellow-100 dark:border-yellow-900">⚠️ 常見卡點</h4>
+                            <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-bn-1">GPU 等主晶片 Lead Time 超過 20 週，樣品到位嚴重延遲</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-bn-2">散熱設計不達標，需重新 Layout，延期 6~8 週</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-bn-3">EE 與 ME 設計邊界衝突，需多輪協調消耗大量時程</span></li></ul>
+                        </div>
+                        <div><h4 class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-3 pb-1 border-b border-red-100 dark:border-red-900">🔴 高風險警示</h4>
+                            <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 border border-red-200 dark:border-red-900/40"><p id="t-npi-dvt-risk" class="text-sm text-red-700 dark:text-red-300 leading-relaxed">上游晶片廠（如 NVIDIA）臨時更新規格 (Spec Rev)，強制觸發 BOM 修改，牽動整條 Critical Path</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="npi-panel-evt" class="hidden card bg-white dark:bg-gray-800 border-l-8 border-green-500 animate-[fadeIn_0.3s_ease-in-out]">
+                    <div class="flex flex-wrap items-center gap-3 mb-5">
+                        <span class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs font-bold px-3 py-1.5 rounded-full">🟢 EVT — Engineering Verification Test（M-8 ~ M-5）</span>
+                        <h3 id="t-npi-evt-title" class="text-lg md:text-xl font-black text-gray-800 dark:text-gray-100">BOM 凍結與工程全面驗證</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div><h4 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 pb-1 border-b border-indigo-100 dark:border-indigo-900">📋 PJM 核心任務</h4>
+                            <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-task-1">主導 BOM Freeze 會議，鎖定工程確認版本</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-task-2">協調 FAE 排入燒機 (Burn-in) 與相容性測試</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-task-3">追蹤 EVT Issue List，設定 Owner 與 ETA，強力推動收斂</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-task-4">安排客戶 Pre-qualification 送樣與技術文件準備</span></li></ul>
+                        </div>
+                        <div><h4 class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 pb-1 border-b border-yellow-100 dark:border-yellow-900">⚠️ 常見卡點</h4>
+                            <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-bn-1">客戶臨時追加規格（Scope Creep），BOM Freeze 一再遞延</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-bn-2">測試 Fail 反覆，PCBA 需多輪重工，迭代週期拉長</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-bn-3">多個 Issue 相互依賴，形成 Critical Path 死結，需 PJM 強力拆解</span></li></ul>
+                        </div>
+                        <div><h4 class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-3 pb-1 border-b border-red-100 dark:border-red-900">🔴 高風險警示</h4>
+                            <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 border border-red-200 dark:border-red-900/40"><p id="t-npi-evt-risk" class="text-sm text-red-700 dark:text-red-300 leading-relaxed">BOM 未準時凍結，導致 PVT 備料失準，量產備料成本暴增且交期延誤</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="npi-panel-pvt" class="hidden card bg-white dark:bg-gray-800 border-l-8 border-blue-500 animate-[fadeIn_0.3s_ease-in-out]">
+                    <div class="flex flex-wrap items-center gap-3 mb-5">
+                        <span class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-bold px-3 py-1.5 rounded-full">🔵 PVT — Production Verification Test（M-5 ~ M-2）</span>
+                        <h3 id="t-npi-pvt-title" class="text-lg md:text-xl font-black text-gray-800 dark:text-gray-100">量產驗證與工廠就緒</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div><h4 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 pb-1 border-b border-indigo-100 dark:border-indigo-900">📋 PJM 核心任務</h4>
+                            <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-task-1">確認工廠產線 SOP、治具設計與測試設備準備就緒</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-task-2">協調 DFM（Design for Manufacturing）審查，確認製造可行性</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-task-3">追蹤良率（Yield Rate）達標進度，設定 Go / No-Go 門檻</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-task-4">準備客戶驗廠（Factory Audit）所需文件與現場安排</span></li></ul>
+                        </div>
+                        <div><h4 class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 pb-1 border-b border-yellow-100 dark:border-yellow-900">⚠️ 常見卡點</h4>
+                            <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-bn-1">良率低於目標（&lt; 95%），良率改善需 2~4 週額外迭代</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-bn-2">工廠端產線換線排程衝突，PVT 批量入廠遭延遲</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-bn-3">治具（Jig / Fixture）製作週期過長，卡住測試整體節奏</span></li></ul>
+                        </div>
+                        <div><h4 class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-3 pb-1 border-b border-red-100 dark:border-red-900">🔴 高風險警示</h4>
+                            <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 border border-red-200 dark:border-red-900/40"><p id="t-npi-pvt-risk" class="text-sm text-red-700 dark:text-red-300 leading-relaxed">良率改善方案若影響 PCB 設計，需重走 EVT 部分驗證流程，回流成本極高</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="npi-panel-mp" class="hidden card bg-white dark:bg-gray-800 border-l-8 border-indigo-500 animate-[fadeIn_0.3s_ease-in-out]">
+                    <div class="flex flex-wrap items-center gap-3 mb-5">
+                        <span class="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 text-xs font-bold px-3 py-1.5 rounded-full">🟣 MP — Mass Production（M-0 起）</span>
+                        <h3 id="t-npi-mp-title" class="text-lg md:text-xl font-black text-gray-800 dark:text-gray-100">量產 Ramp 與供應鏈管理</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div><h4 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 pb-1 border-b border-indigo-100 dark:border-indigo-900">📋 PJM 核心任務</h4>
+                            <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-task-1">管理首批量產出貨（Ramp-up）節奏與客戶交期承諾</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-task-2">即時監控 Field Return Rate 與工廠 DPPM（Defect PPM）</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-task-3">協調缺料（Short Supply）應急替代料（Alternate Part）認証方案</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-task-4">維護長期供應鏈健康度指標與 EOL（End-of-Life）預警管理</span></li></ul>
+                        </div>
+                        <div><h4 class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 pb-1 border-b border-yellow-100 dark:border-yellow-900">⚠️ 常見卡點</h4>
+                            <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-bn-1">Ramp 速度不及預期，無法如期達到客戶要求的出貨量</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-bn-2">關鍵元件突發性缺料，影響整條生產線的排程</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-bn-3">Field Issue 爆發，需緊急啟動 8D Problem-solving 流程應對客訴</span></li></ul>
+                        </div>
+                        <div><h4 class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-3 pb-1 border-b border-red-100 dark:border-red-900">🔴 高風險警示</h4>
+                            <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 border border-red-200 dark:border-red-900/40"><p id="t-npi-mp-risk" class="text-sm text-red-700 dark:text-red-300 leading-relaxed">Ramp 延遲直接縮小與競品的時間差，市佔搶佔速度受損，商業損失難以量化</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Heatmap -->
+                <div class="card bg-white dark:bg-gray-800">
+                    <h3 id="t-npi-heatmap-title" class="text-lg font-black text-gray-800 dark:text-gray-100 mb-1">📊 跨職能風險熱力圖</h3>
+                    <p id="t-npi-heatmap-sub" class="text-sm text-gray-500 dark:text-gray-400 mb-5">各功能部門在不同 NPI 階段的風險集中度，PJM 需提前預判並介入協調</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[400px] text-sm border-collapse">
+                            <thead>
+                                <tr class="border-b-2 border-gray-200 dark:border-gray-700">
+                                    <th class="text-left text-xs text-gray-500 dark:text-gray-400 pb-3 font-bold w-32">職能 / 階段</th>
+                                    <th class="text-center text-xs font-bold pb-3 text-yellow-600 dark:text-yellow-400 w-24" id="t-npi-heatmap-col-dvt">DVT</th>
+                                    <th class="text-center text-xs font-bold pb-3 text-green-600 dark:text-green-400 w-24" id="t-npi-heatmap-col-evt">EVT</th>
+                                    <th class="text-center text-xs font-bold pb-3 text-blue-600 dark:text-blue-400 w-24" id="t-npi-heatmap-col-pvt">PVT</th>
+                                    <th class="text-center text-xs font-bold pb-3 text-indigo-600 dark:text-indigo-400 w-24" id="t-npi-heatmap-col-mp">MP</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-100 dark:border-gray-800">
+                                    <td class="py-3 text-sm font-bold text-gray-700 dark:text-gray-300" id="t-npi-row-ee">EE / 電子設計</td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">高</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">低</span></td>
+                                </tr>
+                                <tr class="border-b border-gray-100 dark:border-gray-800">
+                                    <td class="py-3 text-sm font-bold text-gray-700 dark:text-gray-300" id="t-npi-row-me">ME / 散熱</td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">低</span></td>
+                                </tr>
+                                <tr class="border-b border-gray-100 dark:border-gray-800">
+                                    <td class="py-3 text-sm font-bold text-gray-700 dark:text-gray-300" id="t-npi-row-sw">SW / FW</td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">高</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
+                                </tr>
+                                <tr class="border-b border-gray-100 dark:border-gray-800">
+                                    <td class="py-3 text-sm font-bold text-gray-700 dark:text-gray-300" id="t-npi-row-supply">供應鏈</td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">高</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 text-sm font-bold text-gray-700 dark:text-gray-300" id="t-npi-row-factory">工廠 / 產線</td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">低</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">低</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
+                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">高</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
     <div id="exportPromptModal" class="fixed inset-0 bg-black/60 z-[120] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md border dark:border-gray-700 overflow-hidden transform transition-transform">
             <div class="p-6 bg-indigo-50 dark:bg-indigo-900/30 border-b border-indigo-100 dark:border-gray-700">
@@ -479,8 +677,23 @@
             if(typeof renderCompareGrid === "function" && !document.getElementById('compareViewSection').classList.contains('hidden')) renderCompareGrid();
         }
 
+        function selectNpiPhase(phase) {
+            const phases = ['rfq', 'dvt', 'evt', 'pvt', 'mp'];
+            phases.forEach(p => {
+                const panel = document.getElementById('npi-panel-' + p);
+                const dot = document.getElementById('npi-dot-' + p);
+                if (p === phase) {
+                    if (panel) { panel.classList.remove('hidden'); }
+                    if (dot) { dot.classList.add('scale-125', 'ring-4', 'ring-offset-2', 'ring-offset-white'); }
+                } else {
+                    if (panel) { panel.classList.add('hidden'); }
+                    if (dot) { dot.classList.remove('scale-125', 'ring-4', 'ring-offset-2', 'ring-offset-white'); }
+                }
+            });
+        }
+
         function switchTab(tabName) {
-            const tabs = ['about', 'tco', 'mindset'];
+            const tabs = ['about', 'tco', 'mindset', 'npi'];
             const exportBtn = document.getElementById('btn-export-pdf'); const copyBtn = document.getElementById('btn-copy-link');
             tabs.forEach(t => {
                 const btn = document.getElementById('btn-tab-' + t); const wrapper = document.getElementById('wrapper-' + t);
@@ -488,17 +701,18 @@
                 else { btn.className = 'tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200'; wrapper.classList.remove('block'); wrapper.classList.add('hidden'); }
             });
             
-            if (tabName === 'tco') { 
-                exportBtn.classList.remove('hidden'); copyBtn.classList.remove('hidden'); 
-                if (typeof calculateTCO === "function") setTimeout(() => calculateTCO(), 50); 
-                
+            if (tabName === 'tco') {
+                exportBtn.classList.remove('hidden'); copyBtn.classList.remove('hidden');
+                if (typeof calculateTCO === "function") setTimeout(() => calculateTCO(), 50);
+
                 // 🚀 TCO 頁籤專屬觸發邏輯：載入後延遲 0.6 秒觸發導覽
                 if (window.innerWidth >= 1024 && !localStorage.getItem('bryan_tour_completed')) {
                     setTimeout(() => startTour(), 600);
                 }
-            } else { 
-                exportBtn.classList.add('hidden'); copyBtn.classList.add('hidden'); 
+            } else {
+                exportBtn.classList.add('hidden'); copyBtn.classList.add('hidden');
             }
+            if (tabName === 'npi') { selectNpiPhase('rfq'); }
         }
         
         function closeModal() { document.getElementById('drilldownModal').classList.add('hidden'); }
@@ -516,7 +730,7 @@
             // 🚀 修正：加上 URL 前綴
             const urlParams = new URLSearchParams(window.location.search);
             const targetTab = urlParams.get('tab') || 'about';
-            if (['about', 'tco', 'mindset'].includes(targetTab)) { switchTab(targetTab); }
+            if (['about', 'tco', 'mindset', 'npi'].includes(targetTab)) { switchTab(targetTab); }
             if (typeof calculateTCO === "function") { calculateTCO(); }
             if (urlParams.get('report') === '1' && typeof generateSalesReport === "function") { setTimeout(() => generateSalesReport(), 150); }
         };
