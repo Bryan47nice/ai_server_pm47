@@ -285,7 +285,7 @@
         <div id="wrapper-npi" class="hidden">
 
             <!-- NPI Hub Sub-Navigation -->
-            <div class="mb-6 border-b border-gray-200 dark:border-gray-700 flex items-center gap-1">
+            <div class="mb-6 border-b border-gray-200 dark:border-gray-700 flex items-center gap-1 overflow-x-auto">
                 <button id="npi-sub-btn-checkpoint" onclick="switchNpiSection('checkpoint')" class="pb-2 mr-6 text-sm font-bold border-b-2 border-orange-500 text-orange-600 dark:text-orange-400 transition-colors duration-200"><span id="t-npi-sub-checkpoint">🔍 Phase Checkpoint</span></button>
                 <button id="npi-sub-btn-schedule" onclick="switchNpiSection('schedule')" class="pb-2 mr-6 text-sm font-bold border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"><span id="t-npi-sub-schedule">📅 排程 Pull-in 模擬器</span></button>
                 <button id="npi-sub-btn-raci" onclick="switchNpiSection('raci')" class="pb-2 mr-6 text-sm font-bold border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"><span id="t-npi-sub-raci">👥 RACI 協調矩陣</span></button>
@@ -1375,6 +1375,9 @@
         }
 
         function copyScheduleSummary() {
+            // Auto-generate summary if not yet produced
+            const output = document.getElementById('sched-summary-output');
+            if (!output || !output.textContent.trim()) exportScheduleSummary();
             const text = document.getElementById('sched-summary-output')?.textContent;
             if (!text || !text.trim()) return;
             const btn = document.getElementById('sched-copy-btn');

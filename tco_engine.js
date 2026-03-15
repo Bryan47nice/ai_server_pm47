@@ -409,8 +409,9 @@ function calculateTCO() {
     const finalLiqCost = totalLiqCapEx + (liqOpExPerYear * evalYears);
     const totalSavings = finalAirCost - finalLiqCost;
     
-    // 取得精準的黃金交叉年份
-    const beYearRaw = (totalLiqCapEx - totalAirCapEx) / (airOpExPerYear - liqOpExPerYear);
+    // 取得精準的黃金交叉年份（防止除以零：若 OpEx 相同則永不回本）
+    const opExDiff = airOpExPerYear - liqOpExPerYear;
+    const beYearRaw = Math.abs(opExDiff) < 0.01 ? evalYears + 1 : (totalLiqCapEx - totalAirCapEx) / opExDiff;
 
     // 🚀 NEW: 動態安插黃金交叉點 (Data Point Injection)
     let rawYears = [];
