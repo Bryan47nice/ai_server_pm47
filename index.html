@@ -47,6 +47,7 @@
                     <button id="btn-tab-tco" onclick="switchTab('tco')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-tco">📊 AI 伺服器 TCO 評估儀表板</span></button>
                     <button id="btn-tab-mindset" onclick="switchTab('mindset')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-mindset">🧠 產品企劃：專案管理思維對照</span></button>
                     <button id="btn-tab-npi" onclick="switchTab('npi')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-npi">🏭 NPI 流程卡點</span></button>
+                    <button id="btn-tab-material" onclick="switchTab('material')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-material">📦 備料追蹤</span></button>
                 </div>
                 <div class="flex items-center space-x-3 mb-2">
                     <div class="text-sm font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 px-3 py-1.5 rounded-full shadow-sm mr-2 hidden md:block"><span id="t-author">製作者：莊仕祺 (Bryan)</span></div>
@@ -393,7 +394,7 @@
                 <!-- Phase Detail Panels -->
                 <div id="npi-panel-rfq" class="card bg-white dark:bg-gray-800 border-l-8 border-orange-400 animate-[fadeIn_0.3s_ease-in-out]">
                     <div class="flex flex-wrap items-center gap-3 mb-5">
-                        <span class="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 text-xs font-bold px-3 py-1.5 rounded-full">🟠 RFQ / 規劃（M-18 ~ M-12）</span>
+                        <span data-i18n="t-npi-rfq-panel-badge" class="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 text-xs font-bold px-3 py-1.5 rounded-full">🟠 RFQ / 規劃（M-18 ~ M-12）</span>
                         <h3 id="t-npi-rfq-title" class="text-lg md:text-xl font-black text-gray-800 dark:text-gray-100">需求確認與資源排程</h3>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -415,13 +416,13 @@
                         <h3 id="t-npi-dvt-title" class="text-lg md:text-xl font-black text-gray-800 dark:text-gray-100">設計驗證與關鍵零件認証</h3>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div><h4 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 pb-1 border-b border-indigo-100 dark:border-indigo-900">📋 PJM 核心任務</h4>
+                        <div><h4 data-i18n="t-npi-tasks-label" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 pb-1 border-b border-indigo-100 dark:border-indigo-900">📋 PJM 核心任務</h4>
                             <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-task-1">追蹤 EE / ME / Thermal 設計進度，主持每週 Issue Review 會議</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-task-2">確認 GPU / CPU / HBM 等關鍵零件的 AVL 認証狀態</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-task-3">下單 Long Lead Time 零件並建立交期追蹤看板</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-task-4">制定 DVT 測試計畫，預約 SIT 實驗室資源</span></li></ul>
                         </div>
-                        <div><h4 class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 pb-1 border-b border-yellow-100 dark:border-yellow-900">⚠️ 常見卡點</h4>
+                        <div><h4 data-i18n="t-npi-bn-label" class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 pb-1 border-b border-yellow-100 dark:border-yellow-900">⚠️ 常見卡點</h4>
                             <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-bn-1">GPU 等主晶片 Lead Time 超過 20 週，樣品到位嚴重延遲</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-bn-2">散熱設計不達標，需重新 Layout，延期 6~8 週</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-dvt-bn-3">EE 與 ME 設計邊界衝突，需多輪協調消耗大量時程</span></li></ul>
                         </div>
-                        <div><h4 class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-3 pb-1 border-b border-red-100 dark:border-red-900">🔴 高風險警示</h4>
+                        <div><h4 data-i18n="t-npi-risk-label" class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-3 pb-1 border-b border-red-100 dark:border-red-900">🔴 高風險警示</h4>
                             <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 border border-red-200 dark:border-red-900/40"><p id="t-npi-dvt-risk" class="text-sm text-red-700 dark:text-red-300 leading-relaxed">上游晶片廠（如 NVIDIA）臨時更新規格 (Spec Rev)，強制觸發 BOM 修改，牽動整條 Critical Path</p></div>
                         </div>
                     </div>
@@ -433,13 +434,13 @@
                         <h3 id="t-npi-evt-title" class="text-lg md:text-xl font-black text-gray-800 dark:text-gray-100">BOM 凍結與工程全面驗證</h3>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div><h4 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 pb-1 border-b border-indigo-100 dark:border-indigo-900">📋 PJM 核心任務</h4>
+                        <div><h4 data-i18n="t-npi-tasks-label" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 pb-1 border-b border-indigo-100 dark:border-indigo-900">📋 PJM 核心任務</h4>
                             <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-task-1">主導 BOM Freeze 會議，鎖定工程確認版本</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-task-2">協調 FAE 排入燒機 (Burn-in) 與相容性測試</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-task-3">追蹤 EVT Issue List，設定 Owner 與 ETA，強力推動收斂</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-task-4">安排客戶 Pre-qualification 送樣與技術文件準備</span></li></ul>
                         </div>
-                        <div><h4 class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 pb-1 border-b border-yellow-100 dark:border-yellow-900">⚠️ 常見卡點</h4>
+                        <div><h4 data-i18n="t-npi-bn-label" class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 pb-1 border-b border-yellow-100 dark:border-yellow-900">⚠️ 常見卡點</h4>
                             <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-bn-1">客戶臨時追加規格（Scope Creep），BOM Freeze 一再遞延</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-bn-2">測試 Fail 反覆，PCBA 需多輪重工，迭代週期拉長</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-evt-bn-3">多個 Issue 相互依賴，形成 Critical Path 死結，需 PJM 強力拆解</span></li></ul>
                         </div>
-                        <div><h4 class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-3 pb-1 border-b border-red-100 dark:border-red-900">🔴 高風險警示</h4>
+                        <div><h4 data-i18n="t-npi-risk-label" class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-3 pb-1 border-b border-red-100 dark:border-red-900">🔴 高風險警示</h4>
                             <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 border border-red-200 dark:border-red-900/40"><p id="t-npi-evt-risk" class="text-sm text-red-700 dark:text-red-300 leading-relaxed">BOM 未準時凍結，導致 PVT 備料失準，量產備料成本暴增且交期延誤</p></div>
                         </div>
                     </div>
@@ -451,13 +452,13 @@
                         <h3 id="t-npi-pvt-title" class="text-lg md:text-xl font-black text-gray-800 dark:text-gray-100">量產驗證與工廠就緒</h3>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div><h4 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 pb-1 border-b border-indigo-100 dark:border-indigo-900">📋 PJM 核心任務</h4>
+                        <div><h4 data-i18n="t-npi-tasks-label" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 pb-1 border-b border-indigo-100 dark:border-indigo-900">📋 PJM 核心任務</h4>
                             <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-task-1">確認工廠產線 SOP、治具設計與測試設備準備就緒</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-task-2">協調 DFM（Design for Manufacturing）審查，確認製造可行性</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-task-3">追蹤良率（Yield Rate）達標進度，設定 Go / No-Go 門檻</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-task-4">準備客戶驗廠（Factory Audit）所需文件與現場安排</span></li></ul>
                         </div>
-                        <div><h4 class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 pb-1 border-b border-yellow-100 dark:border-yellow-900">⚠️ 常見卡點</h4>
+                        <div><h4 data-i18n="t-npi-bn-label" class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 pb-1 border-b border-yellow-100 dark:border-yellow-900">⚠️ 常見卡點</h4>
                             <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-bn-1">良率低於目標（&lt; 95%），良率改善需 2~4 週額外迭代</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-bn-2">工廠端產線換線排程衝突，PVT 批量入廠遭延遲</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-pvt-bn-3">治具（Jig / Fixture）製作週期過長，卡住測試整體節奏</span></li></ul>
                         </div>
-                        <div><h4 class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-3 pb-1 border-b border-red-100 dark:border-red-900">🔴 高風險警示</h4>
+                        <div><h4 data-i18n="t-npi-risk-label" class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-3 pb-1 border-b border-red-100 dark:border-red-900">🔴 高風險警示</h4>
                             <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 border border-red-200 dark:border-red-900/40"><p id="t-npi-pvt-risk" class="text-sm text-red-700 dark:text-red-300 leading-relaxed">良率改善方案若影響 PCB 設計，需重走 EVT 部分驗證流程，回流成本極高</p></div>
                         </div>
                     </div>
@@ -465,17 +466,17 @@
 
                 <div id="npi-panel-mp" class="hidden card bg-white dark:bg-gray-800 border-l-8 border-indigo-500 animate-[fadeIn_0.3s_ease-in-out]">
                     <div class="flex flex-wrap items-center gap-3 mb-5">
-                        <span class="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 text-xs font-bold px-3 py-1.5 rounded-full">🟣 MP — Mass Production（M-0 起）</span>
+                        <span data-i18n="t-npi-mp-panel-badge" class="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 text-xs font-bold px-3 py-1.5 rounded-full">🟣 MP — Mass Production（M-0 起）</span>
                         <h3 id="t-npi-mp-title" class="text-lg md:text-xl font-black text-gray-800 dark:text-gray-100">量產 Ramp 與供應鏈管理</h3>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div><h4 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 pb-1 border-b border-indigo-100 dark:border-indigo-900">📋 PJM 核心任務</h4>
+                        <div><h4 data-i18n="t-npi-tasks-label" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3 pb-1 border-b border-indigo-100 dark:border-indigo-900">📋 PJM 核心任務</h4>
                             <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-task-1">管理首批量產出貨（Ramp-up）節奏與客戶交期承諾</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-task-2">即時監控 Field Return Rate 與工廠 DPPM（Defect PPM）</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-task-3">協調缺料（Short Supply）應急替代料（Alternate Part）認証方案</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-indigo-400 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-task-4">維護長期供應鏈健康度指標與 EOL（End-of-Life）預警管理</span></li></ul>
                         </div>
-                        <div><h4 class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 pb-1 border-b border-yellow-100 dark:border-yellow-900">⚠️ 常見卡點</h4>
+                        <div><h4 data-i18n="t-npi-bn-label" class="text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider mb-3 pb-1 border-b border-yellow-100 dark:border-yellow-900">⚠️ 常見卡點</h4>
                             <ul class="space-y-2"><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-bn-1">Ramp 速度不及預期，無法如期達到客戶要求的出貨量</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-bn-2">關鍵元件突發性缺料，影響整條生產線的排程</span></li><li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span class="text-yellow-500 font-bold shrink-0 mt-0.5">▸</span><span id="t-npi-mp-bn-3">Field Issue 爆發，需緊急啟動 8D Problem-solving 流程應對客訴</span></li></ul>
                         </div>
-                        <div><h4 class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-3 pb-1 border-b border-red-100 dark:border-red-900">🔴 高風險警示</h4>
+                        <div><h4 data-i18n="t-npi-risk-label" class="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-3 pb-1 border-b border-red-100 dark:border-red-900">🔴 高風險警示</h4>
                             <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 border border-red-200 dark:border-red-900/40"><p id="t-npi-mp-risk" class="text-sm text-red-700 dark:text-red-300 leading-relaxed">Ramp 延遲直接縮小與競品的時間差，市佔搶佔速度受損，商業損失難以量化</p></div>
                         </div>
                     </div>
@@ -489,7 +490,7 @@
                         <table class="w-full min-w-[400px] text-sm border-collapse">
                             <thead>
                                 <tr class="border-b-2 border-gray-200 dark:border-gray-700">
-                                    <th class="text-left text-xs text-gray-500 dark:text-gray-400 pb-3 font-bold w-32">職能 / 階段</th>
+                                    <th data-i18n="t-npi-heatmap-th" class="text-left text-xs text-gray-500 dark:text-gray-400 pb-3 font-bold w-32">職能 / 階段</th>
                                     <th class="text-center text-xs font-bold pb-3 text-yellow-600 dark:text-yellow-400 w-24" id="t-npi-heatmap-col-dvt">DVT</th>
                                     <th class="text-center text-xs font-bold pb-3 text-green-600 dark:text-green-400 w-24" id="t-npi-heatmap-col-evt">EVT</th>
                                     <th class="text-center text-xs font-bold pb-3 text-blue-600 dark:text-blue-400 w-24" id="t-npi-heatmap-col-pvt">PVT</th>
@@ -499,38 +500,38 @@
                             <tbody>
                                 <tr class="border-b border-gray-100 dark:border-gray-800">
                                     <td class="py-3 text-sm font-bold text-gray-700 dark:text-gray-300" id="t-npi-row-ee">EE / 電子設計</td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">高</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">低</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-vh" class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-h" class="inline-block w-16 py-1 rounded text-xs font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">高</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-m" class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-l" class="inline-block w-16 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">低</span></td>
                                 </tr>
                                 <tr class="border-b border-gray-100 dark:border-gray-800">
                                     <td class="py-3 text-sm font-bold text-gray-700 dark:text-gray-300" id="t-npi-row-me">ME / 散熱</td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">低</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-vh" class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-m" class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-m" class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-l" class="inline-block w-16 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">低</span></td>
                                 </tr>
                                 <tr class="border-b border-gray-100 dark:border-gray-800">
                                     <td class="py-3 text-sm font-bold text-gray-700 dark:text-gray-300" id="t-npi-row-sw">SW / FW</td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">高</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-m" class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-vh" class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-h" class="inline-block w-16 py-1 rounded text-xs font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">高</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-m" class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
                                 </tr>
                                 <tr class="border-b border-gray-100 dark:border-gray-800">
                                     <td class="py-3 text-sm font-bold text-gray-700 dark:text-gray-300" id="t-npi-row-supply">供應鏈</td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">高</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-vh" class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-h" class="inline-block w-16 py-1 rounded text-xs font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">高</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-m" class="inline-block w-16 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">中</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-vh" class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
                                 </tr>
                                 <tr>
                                     <td class="py-3 text-sm font-bold text-gray-700 dark:text-gray-300" id="t-npi-row-factory">工廠 / 產線</td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">低</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">低</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
-                                    <td class="text-center py-3"><span class="inline-block w-16 py-1 rounded text-xs font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">高</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-l" class="inline-block w-16 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">低</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-l" class="inline-block w-16 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">低</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-vh" class="inline-block w-16 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">極高</span></td>
+                                    <td class="text-center py-3"><span data-i18n="t-npi-risk-h" class="inline-block w-16 py-1 rounded text-xs font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">高</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -539,6 +540,69 @@
 
             </div>
         </div>
+
+    <!-- ===== MATERIAL READINESS DASHBOARD ===== -->
+    <div id="wrapper-material" class="hidden">
+        <div class="flex flex-col gap-6">
+
+            <!-- Header -->
+            <div class="rounded-2xl p-8 text-center text-white relative overflow-hidden" style="background: linear-gradient(135deg, #1e3a5f 0%, #0f5132 100%);">
+                <div class="absolute inset-0 opacity-10" style="background-image: repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%); background-size: 10px 10px;"></div>
+                <div class="relative z-10 px-4">
+                    <h2 id="t-material-title" class="text-2xl md:text-3xl font-black mb-3 tracking-tight">📦 AI Server 備料狀態追蹤</h2>
+                    <p id="t-material-subtitle" class="text-green-200 max-w-3xl mx-auto font-medium text-sm md:text-base tracking-wide">輸入目標量產日期，即時計算各關鍵零件的最晚下單日與備料風險</p>
+                </div>
+            </div>
+
+            <!-- MP Date Input -->
+            <div class="card bg-white dark:bg-gray-800">
+                <div class="flex flex-wrap items-center gap-4">
+                    <label id="t-material-mp-label" for="mpDateInput" class="text-sm font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap">🎯 目標量產日 (MP Date)</label>
+                    <input type="date" id="mpDateInput" onchange="updateMaterialTable()" class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-bold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 w-44">
+                    <span id="t-material-note" class="text-xs text-gray-400 dark:text-gray-500 italic">⚡ Lead Time 可直接編輯，日期與狀態即時更新</span>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-3 gap-4">
+                <div class="card bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-center">
+                    <div id="summary-critical" class="text-4xl font-black text-red-600 dark:text-red-400 mb-1">0</div>
+                    <div id="t-material-summary-critical" class="text-xs font-bold text-red-500 dark:text-red-400 uppercase tracking-wider">零件逾期</div>
+                </div>
+                <div class="card bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 text-center">
+                    <div id="summary-risk" class="text-4xl font-black text-yellow-600 dark:text-yellow-400 mb-1">0</div>
+                    <div id="t-material-summary-risk" class="text-xs font-bold text-yellow-500 dark:text-yellow-400 uppercase tracking-wider">零件警示</div>
+                </div>
+                <div class="card bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-center">
+                    <div id="summary-ok" class="text-4xl font-black text-green-600 dark:text-green-400 mb-1">0</div>
+                    <div id="t-material-summary-ok" class="text-xs font-bold text-green-500 dark:text-green-400 uppercase tracking-wider">零件正常</div>
+                </div>
+            </div>
+
+            <!-- Material Table -->
+            <div class="card bg-white dark:bg-gray-800">
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[700px] text-sm border-collapse">
+                        <thead>
+                            <tr class="border-b-2 border-gray-200 dark:border-gray-700">
+                                <th id="t-material-col-part"    class="text-left text-xs text-gray-500 dark:text-gray-400 pb-3 font-bold pr-4">零件 / 模組</th>
+                                <th id="t-material-col-category" class="text-left text-xs text-gray-500 dark:text-gray-400 pb-3 font-bold pr-4">類別</th>
+                                <th id="t-material-col-leadtime" class="text-center text-xs text-gray-500 dark:text-gray-400 pb-3 font-bold pr-4">交期（週）</th>
+                                <th id="t-material-col-needed"  class="text-center text-xs text-gray-500 dark:text-gray-400 pb-3 font-bold pr-4">需到貨階段</th>
+                                <th id="t-material-col-order"   class="text-center text-xs text-gray-500 dark:text-gray-400 pb-3 font-bold pr-4">最晚下單日</th>
+                                <th id="t-material-col-days"    class="text-center text-xs text-gray-500 dark:text-gray-400 pb-3 font-bold pr-4">剩餘天數</th>
+                                <th id="t-material-col-status"  class="text-center text-xs text-gray-500 dark:text-gray-400 pb-3 font-bold">狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody id="materialTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- ===== END MATERIAL READINESS DASHBOARD ===== -->
 
     <div id="exportPromptModal" class="fixed inset-0 bg-black/60 z-[120] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md border dark:border-gray-700 overflow-hidden transform transition-transform">
@@ -650,13 +714,17 @@
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             document.getElementById('langBtnText').innerText = currentLang === 'zh' ? 'EN' : '中文';
             
-            if(typeof dict !== 'undefined' && dict[currentLang]) { 
-                for (const key in dict[currentLang]) { 
-                    const el = document.getElementById(key); 
-                    if (el) { el.innerHTML = dict[currentLang][key]; } 
-                } 
+            if(typeof dict !== 'undefined' && dict[currentLang]) {
+                for (const key in dict[currentLang]) {
+                    const el = document.getElementById(key);
+                    if (el) { el.innerHTML = dict[currentLang][key]; }
+                }
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (dict[currentLang][key]) el.innerHTML = dict[currentLang][key];
+                });
             }
-            
+
             // 🚀 若導覽進行中切換語系，瞬間重繪氣泡文字 (從本地 Cache 讀取)
             if (typeof renderTourStep === "function" && document.getElementById('tourOverlay').classList.contains('block')) {
                 renderTourStep();
@@ -668,6 +736,7 @@
             }
             if(typeof calculateTCO === "function") calculateTCO();
             if(typeof forceRegenerateReport === "function") forceRegenerateReport();
+            if(typeof updateMaterialTable === "function") updateMaterialTable();
         }
 
         function toggleTheme() {
@@ -693,7 +762,7 @@
         }
 
         function switchTab(tabName) {
-            const tabs = ['about', 'tco', 'mindset', 'npi'];
+            const tabs = ['about', 'tco', 'mindset', 'npi', 'material'];
             const exportBtn = document.getElementById('btn-export-pdf'); const copyBtn = document.getElementById('btn-copy-link');
             tabs.forEach(t => {
                 const btn = document.getElementById('btn-tab-' + t); const wrapper = document.getElementById('wrapper-' + t);
@@ -713,24 +782,130 @@
                 exportBtn.classList.add('hidden'); copyBtn.classList.add('hidden');
             }
             if (tabName === 'npi') { selectNpiPhase('rfq'); }
+            if (tabName === 'material') { updateMaterialTable(); }
         }
         
         function closeModal() { document.getElementById('drilldownModal').classList.add('hidden'); }
 
+        // ===== MATERIAL READINESS DASHBOARD =====
+        const materialParts = [
+            { part: 'GPU Module (H100/B200)', category: 'Compute',    leadTime: 20, phase: 'DVT', phaseOffset: 12 },
+            { part: 'HBM Memory',             category: 'Compute',    leadTime: 24, phase: 'DVT', phaseOffset: 12 },
+            { part: 'PCB / PCBA',             category: 'PCB',        leadTime: 12, phase: 'DVT', phaseOffset: 12 },
+            { part: 'Liquid Cooling CDU',     category: 'Thermal',    leadTime: 18, phase: 'EVT', phaseOffset: 8  },
+            { part: 'Power Supply Unit',      category: 'Power',      leadTime: 16, phase: 'EVT', phaseOffset: 8  },
+            { part: 'Network Switch',         category: 'Network',    leadTime: 14, phase: 'EVT', phaseOffset: 8  },
+            { part: 'SSD Storage',            category: 'Storage',    leadTime: 10, phase: 'EVT', phaseOffset: 8  },
+            { part: 'Cable Assembly',         category: 'Mechanical', leadTime: 8,  phase: 'PVT', phaseOffset: 5  },
+        ];
+
+        const categoryColors = {
+            'Compute':    'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300',
+            'PCB':        'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
+            'Thermal':    'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300',
+            'Power':      'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300',
+            'Network':    'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300',
+            'Storage':    'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300',
+            'Mechanical': 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
+        };
+
+        function calcLatestOrderDate(mpDateStr, phaseOffset, leadTimeWeeks) {
+            const mp = new Date(mpDateStr);
+            mp.setMonth(mp.getMonth() - phaseOffset);
+            mp.setDate(mp.getDate() - leadTimeWeeks * 7);
+            return mp;
+        }
+
+        function getStatus(orderDate) {
+            const today = new Date(); today.setHours(0,0,0,0);
+            const diff = Math.round((orderDate - today) / (1000 * 60 * 60 * 24));
+            if (diff < 0) return 'critical';
+            if (diff < 28) return 'risk';
+            return 'ok';
+        }
+
+        function formatDate(d) {
+            return d.toISOString().split('T')[0];
+        }
+
+        function updateMaterialTable() {
+            const mpVal = document.getElementById('mpDateInput').value;
+            const tbody = document.getElementById('materialTableBody');
+            if (!tbody) return;
+
+            const hasMp = !!mpVal;
+            let counts = { critical: 0, risk: 0, ok: 0 };
+
+            tbody.innerHTML = materialParts.map((p, i) => {
+                const lt = parseInt(document.getElementById('lt-input-' + i)?.value ?? p.leadTime) || p.leadTime;
+                let orderDateStr = '—', daysStr = '—', status = 'ok';
+                let statusBadge = '';
+
+                if (hasMp) {
+                    const orderDate = calcLatestOrderDate(mpVal, p.phaseOffset, lt);
+                    const today = new Date(); today.setHours(0,0,0,0);
+                    const diff = Math.round((orderDate - today) / (1000 * 60 * 60 * 24));
+                    status = getStatus(orderDate);
+                    orderDateStr = formatDate(orderDate);
+                    daysStr = diff >= 0 ? '+' + diff : diff.toString();
+                    counts[status]++;
+                }
+
+                const zh = currentLang === 'zh';
+                if (status === 'critical') statusBadge = `<span class="inline-block px-2 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">${zh ? '🔴 逾期' : '🔴 Past Due'}</span>`;
+                else if (status === 'risk')     statusBadge = `<span class="inline-block px-2 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">${zh ? '🟡 警示' : '🟡 At Risk'}</span>`;
+                else                            statusBadge = `<span class="inline-block px-2 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">${zh ? '🟢 正常' : '🟢 On Track'}</span>`;
+
+                const catColor = categoryColors[p.category] || 'bg-gray-100 text-gray-700';
+                const daysColor = !hasMp ? 'text-gray-400' : status === 'critical' ? 'text-red-600 dark:text-red-400 font-bold' : status === 'risk' ? 'text-yellow-600 dark:text-yellow-400 font-bold' : 'text-green-600 dark:text-green-400';
+                const rowBg = !hasMp ? '' : status === 'critical' ? 'bg-red-50/40 dark:bg-red-900/10' : status === 'risk' ? 'bg-yellow-50/40 dark:bg-yellow-900/10' : '';
+
+                return `<tr class="border-b border-gray-100 dark:border-gray-800 ${rowBg}">
+                    <td class="py-3 pr-4 text-sm font-bold text-gray-800 dark:text-gray-200">${p.part}</td>
+                    <td class="py-3 pr-4"><span class="inline-block px-2 py-0.5 rounded text-xs font-bold ${catColor}">${p.category}</span></td>
+                    <td class="py-3 pr-4 text-center"><input id="lt-input-${i}" type="number" min="1" max="52" value="${lt}" onchange="updateMaterialTable()" class="w-16 text-center border border-gray-300 dark:border-gray-600 rounded px-1 py-0.5 text-sm font-bold bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-400"></td>
+                    <td class="py-3 pr-4 text-center text-xs font-bold text-indigo-600 dark:text-indigo-400">${p.phase} (M-${p.phaseOffset})</td>
+                    <td class="py-3 pr-4 text-center text-sm font-mono ${!hasMp ? 'text-gray-400' : 'text-gray-700 dark:text-gray-200'}">${orderDateStr}</td>
+                    <td class="py-3 pr-4 text-center text-sm font-bold ${daysColor}">${daysStr}</td>
+                    <td class="py-3 text-center">${statusBadge}</td>
+                </tr>`;
+            }).join('');
+
+            if (hasMp) {
+                document.getElementById('summary-critical').textContent = counts.critical;
+                document.getElementById('summary-risk').textContent = counts.risk;
+                document.getElementById('summary-ok').textContent = counts.ok;
+            }
+        }
+
+        function initMaterialDashboard() {
+            // Default MP date: 12 months from today
+            const d = new Date();
+            d.setMonth(d.getMonth() + 12);
+            document.getElementById('mpDateInput').value = formatDate(d);
+            updateMaterialTable();
+        }
+        // ===== END MATERIAL READINESS DASHBOARD =====
+
         window.onload = function() {
-            if(typeof dict !== 'undefined' && dict[currentLang]) { 
-                for (const key in dict[currentLang]) { 
-                    const el = document.getElementById(key); 
-                    if (el) el.innerHTML = dict[currentLang][key]; 
-                } 
+            if(typeof dict !== 'undefined' && dict[currentLang]) {
+                for (const key in dict[currentLang]) {
+                    const el = document.getElementById(key);
+                    if (el) el.innerHTML = dict[currentLang][key];
+                }
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (dict[currentLang][key]) el.innerHTML = dict[currentLang][key];
+                });
             }
             if (typeof initScenarios === "function") { initScenarios(); }
             if (typeof loadStateFromURL === "function") { loadStateFromURL(); }
-            
+            initMaterialDashboard();
+
             // 🚀 修正：加上 URL 前綴
             const urlParams = new URLSearchParams(window.location.search);
             const targetTab = urlParams.get('tab') || 'about';
-            if (['about', 'tco', 'mindset', 'npi'].includes(targetTab)) { switchTab(targetTab); }
+            if (['about', 'tco', 'mindset', 'npi', 'material'].includes(targetTab)) { switchTab(targetTab); }
             if (typeof calculateTCO === "function") { calculateTCO(); }
             if (urlParams.get('report') === '1' && typeof generateSalesReport === "function") { setTimeout(() => generateSalesReport(), 150); }
         };
