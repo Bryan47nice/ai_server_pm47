@@ -289,6 +289,7 @@
                 <button id="npi-sub-btn-checkpoint" onclick="switchNpiSection('checkpoint')" class="pb-2 mr-6 text-sm font-bold border-b-2 border-orange-500 text-orange-600 dark:text-orange-400 transition-colors duration-200"><span id="t-npi-sub-checkpoint">🔍 Phase Checkpoint</span></button>
                 <button id="npi-sub-btn-schedule" onclick="switchNpiSection('schedule')" class="pb-2 mr-6 text-sm font-bold border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"><span id="t-npi-sub-schedule">📅 排程 Pull-in 模擬器</span></button>
                 <button id="npi-sub-btn-raci" onclick="switchNpiSection('raci')" class="pb-2 mr-6 text-sm font-bold border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"><span id="t-npi-sub-raci">👥 RACI 協調矩陣</span></button>
+                <button id="npi-sub-btn-gate" onclick="switchNpiSection('gate')" class="pb-2 mr-6 text-sm font-bold border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"><span id="t-npi-sub-gate">🎯 Gate Review</span></button>
             </div>
 
             <!-- Section A: Checkpoint (default) -->
@@ -656,6 +657,59 @@
 
             </div><!-- end npi-section-raci -->
 
+            <!-- Section D: Phase Gate Go/No-Go Simulator -->
+            <div id="npi-section-gate" class="hidden flex flex-col gap-6">
+
+                <!-- Hero -->
+                <div class="card bg-gradient-to-r from-indigo-900 to-violet-800 dark:from-indigo-950 dark:to-violet-950 text-white text-center py-8 relative overflow-hidden shadow-xl border-b-4 border-indigo-400">
+                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')]"></div>
+                    <div class="relative z-10 px-4">
+                        <h2 class="text-2xl md:text-3xl font-black mb-3 tracking-tight">🎯 Phase Gate Go / No-Go Simulator</h2>
+                        <p id="t-gate-subtitle" class="text-indigo-200 max-w-3xl mx-auto font-medium text-sm md:text-base tracking-wide">調整各 Gate Criteria 的完成度，即時得到 Go / Conditional Go / Hold 決策建議</p>
+                    </div>
+                </div>
+
+                <!-- Gate Selector -->
+                <div class="card bg-white dark:bg-gray-800">
+                    <p id="t-gate-select-label" class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">選擇評審階段</p>
+                    <div class="flex gap-2 flex-wrap">
+                        <button id="gate-btn-dvt" onclick="switchGate('dvt')" class="px-4 py-2 rounded-lg text-sm font-bold bg-yellow-500 text-white shadow transition">DVT Gate</button>
+                        <button id="gate-btn-evt" onclick="switchGate('evt')" class="px-4 py-2 rounded-lg text-sm font-bold bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:opacity-80 shadow transition">EVT Gate</button>
+                        <button id="gate-btn-pvt" onclick="switchGate('pvt')" class="px-4 py-2 rounded-lg text-sm font-bold bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:opacity-80 shadow transition">PVT Gate</button>
+                        <button id="gate-btn-mp"  onclick="switchGate('mp')"  class="px-4 py-2 rounded-lg text-sm font-bold bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:opacity-80 shadow transition">MP Gate</button>
+                    </div>
+                </div>
+
+                <!-- Hidden state tracker -->
+                <input type="hidden" id="_currentGateId" value="dvt">
+
+                <!-- Criteria Sliders (JS-rendered) -->
+                <div id="gate-criteria-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+                <!-- Score + Decision -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="card bg-white dark:bg-gray-800 text-center">
+                        <p id="t-gate-score-label" class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Gate Score</p>
+                        <p id="gate-score-value" class="text-5xl font-black font-mono text-indigo-600 dark:text-indigo-400 mb-3">--%</p>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                            <div id="gate-score-bar" class="h-3 rounded-full transition-all duration-500 bg-indigo-500" style="width:0%"></div>
+                        </div>
+                    </div>
+                    <div id="gate-decision-card" class="card text-center border-t-4 border-gray-300 bg-gray-50 dark:bg-gray-800/50">
+                        <p id="t-gate-decision-label" class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Decision</p>
+                        <p id="gate-decision-badge" class="text-3xl font-black mb-1">—</p>
+                        <p id="gate-decision-desc" class="text-sm text-gray-500 dark:text-gray-400">—</p>
+                    </div>
+                </div>
+
+                <!-- Action Items / Escalation Panel -->
+                <div id="gate-action-panel" class="hidden card bg-white dark:bg-gray-800">
+                    <h4 id="t-gate-action-title" class="font-bold text-gray-700 dark:text-gray-200 mb-3 text-sm">📋 Action Items</h4>
+                    <div id="gate-action-list" class="space-y-2"></div>
+                </div>
+
+            </div><!-- end npi-section-gate -->
+
         </div>
 
     <!-- ===== OPS & PM THINKING TAB ===== -->
@@ -930,6 +984,13 @@
             }
             if(typeof renderScheduleGantt === "function") renderScheduleGantt();
             if(typeof recalcSchedule === "function") recalcSchedule();
+            // Re-render Gate Review if visible
+            const gateSection = document.getElementById('npi-section-gate');
+            if (gateSection && !gateSection.classList.contains('hidden')) {
+                const gId = document.getElementById('_currentGateId')?.value || 'dvt';
+                if(typeof renderGateCriteria === "function") renderGateCriteria(gId);
+                if(typeof recalcGateScore === "function") recalcGateScore();
+            }
         }
 
         function toggleTheme() {
@@ -978,7 +1039,7 @@
         }
 
         function switchNpiSection(sectionName) {
-            const sections = ['checkpoint', 'schedule', 'raci'];
+            const sections = ['checkpoint', 'schedule', 'raci', 'gate'];
             sections.forEach(s => {
                 const el = document.getElementById('npi-section-' + s);
                 const btn = document.getElementById('npi-sub-btn-' + s);
@@ -991,6 +1052,7 @@
                     btn.className = 'pb-2 mr-6 text-sm font-bold border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200';
                 }
             });
+            if (sectionName === 'gate' && typeof initGateReview === 'function') initGateReview();
         }
 
         function switchOpsSection(sectionName) {
@@ -1474,6 +1536,211 @@
             switchRaciScenario('normal');
         }
         // ===== END RACI MATRIX =====
+
+        // ===== PHASE GATE GO/NO-GO SIMULATOR =====
+        const gateConfig = {
+            dvt: {
+                color: 'yellow',
+                criteria: [
+                    { id: 'dvt_sample',   label: { zh: '工程樣品到位率',                en: 'Engineering Sample Arrival' },      weight: 25, owner: 'supply',  ownerEn: 'Supply Chain', default: 80 },
+                    { id: 'dvt_bom',      label: { zh: 'BOM 凍結完成度',                en: 'BOM Freeze Completion' },           weight: 20, owner: 'ee',      ownerEn: 'EE / RD',      default: 90 },
+                    { id: 'dvt_test',     label: { zh: '測試覆蓋率',                    en: 'Test Coverage Rate' },              weight: 25, owner: 'ee',      ownerEn: 'EE / RD',      default: 75 },
+                    { id: 'dvt_supplier', label: { zh: 'Supplier Qualification 完成率', en: 'Supplier Qualification Rate' },     weight: 30, owner: 'supply',  ownerEn: 'Supply Chain', default: 70 },
+                ],
+                holdEscalation: {
+                    zh: ['PJM 召集跨部門 Gate Review，釐清 Hold 原因', 'EE Lead 提出修正計畫（2 週內交付）', 'Supply Chain 確認 Supplier 替代方案或加速計畫'],
+                    en: ['PJM to convene cross-functional Gate Review, clarify Hold reasons', 'EE Lead to submit correction plan (within 2 weeks)', 'Supply Chain to confirm supplier alternatives or acceleration plan']
+                }
+            },
+            evt: {
+                color: 'green',
+                criteria: [
+                    { id: 'evt_dvt_closure', label: { zh: 'DVT 問題關閉率',     en: 'DVT Issue Closure Rate' },    weight: 30, owner: 'ee',     ownerEn: 'EE / RD',      default: 85 },
+                    { id: 'evt_thermal',     label: { zh: '熱測試驗收率',        en: 'Thermal Validation Rate' },   weight: 25, owner: 'me',     ownerEn: 'ME / Thermal', default: 78 },
+                    { id: 'evt_firmware',    label: { zh: 'Firmware 穩定度',     en: 'Firmware Stability' },        weight: 25, owner: 'ee',     ownerEn: 'EE / RD',      default: 80 },
+                    { id: 'evt_yield',       label: { zh: 'Supplier 良率達標率', en: 'Supplier Yield Rate' },       weight: 20, owner: 'supply', ownerEn: 'Supply Chain', default: 72 },
+                ],
+                holdEscalation: {
+                    zh: ['EE / RD 提出 DVT 殘留問題修正計畫', 'ME/Thermal Lead 確認熱驗收測試重啟時間', 'PJM 向 Program Director 升級並調整整體時程'],
+                    en: ['EE/RD to submit DVT residual issue correction plan', 'ME/Thermal Lead to confirm thermal retest timeline', 'PJM to escalate to Program Director and revise overall schedule']
+                }
+            },
+            pvt: {
+                color: 'blue',
+                criteria: [
+                    { id: 'pvt_evt_closure', label: { zh: 'EVT 問題關閉率',     en: 'EVT Issue Closure Rate' },          weight: 25, owner: 'ee',      ownerEn: 'EE / RD',      default: 90 },
+                    { id: 'pvt_yield',       label: { zh: '產線良率目標達成',    en: 'Production Line Yield Target' },    weight: 30, owner: 'factory', ownerEn: 'Factory',      default: 82 },
+                    { id: 'pvt_packaging',   label: { zh: '包裝驗收完成度',      en: 'Packaging Validation' },            weight: 20, owner: 'me',      ownerEn: 'ME / Thermal', default: 88 },
+                    { id: 'pvt_material',    label: { zh: '量產物料備料完成率',  en: 'MP Material Readiness' },           weight: 25, owner: 'supply',  ownerEn: 'Supply Chain', default: 75 },
+                ],
+                holdEscalation: {
+                    zh: ['Factory Lead 提出良率改善計畫（含根因分析）', 'Supply Chain 確認量產物料全數到位時間', 'PJM 通知客戶 MP 日期可能調整'],
+                    en: ['Factory Lead to submit yield improvement plan (with root cause analysis)', 'Supply Chain to confirm full MP material arrival date', 'PJM to notify customer of potential MP date adjustment']
+                }
+            },
+            mp: {
+                color: 'purple',
+                criteria: [
+                    { id: 'mp_pvt_closure', label: { zh: 'PVT 問題全數關閉', en: 'PVT Full Issue Closure' },         weight: 30, owner: 'pjm',     ownerEn: 'PJM',          default: 95 },
+                    { id: 'mp_capacity',    label: { zh: '產能確認完成',      en: 'Production Capacity Confirmed' },   weight: 25, owner: 'factory', ownerEn: 'Factory',      default: 88 },
+                    { id: 'mp_fat',         label: { zh: '客戶 FAT 完成',     en: 'Customer FAT Completed' },          weight: 25, owner: 'sales',   ownerEn: 'Sales / PM',   default: 85 },
+                    { id: 'mp_logistics',   label: { zh: '物流出貨準備完成',  en: 'Logistics Readiness' },             weight: 20, owner: 'supply',  ownerEn: 'Supply Chain', default: 90 },
+                ],
+                holdEscalation: {
+                    zh: ['PJM 召集 MP Readiness Review，確認 Hold 範圍', '與客戶同步 MP 延後時間與補償方案', '啟動出貨風險緊急應對程序'],
+                    en: ['PJM to convene MP Readiness Review, define Hold scope', 'Sync with customer on MP delay and compensation plan', 'Activate shipment risk emergency response procedure']
+                }
+            }
+        };
+
+        function switchGate(gateId) {
+            const gateColors = { dvt: 'bg-yellow-500', evt: 'bg-green-500', pvt: 'bg-blue-500', mp: 'bg-purple-500' };
+            Object.keys(gateConfig).forEach(g => {
+                const btn = document.getElementById('gate-btn-' + g);
+                if (!btn) return;
+                btn.className = g === gateId
+                    ? `px-4 py-2 rounded-lg text-sm font-bold ${gateColors[g]} text-white shadow transition`
+                    : 'px-4 py-2 rounded-lg text-sm font-bold bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:opacity-80 shadow transition';
+            });
+            const tracker = document.getElementById('_currentGateId');
+            if (tracker) tracker.value = gateId;
+            renderGateCriteria(gateId);
+            recalcGateScore();
+        }
+
+        function renderGateCriteria(gateId) {
+            const gate = gateConfig[gateId];
+            if (!gate) return;
+            const container = document.getElementById('gate-criteria-container');
+            if (!container) return;
+            const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
+            const ownerColors = {
+                pjm:     'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
+                ee:      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
+                me:      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+                supply:  'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300',
+                factory: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
+                sales:   'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300'
+            };
+            const ownerLabel = (c) => {
+                if (isEn) return c.ownerEn;
+                const map = { pjm: 'PJM', ee: 'EE/RD', me: 'ME/Thermal', supply: 'Supply Chain', factory: 'Factory', sales: 'Sales/PM' };
+                return map[c.owner] || c.owner;
+            };
+            container.innerHTML = gate.criteria.map(c => `
+                <div class="card bg-white dark:bg-gray-800">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="font-bold text-gray-800 dark:text-gray-100 text-sm">${isEn ? c.label.en : c.label.zh}</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full font-bold ${ownerColors[c.owner] || 'bg-gray-100 text-gray-600'}">${ownerLabel(c)}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="range" id="gate-slider-${c.id}" min="0" max="100" value="${c.default}"
+                            oninput="document.getElementById('gate-val-${c.id}').textContent=this.value+'%'; recalcGateScore();"
+                            class="flex-1 accent-indigo-500 cursor-pointer">
+                        <span id="gate-val-${c.id}" class="text-sm font-black font-mono w-12 text-right text-indigo-600 dark:text-indigo-400">${c.default}%</span>
+                    </div>
+                    <div class="text-xs text-gray-400 dark:text-gray-600 mt-1">
+                        ${isEn ? 'Weight' : '權重'}：${c.weight}%
+                    </div>
+                </div>`).join('');
+        }
+
+        function recalcGateScore() {
+            const gateId = document.getElementById('_currentGateId')?.value || 'dvt';
+            const gate = gateConfig[gateId];
+            if (!gate) return;
+            const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
+            let weightedSum = 0, totalWeight = 0;
+            gate.criteria.forEach(c => {
+                const slider = document.getElementById('gate-slider-' + c.id);
+                const val = parseInt(slider ? slider.value : c.default);
+                weightedSum += val * c.weight;
+                totalWeight += c.weight;
+            });
+            const score = Math.round(weightedSum / totalWeight);
+            const scoreEl = document.getElementById('gate-score-value');
+            const bar = document.getElementById('gate-score-bar');
+            if (scoreEl) scoreEl.textContent = score + '%';
+            if (bar) {
+                bar.style.width = score + '%';
+                bar.className = `h-3 rounded-full transition-all duration-500 ${score >= 85 ? 'bg-green-500' : score >= 65 ? 'bg-yellow-500' : 'bg-red-500'}`;
+            }
+            const decisionCard = document.getElementById('gate-decision-card');
+            const badge = document.getElementById('gate-decision-badge');
+            const desc = document.getElementById('gate-decision-desc');
+            if (!decisionCard || !badge || !desc) return;
+            if (score >= 85) {
+                decisionCard.className = 'card text-center border-t-4 border-green-500 bg-green-50 dark:bg-green-900/20';
+                badge.textContent = '✅ Go';
+                desc.textContent = isEn ? 'All criteria met. Proceed to next phase.' : '所有標準達標，可進入下一 Phase。';
+                document.getElementById('gate-action-panel')?.classList.add('hidden');
+            } else if (score >= 65) {
+                decisionCard.className = 'card text-center border-t-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20';
+                badge.textContent = '⚠️ Conditional Go';
+                desc.textContent = isEn ? 'Proceed with conditions. Action items required.' : '條件通過，以下項目需在期限內完成。';
+                renderGateActionItems(gate, isEn, 'conditional');
+            } else {
+                decisionCard.className = 'card text-center border-t-4 border-red-500 bg-red-50 dark:bg-red-900/20';
+                badge.textContent = '🚫 Hold';
+                desc.textContent = isEn ? 'Gate blocked. Escalation required before re-review.' : '評審未通過，需升級處理後重新召開 Gate Review。';
+                renderGateActionItems(gate, isEn, 'hold');
+            }
+        }
+
+        function renderGateActionItems(gate, isEn, mode) {
+            const panel = document.getElementById('gate-action-panel');
+            const list = document.getElementById('gate-action-list');
+            const title = document.getElementById('t-gate-action-title');
+            if (!panel || !list) return;
+            panel.classList.remove('hidden');
+            if (mode === 'hold') {
+                if (title) title.textContent = isEn ? '🚨 Escalation Path' : '🚨 升級路徑';
+                list.innerHTML = gate.holdEscalation[isEn ? 'en' : 'zh'].map((item, i) =>
+                    `<div class="flex items-start gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                        <span class="text-red-500 font-bold flex-shrink-0">${i + 1}.</span>
+                        <span class="text-gray-700 dark:text-gray-300 text-sm">${item}</span>
+                    </div>`).join('');
+            } else {
+                if (title) title.textContent = isEn ? '📋 Action Items (Criteria Below 80%)' : '📋 Action Items（完成度 < 80% 的項目）';
+                const ownerActionMap = {
+                    supply:  { zh: '確認交期與供應商加速計畫',                       en: 'Confirm ETA and supplier acceleration plan' },
+                    ee:      { zh: '提出修正方案並在 5 工作日內更新',                 en: 'Submit correction plan, update within 5 business days' },
+                    me:      { zh: '完成測試並提交驗收報告',                          en: 'Complete testing and submit validation report' },
+                    factory: { zh: '確認改善目標與驗收時間點',                        en: 'Confirm improvement targets and verification timeline' },
+                    pjm:     { zh: '協調各部門對齊並向 Program Director 升級',       en: 'Align cross-functional teams and escalate to Program Director' },
+                    sales:   { zh: '與客戶確認新時程並管理期待',                      en: 'Confirm revised timeline with customer and manage expectations' }
+                };
+                const ownerDisplayMap = { pjm: 'PJM', ee: 'EE/RD', me: 'ME/Thermal', supply: 'Supply Chain', factory: 'Factory', sales: 'Sales/PM' };
+                const lowItems = gate.criteria.filter(c => {
+                    const slider = document.getElementById('gate-slider-' + c.id);
+                    return parseInt(slider ? slider.value : c.default) < 80;
+                });
+                if (lowItems.length === 0) {
+                    list.innerHTML = `<p class="text-sm text-gray-500">${isEn ? 'No critical items below 80%. Monitor and proceed.' : '無低於 80% 的項目，繼續監控並推進。'}</p>`;
+                } else {
+                    list.innerHTML = lowItems.map(c => {
+                        const slider = document.getElementById('gate-slider-' + c.id);
+                        const val = parseInt(slider ? slider.value : c.default);
+                        const action = ownerActionMap[c.owner] || { zh: '請跟進', en: 'Follow up required' };
+                        const oLabel = isEn ? c.ownerEn : (ownerDisplayMap[c.owner] || c.owner);
+                        return `<div class="p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="font-bold text-sm text-gray-800 dark:text-gray-100">${isEn ? c.label.en : c.label.zh}</span>
+                                <span class="text-xs font-black text-yellow-600 dark:text-yellow-400">${val}%</span>
+                            </div>
+                            <div class="text-xs text-gray-600 dark:text-gray-400">
+                                <span class="font-bold text-indigo-600 dark:text-indigo-400">${oLabel}：</span>${isEn ? action.en : action.zh}
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+            }
+        }
+
+        function initGateReview() {
+            switchGate('dvt');
+        }
+        // ===== END PHASE GATE SIMULATOR =====
 
         window.onload = function() {
             if(typeof dict !== 'undefined' && dict[currentLang]) {

@@ -9,6 +9,14 @@ const dict = {
         't-npi-sub-checkpoint': '🔍 Phase Checkpoint',
         't-npi-sub-schedule': '📅 排程 Pull-in 模擬器',
         't-npi-sub-raci': '👥 RACI 協調矩陣',
+        't-npi-sub-gate': '🎯 Gate Review',
+
+        // Gate Review
+        't-gate-subtitle': '調整各 Gate Criteria 的完成度，即時得到 Go / Conditional Go / Hold 決策建議',
+        't-gate-select-label': '選擇評審階段',
+        't-gate-score-label': 'Gate Score',
+        't-gate-decision-label': 'Decision',
+        't-gate-action-title': '📋 Action Items',
 
         // Ops sub-nav
         't-ops-sub-material': '📦 備料追蹤',
@@ -290,6 +298,14 @@ const dict = {
         't-npi-sub-checkpoint': '🔍 Phase Checkpoint',
         't-npi-sub-schedule': '📅 Schedule Pull-in Simulator',
         't-npi-sub-raci': '👥 RACI Matrix',
+        't-npi-sub-gate': '🎯 Gate Review',
+
+        // Gate Review
+        't-gate-subtitle': 'Adjust criteria completion rates to get real-time Go / Conditional Go / Hold recommendations',
+        't-gate-select-label': 'Select Gate Phase',
+        't-gate-score-label': 'Gate Score',
+        't-gate-decision-label': 'Decision',
+        't-gate-action-title': '📋 Action Items',
 
         // Ops sub-nav
         't-ops-sub-material': '📦 Material Tracker',
