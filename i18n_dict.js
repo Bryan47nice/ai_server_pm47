@@ -271,6 +271,8 @@ const dict = {
         't-material-status-risk': '🟡 警示',
         't-material-status-ok': '🟢 正常',
         't-material-note': '⚡ Lead Time 可直接編輯，日期與狀態即時更新',
+        't-material-add-btn': '新增零件',
+        't-material-add-confirm': '✅ 新增',
 
         't-tour-btn': '❓ 導覽',
         't-tour-skip': '跳過',
@@ -560,6 +562,8 @@ const dict = {
         't-material-status-risk': '🟡 At Risk',
         't-material-status-ok': '🟢 On Track',
         't-material-note': '⚡ Lead time is editable — dates and status update instantly',
+        't-material-add-btn': 'Add Part',
+        't-material-add-confirm': '✅ Add',
 
         't-tour-btn': '❓ Tour',
         't-tour-skip': 'Skip',

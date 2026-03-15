@@ -734,28 +734,44 @@
                 </div>
             </div>
 
-            <!-- MP Date Input -->
+            <!-- MP Date Input + Mode Toggle -->
             <div class="card bg-white dark:bg-gray-800">
                 <div class="flex flex-wrap items-center gap-4">
                     <label id="t-material-mp-label" for="mpDateInput" class="text-sm font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap">🎯 目標量產日 (MP Date)</label>
                     <input type="date" id="mpDateInput" onchange="updateMaterialTable()" class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-bold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 w-44">
                     <span id="t-material-note" class="text-xs text-gray-400 dark:text-gray-500 italic">⚡ Lead Time 可直接編輯，日期與狀態即時更新</span>
+                    <div class="flex gap-2 ml-auto">
+                        <button id="mode-btn-backward" onclick="switchMaterialMode('backward')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-teal-600 text-white shadow-md transition-all duration-200">⬅ 反推模式</button>
+                        <button id="mode-btn-forward" onclick="switchMaterialMode('forward')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200">正推模式 ➡</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Summary Cards -->
-            <div class="grid grid-cols-3 gap-4">
-                <div class="card bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-center">
+            <!-- Summary Cards — Backward Mode (default) -->
+            <div id="summary-backward" class="grid grid-cols-3 gap-4">
+                <div id="filter-card-critical" onclick="filterMaterialStatus('critical')" class="card bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-center cursor-pointer select-none transition-all duration-200 hover:shadow-lg ring-red-400 dark:ring-red-500">
                     <div id="summary-critical" class="text-4xl font-black text-red-600 dark:text-red-400 mb-1">0</div>
                     <div id="t-material-summary-critical" class="text-xs font-bold text-red-500 dark:text-red-400 uppercase tracking-wider">零件逾期</div>
                 </div>
-                <div class="card bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 text-center">
+                <div id="filter-card-risk" onclick="filterMaterialStatus('risk')" class="card bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 text-center cursor-pointer select-none transition-all duration-200 hover:shadow-lg ring-yellow-400 dark:ring-yellow-500">
                     <div id="summary-risk" class="text-4xl font-black text-yellow-600 dark:text-yellow-400 mb-1">0</div>
                     <div id="t-material-summary-risk" class="text-xs font-bold text-yellow-500 dark:text-yellow-400 uppercase tracking-wider">零件警示</div>
                 </div>
-                <div class="card bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-center">
+                <div id="filter-card-ok" onclick="filterMaterialStatus('ok')" class="card bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-center cursor-pointer select-none transition-all duration-200 hover:shadow-lg ring-green-400 dark:ring-green-500">
                     <div id="summary-ok" class="text-4xl font-black text-green-600 dark:text-green-400 mb-1">0</div>
                     <div id="t-material-summary-ok" class="text-xs font-bold text-green-500 dark:text-green-400 uppercase tracking-wider">零件正常</div>
+                </div>
+            </div>
+
+            <!-- Summary Cards — Forward Mode (hidden by default) -->
+            <div id="summary-forward" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="card bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 text-center">
+                    <div id="forward-earliest-mp" class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mb-1">—</div>
+                    <div id="t-material-earliest-mp-label" class="text-xs font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider">🚀 最早可 MP 日期</div>
+                </div>
+                <div class="card bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 text-center">
+                    <div id="forward-bottleneck" class="text-lg font-black text-yellow-600 dark:text-yellow-400 mb-1 truncate">—</div>
+                    <div id="t-material-bottleneck-label" class="text-xs font-bold text-yellow-500 dark:text-yellow-400 uppercase tracking-wider">⚠️ 瓶頸零件</div>
                 </div>
             </div>
 
@@ -777,6 +793,57 @@
                         <tbody id="materialTableBody">
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Add Custom Part -->
+            <div class="card bg-white dark:bg-gray-800">
+                <button onclick="toggleAddPartForm()" class="flex items-center gap-2 text-sm font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors">
+                    <span id="add-part-toggle-icon">➕</span>
+                    <span id="t-material-add-btn">新增零件</span>
+                </button>
+                <div id="add-part-form" class="hidden mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">零件名稱（中文）* / Part Name (EN)</label>
+                            <div class="flex gap-2">
+                                <input id="new-part-zh" type="text" placeholder="例：散熱貼片" class="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                                <input id="new-part-en" type="text" placeholder="e.g. Thermal Pad" class="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">類別 Category</label>
+                            <select id="new-part-cat" onchange="toggleCustomCatInput()" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                                <option value="Compute">Compute 運算</option>
+                                <option value="PCB">PCB 電路板</option>
+                                <option value="Thermal" selected>Thermal 散熱</option>
+                                <option value="Power">Power 電源</option>
+                                <option value="Network">Network 網路</option>
+                                <option value="Storage">Storage 儲存</option>
+                                <option value="Mechanical">Mechanical 機構</option>
+                                <option value="Custom">自訂 Custom...</option>
+                            </select>
+                            <input id="new-part-custom-cat" type="text" placeholder="輸入自訂類別名稱 / Custom category name" class="hidden mt-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">交期（週）Lead Time (wks)</label>
+                            <input id="new-part-leadtime" type="number" min="1" max="52" value="12" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">需到貨階段 Phase</label>
+                            <select id="new-part-phase" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                                <option value="DVT">DVT (M-12)</option>
+                                <option value="EVT" selected>EVT (M-8)</option>
+                                <option value="PVT">PVT (M-5)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-4">
+                        <button onclick="addCustomPart()" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold rounded-lg transition-colors">
+                            <span id="t-material-add-confirm">✅ 新增</span>
+                        </button>
+                        <button onclick="toggleAddPartForm()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-bold rounded-lg transition-colors">取消 / Cancel</button>
+                    </div>
                 </div>
             </div>
 
@@ -975,7 +1042,7 @@
             }
             if(typeof calculateTCO === "function") calculateTCO();
             if(typeof forceRegenerateReport === "function") forceRegenerateReport();
-            if(typeof updateMaterialTable === "function") updateMaterialTable();
+            if(typeof switchMaterialMode === "function") switchMaterialMode(materialMode);
             // Re-render dynamically generated RACI and Gantt with new language
             const activeRaciBtn = document.querySelector('#raci-btn-normal.border-green-400, #raci-btn-delay.border-orange-400, #raci-btn-emergency.border-red-400');
             if (activeRaciBtn) {
@@ -1074,16 +1141,19 @@
         function closeModal() { document.getElementById('drilldownModal').classList.add('hidden'); }
 
         // ===== MATERIAL READINESS DASHBOARD =====
-        const materialParts = [
-            { part: 'GPU Module (H100/B200)', partZh: 'GPU 模組 (H100/B200)', category: 'Compute',    categoryZh: '運算',   leadTime: 20, phase: 'DVT', phaseOffset: 12 },
-            { part: 'HBM Memory',             partZh: 'HBM 記憶體',           category: 'Compute',    categoryZh: '運算',   leadTime: 24, phase: 'DVT', phaseOffset: 12 },
-            { part: 'PCB / PCBA',             partZh: 'PCB / PCBA 電路板',    category: 'PCB',        categoryZh: '電路板', leadTime: 12, phase: 'DVT', phaseOffset: 12 },
-            { part: 'Liquid Cooling CDU',     partZh: '液冷散熱模組 CDU',     category: 'Thermal',    categoryZh: '散熱',   leadTime: 18, phase: 'EVT', phaseOffset: 8  },
-            { part: 'Power Supply Unit',      partZh: '電源供應器 PSU',       category: 'Power',      categoryZh: '電源',   leadTime: 16, phase: 'EVT', phaseOffset: 8  },
-            { part: 'Network Switch',         partZh: '網路交換器',           category: 'Network',    categoryZh: '網路',   leadTime: 14, phase: 'EVT', phaseOffset: 8  },
-            { part: 'SSD Storage',            partZh: 'SSD 儲存裝置',         category: 'Storage',    categoryZh: '儲存',   leadTime: 10, phase: 'EVT', phaseOffset: 8  },
-            { part: 'Cable Assembly',         partZh: '線材組件',             category: 'Mechanical', categoryZh: '機構',   leadTime: 8,  phase: 'PVT', phaseOffset: 5  },
+        let materialParts = [
+            { part: 'GPU Module (H100/B200)', partZh: 'GPU 模組 (H100/B200)', category: 'Compute',    categoryZh: '運算',   leadTime: 20, phase: 'DVT', phaseOffset: 12, isCustom: false },
+            { part: 'HBM Memory',             partZh: 'HBM 記憶體',           category: 'Compute',    categoryZh: '運算',   leadTime: 24, phase: 'DVT', phaseOffset: 12, isCustom: false },
+            { part: 'PCB / PCBA',             partZh: 'PCB / PCBA 電路板',    category: 'PCB',        categoryZh: '電路板', leadTime: 12, phase: 'DVT', phaseOffset: 12, isCustom: false },
+            { part: 'Liquid Cooling CDU',     partZh: '液冷散熱模組 CDU',     category: 'Thermal',    categoryZh: '散熱',   leadTime: 18, phase: 'EVT', phaseOffset: 8,  isCustom: false },
+            { part: 'Power Supply Unit',      partZh: '電源供應器 PSU',       category: 'Power',      categoryZh: '電源',   leadTime: 16, phase: 'EVT', phaseOffset: 8,  isCustom: false },
+            { part: 'Network Switch',         partZh: '網路交換器',           category: 'Network',    categoryZh: '網路',   leadTime: 14, phase: 'EVT', phaseOffset: 8,  isCustom: false },
+            { part: 'SSD Storage',            partZh: 'SSD 儲存裝置',         category: 'Storage',    categoryZh: '儲存',   leadTime: 10, phase: 'EVT', phaseOffset: 8,  isCustom: false },
+            { part: 'Cable Assembly',         partZh: '線材組件',             category: 'Mechanical', categoryZh: '機構',   leadTime: 8,  phase: 'PVT', phaseOffset: 5,  isCustom: false },
         ];
+        let activeMaterialFilter = 'all';
+        let materialMode = 'backward';
+        const categoryZhMap = { 'Compute': '運算', 'PCB': '電路板', 'Thermal': '散熱', 'Power': '電源', 'Network': '網路', 'Storage': '儲存', 'Mechanical': '機構' };
 
         const categoryColors = {
             'Compute':    'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300',
@@ -1118,15 +1188,58 @@
             const mpVal = document.getElementById('mpDateInput').value;
             const tbody = document.getElementById('materialTableBody');
             if (!tbody) return;
+            const zh = currentLang === 'zh';
 
+            // ===== FORWARD (正推) MODE =====
+            if (materialMode === 'forward') {
+                if (!mpVal) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-400 text-sm">${zh ? '請輸入最早可下單日' : 'Please enter an order start date'}</td></tr>`;
+                    return;
+                }
+                const orderStart = new Date(mpVal); orderStart.setHours(0,0,0,0);
+                const projections = materialParts.map((p, i) => {
+                    const lt = parseInt(document.getElementById('lt-input-' + i)?.value ?? p.leadTime) || p.leadTime;
+                    const arrivalDate = new Date(orderStart);
+                    arrivalDate.setDate(arrivalDate.getDate() + lt * 7);
+                    const projectedMP = new Date(arrivalDate);
+                    projectedMP.setMonth(projectedMP.getMonth() + p.phaseOffset);
+                    return { arrivalDate, projectedMP, lt };
+                });
+                const maxMPTime = Math.max(...projections.map(r => r.projectedMP.getTime()));
+                tbody.innerHTML = materialParts.map((p, i) => {
+                    const r = projections[i];
+                    const isBottleneck = r.projectedMP.getTime() === maxMPTime;
+                    const catColor = categoryColors[p.category] || 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+                    const rowBg = isBottleneck ? 'bg-yellow-50/40 dark:bg-yellow-900/10' : '';
+                    const bottleneckBadge = isBottleneck
+                        ? `<span class="inline-block px-2 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">⚠️ ${zh ? '瓶頸' : 'Bottleneck'}</span>`
+                        : `<span class="inline-block px-2 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">✅ OK</span>`;
+                    const deleteBtn = p.isCustom ? `<button onclick="deleteCustomPart(${i})" class="ml-1 text-red-400 hover:text-red-600 text-xs" title="${zh ? '刪除' : 'Delete'}">🗑</button>` : '';
+                    return `<tr class="border-b border-gray-100 dark:border-gray-800 ${rowBg}" data-status="${isBottleneck ? 'bottleneck' : 'ok'}">
+                        <td class="py-3 pr-4 text-sm font-bold text-gray-800 dark:text-gray-200">${zh ? p.partZh : p.part}${deleteBtn}</td>
+                        <td class="py-3 pr-4"><span class="inline-block px-2 py-0.5 rounded text-xs font-bold ${catColor}">${zh ? p.categoryZh : p.category}</span></td>
+                        <td class="py-3 pr-4 text-center"><input id="lt-input-${i}" type="number" min="1" max="52" value="${r.lt}" onchange="updateMaterialTable()" class="w-16 text-center border border-gray-300 dark:border-gray-600 rounded px-1 py-0.5 text-sm font-bold bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-400"></td>
+                        <td class="py-3 pr-4 text-center text-xs font-bold text-indigo-600 dark:text-indigo-400">${p.phase} (M-${p.phaseOffset})</td>
+                        <td class="py-3 pr-4 text-center text-sm font-mono text-gray-700 dark:text-gray-200">${formatDate(r.arrivalDate)}</td>
+                        <td class="py-3 pr-4 text-center text-sm font-bold ${isBottleneck ? 'text-yellow-600 dark:text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'}">${formatDate(r.projectedMP)}</td>
+                        <td class="py-3 text-center">${bottleneckBadge}</td>
+                    </tr>`;
+                }).join('');
+                // Update forward summary cards
+                const bottleneckIdx = projections.findIndex(r => r.projectedMP.getTime() === maxMPTime);
+                const bn = materialParts[bottleneckIdx];
+                document.getElementById('forward-earliest-mp').textContent = formatDate(new Date(maxMPTime));
+                document.getElementById('forward-bottleneck').textContent = zh ? bn.partZh : bn.part;
+                return;
+            }
+
+            // ===== BACKWARD (反推) MODE — original logic =====
             const hasMp = !!mpVal;
             let counts = { critical: 0, risk: 0, ok: 0 };
-
             tbody.innerHTML = materialParts.map((p, i) => {
                 const lt = parseInt(document.getElementById('lt-input-' + i)?.value ?? p.leadTime) || p.leadTime;
                 let orderDateStr = '—', daysStr = '—', status = 'ok';
                 let statusBadge = '';
-
                 if (hasMp) {
                     const orderDate = calcLatestOrderDate(mpVal, p.phaseOffset, lt);
                     const today = new Date(); today.setHours(0,0,0,0);
@@ -1136,18 +1249,15 @@
                     daysStr = diff >= 0 ? '+' + diff : diff.toString();
                     counts[status]++;
                 }
-
-                const zh = currentLang === 'zh';
                 if (status === 'critical') statusBadge = `<span class="inline-block px-2 py-1 rounded text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300">${zh ? '🔴 逾期' : '🔴 Past Due'}</span>`;
-                else if (status === 'risk')     statusBadge = `<span class="inline-block px-2 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">${zh ? '🟡 警示' : '🟡 At Risk'}</span>`;
-                else                            statusBadge = `<span class="inline-block px-2 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">${zh ? '🟢 正常' : '🟢 On Track'}</span>`;
-
-                const catColor = categoryColors[p.category] || 'bg-gray-100 text-gray-700';
+                else if (status === 'risk') statusBadge = `<span class="inline-block px-2 py-1 rounded text-xs font-bold bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">${zh ? '🟡 警示' : '🟡 At Risk'}</span>`;
+                else                       statusBadge = `<span class="inline-block px-2 py-1 rounded text-xs font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">${zh ? '🟢 正常' : '🟢 On Track'}</span>`;
+                const catColor = categoryColors[p.category] || 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
                 const daysColor = !hasMp ? 'text-gray-400' : status === 'critical' ? 'text-red-600 dark:text-red-400 font-bold' : status === 'risk' ? 'text-yellow-600 dark:text-yellow-400 font-bold' : 'text-green-600 dark:text-green-400';
                 const rowBg = !hasMp ? '' : status === 'critical' ? 'bg-red-50/40 dark:bg-red-900/10' : status === 'risk' ? 'bg-yellow-50/40 dark:bg-yellow-900/10' : '';
-
-                return `<tr class="border-b border-gray-100 dark:border-gray-800 ${rowBg}">
-                    <td class="py-3 pr-4 text-sm font-bold text-gray-800 dark:text-gray-200">${zh ? p.partZh : p.part}</td>
+                const deleteBtn = p.isCustom ? `<button onclick="deleteCustomPart(${i})" class="ml-1 text-red-400 hover:text-red-600 text-xs" title="${zh ? '刪除' : 'Delete'}">🗑</button>` : '';
+                return `<tr class="border-b border-gray-100 dark:border-gray-800 ${rowBg}" data-status="${status}">
+                    <td class="py-3 pr-4 text-sm font-bold text-gray-800 dark:text-gray-200">${zh ? p.partZh : p.part}${deleteBtn}</td>
                     <td class="py-3 pr-4"><span class="inline-block px-2 py-0.5 rounded text-xs font-bold ${catColor}">${zh ? p.categoryZh : p.category}</span></td>
                     <td class="py-3 pr-4 text-center"><input id="lt-input-${i}" type="number" min="1" max="52" value="${lt}" onchange="updateMaterialTable()" class="w-16 text-center border border-gray-300 dark:border-gray-600 rounded px-1 py-0.5 text-sm font-bold bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-400"></td>
                     <td class="py-3 pr-4 text-center text-xs font-bold text-indigo-600 dark:text-indigo-400">${p.phase} (M-${p.phaseOffset})</td>
@@ -1156,20 +1266,120 @@
                     <td class="py-3 text-center">${statusBadge}</td>
                 </tr>`;
             }).join('');
-
             if (hasMp) {
                 document.getElementById('summary-critical').textContent = counts.critical;
                 document.getElementById('summary-risk').textContent = counts.risk;
                 document.getElementById('summary-ok').textContent = counts.ok;
             }
+            applyMaterialFilterVisuals();
+        }
+
+        // Feature A — Status filter
+        function applyMaterialFilterVisuals() {
+            ['critical', 'risk', 'ok'].forEach(s => {
+                const card = document.getElementById('filter-card-' + s);
+                if (!card) return;
+                if (activeMaterialFilter === 'all') {
+                    card.classList.remove('ring-2', 'ring-offset-2', 'opacity-60');
+                } else if (activeMaterialFilter === s) {
+                    card.classList.add('ring-2', 'ring-offset-2');
+                    card.classList.remove('opacity-60');
+                } else {
+                    card.classList.add('opacity-60');
+                    card.classList.remove('ring-2', 'ring-offset-2');
+                }
+            });
+            document.querySelectorAll('#materialTableBody tr').forEach(row => {
+                const s = row.getAttribute('data-status');
+                row.style.display = (activeMaterialFilter === 'all' || s === activeMaterialFilter) ? '' : 'none';
+            });
+        }
+        function filterMaterialStatus(status) {
+            activeMaterialFilter = (activeMaterialFilter === status) ? 'all' : status;
+            applyMaterialFilterVisuals();
+        }
+
+        // Feature B — Add / delete custom parts
+        function toggleAddPartForm() {
+            const form = document.getElementById('add-part-form');
+            const icon = document.getElementById('add-part-toggle-icon');
+            const hidden = form.classList.toggle('hidden');
+            if (icon) icon.textContent = hidden ? '➕' : '➖';
+        }
+        function toggleCustomCatInput() {
+            const sel = document.getElementById('new-part-cat');
+            const input = document.getElementById('new-part-custom-cat');
+            if (input) input.classList.toggle('hidden', sel.value !== 'Custom');
+        }
+        function addCustomPart() {
+            const nameZh = document.getElementById('new-part-zh')?.value.trim();
+            if (!nameZh) { alert(currentLang === 'zh' ? '請輸入零件名稱（中文）' : 'Please enter a part name'); return; }
+            const nameEn = document.getElementById('new-part-en')?.value.trim() || nameZh;
+            const catSelect = document.getElementById('new-part-cat')?.value;
+            const customCatInput = document.getElementById('new-part-custom-cat')?.value.trim();
+            const category = catSelect === 'Custom' ? (customCatInput || '自訂') : catSelect;
+            const categoryZh = catSelect === 'Custom' ? (customCatInput || '自訂') : (categoryZhMap[catSelect] || catSelect);
+            const leadTime = parseInt(document.getElementById('new-part-leadtime')?.value) || 12;
+            const phase = document.getElementById('new-part-phase')?.value || 'EVT';
+            const phaseOffset = { DVT: 12, EVT: 8, PVT: 5 }[phase] || 8;
+            materialParts.push({ part: nameEn, partZh: nameZh, category, categoryZh, leadTime, phase, phaseOffset, isCustom: true });
+            // Reset form fields
+            ['new-part-zh', 'new-part-en', 'new-part-custom-cat'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            document.getElementById('new-part-custom-cat')?.classList.add('hidden');
+            document.getElementById('new-part-cat').value = 'Thermal';
+            document.getElementById('new-part-leadtime').value = '12';
+            document.getElementById('new-part-phase').value = 'EVT';
+            toggleAddPartForm();
+            updateMaterialTable();
+        }
+        function deleteCustomPart(index) {
+            materialParts.splice(index, 1);
+            updateMaterialTable();
+        }
+
+        // Feature C — Mode toggle
+        function switchMaterialMode(mode) {
+            materialMode = mode;
+            const zh = currentLang === 'zh';
+            const activeCls = (color) => `px-3 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 ${color} shadow-md`;
+            const inactiveCls = 'px-3 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+            const btnBwd = document.getElementById('mode-btn-backward');
+            const btnFwd = document.getElementById('mode-btn-forward');
+            if (btnBwd) { btnBwd.className = mode === 'backward' ? activeCls('bg-teal-600 text-white') : inactiveCls; btnBwd.textContent = zh ? '⬅ 反推模式' : '⬅ Backward'; }
+            if (btnFwd) { btnFwd.className = mode === 'forward'  ? activeCls('bg-indigo-600 text-white') : inactiveCls; btnFwd.textContent = zh ? '正推模式 ➡' : 'Forward ➡'; }
+            // Update input label
+            const mpLabel = document.getElementById('t-material-mp-label');
+            if (mpLabel) mpLabel.textContent = mode === 'backward' ? (zh ? '🎯 目標量產日 (MP Date)' : '🎯 Target MP Date') : (zh ? '📅 最早可下單日' : '📅 Earliest Order Date');
+            // Update subtitle
+            const subtitle = document.getElementById('t-material-subtitle');
+            if (subtitle) subtitle.textContent = mode === 'backward'
+                ? (zh ? '輸入目標量產日期，即時計算各關鍵零件的最晚下單日與備料風險' : 'Enter your target MP date to instantly calculate latest order dates and procurement risk for all key components')
+                : (zh ? '輸入最早可下單日，推算各零件到位時程與最早可量產日期' : 'Enter your earliest order date to project component arrival and the earliest possible MP date');
+            // Toggle summary card sets
+            document.getElementById('summary-backward')?.classList.toggle('hidden', mode === 'forward');
+            document.getElementById('summary-forward')?.classList.toggle('hidden', mode === 'backward');
+            // Toggle table column headers
+            const colOrder  = document.getElementById('t-material-col-order');
+            const colDays   = document.getElementById('t-material-col-days');
+            const colStatus = document.getElementById('t-material-col-status');
+            if (colOrder)  colOrder.textContent  = mode === 'backward' ? (zh ? '最晚下單日' : 'Latest Order Date') : (zh ? '預計到位日' : 'Est. Arrival Date');
+            if (colDays)   colDays.textContent   = mode === 'backward' ? (zh ? '剩餘天數' : 'Days Remaining')    : (zh ? '推算最早 MP' : 'Projected MP');
+            if (colStatus) colStatus.textContent = mode === 'backward' ? (zh ? '狀態' : 'Status')                : (zh ? '瓶頸' : 'Bottleneck');
+            // Update forward summary labels
+            const fwdMp = document.getElementById('t-material-earliest-mp-label');
+            const fwdBn = document.getElementById('t-material-bottleneck-label');
+            if (fwdMp) fwdMp.textContent = zh ? '🚀 最早可 MP 日期' : '🚀 Earliest Possible MP';
+            if (fwdBn) fwdBn.textContent = zh ? '⚠️ 瓶頸零件' : '⚠️ Bottleneck Part';
+            // Reset filter when switching modes
+            activeMaterialFilter = 'all';
+            updateMaterialTable();
         }
 
         function initMaterialDashboard() {
-            // Default MP date: 12 months from today
             const d = new Date();
             d.setMonth(d.getMonth() + 12);
             document.getElementById('mpDateInput').value = formatDate(d);
-            updateMaterialTable();
+            switchMaterialMode('backward');
         }
         // ===== END MATERIAL READINESS DASHBOARD =====
 
