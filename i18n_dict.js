@@ -28,6 +28,19 @@ const dict = {
         't-sched-summary-title': '📋 排程摘要報告',
         't-sched-summary-desc': '一鍵產出各 Phase 狀態與風險說明，可直接貼入週報',
         't-sched-export-btn': '📤 產出排程摘要',
+        't-sched-copy-btn': '📋 複製',
+
+        // Business Impact Calculator
+        't-impact-params-title': '💼 商業衝擊參數',
+        't-impact-rev-label': '💰 每台售價 (USD)',
+        't-impact-units-label': '📦 合約數量 (Units)',
+        't-impact-penalty-label': '⚖️ 每日違約金 (USD/day)',
+        't-impact-oppcost-label': '📊 每週機會成本 (USD/wk)',
+        't-impact-rev-card-label': '合約風險金額',
+        't-impact-penalty-card-label': '合約違約金',
+        't-impact-oppcost-card-label': '機會成本',
+        't-impact-priority-label': '優先級',
+        't-impact-mitigation-title': '📋 建議處置行動',
 
         // RACI Matrix
         't-raci-hero-title': '👥 跨部門協調 RACI 矩陣',
@@ -295,6 +308,19 @@ const dict = {
         't-sched-summary-title': '📋 Schedule Summary Report',
         't-sched-summary-desc': 'One-click export Phase status & risk summary — paste directly into weekly report',
         't-sched-export-btn': '📤 Export Summary',
+        't-sched-copy-btn': '📋 Copy',
+
+        // Business Impact Calculator
+        't-impact-params-title': '💼 Business Impact Parameters',
+        't-impact-rev-label': '💰 Revenue per Unit (USD)',
+        't-impact-units-label': '📦 Units Contracted',
+        't-impact-penalty-label': '⚖️ Penalty per Day (USD/day)',
+        't-impact-oppcost-label': '📊 Opportunity Cost (USD/wk)',
+        't-impact-rev-card-label': 'Revenue at Risk',
+        't-impact-penalty-card-label': 'Contract Penalty',
+        't-impact-oppcost-card-label': 'Opportunity Cost',
+        't-impact-priority-label': 'Priority Level',
+        't-impact-mitigation-title': '📋 Recommended Actions',
 
         // RACI Matrix
         't-raci-hero-title': '👥 Cross-Functional RACI Matrix',

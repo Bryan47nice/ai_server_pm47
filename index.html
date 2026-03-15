@@ -509,6 +509,29 @@
                     </div>
                 </div>
 
+                <!-- Business Impact Parameters -->
+                <div class="card bg-white dark:bg-gray-800">
+                    <h4 id="t-impact-params-title" class="font-bold text-gray-700 dark:text-gray-200 mb-3 text-sm">💼 商業衝擊參數</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                        <div>
+                            <label id="t-impact-rev-label" class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">💰 每台售價 (USD)</label>
+                            <input id="impact-revenue-per-unit" type="number" value="15000" min="0" oninput="recalcSchedule()" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-bold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        <div>
+                            <label id="t-impact-units-label" class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">📦 合約數量 (Units)</label>
+                            <input id="impact-units" type="number" value="100" min="1" oninput="recalcSchedule()" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-bold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        <div>
+                            <label id="t-impact-penalty-label" class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">⚖️ 每日違約金 (USD/day)</label>
+                            <input id="impact-penalty-day" type="number" value="5000" min="0" oninput="recalcSchedule()" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-bold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        <div>
+                            <label id="t-impact-oppcost-label" class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">📊 每週機會成本 (USD/wk)</label>
+                            <input id="impact-oppcost-week" type="number" value="50000" min="0" oninput="recalcSchedule()" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-bold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Gantt Chart -->
                 <div class="card bg-white dark:bg-gray-800">
                     <h3 id="t-sched-gantt-title" class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">NPI Gantt 時程模擬</h3>
@@ -531,6 +554,34 @@
                     </div>
                 </div>
 
+                <!-- Business Impact Result (hidden when no delay) -->
+                <div id="impact-result-section" class="hidden space-y-4">
+                    <!-- 4-card Financial Impact -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="card text-center border-t-4 border-orange-400 bg-orange-50 dark:bg-orange-900/20">
+                            <p id="t-impact-rev-card-label" class="text-xs font-bold text-orange-500 dark:text-orange-400 uppercase tracking-wider mb-1">合約風險金額</p>
+                            <p id="impact-revenue-display" class="text-xl font-black font-mono text-orange-600 dark:text-orange-400">$0</p>
+                        </div>
+                        <div class="card text-center border-t-4 border-red-400 bg-red-50 dark:bg-red-900/20">
+                            <p id="t-impact-penalty-card-label" class="text-xs font-bold text-red-500 dark:text-red-400 uppercase tracking-wider mb-1">合約違約金</p>
+                            <p id="impact-penalty-display" class="text-xl font-black font-mono text-red-600 dark:text-red-400">$0</p>
+                        </div>
+                        <div class="card text-center border-t-4 border-purple-400 bg-purple-50 dark:bg-purple-900/20">
+                            <p id="t-impact-oppcost-card-label" class="text-xs font-bold text-purple-500 dark:text-purple-400 uppercase tracking-wider mb-1">機會成本</p>
+                            <p id="impact-oppcost-display" class="text-xl font-black font-mono text-purple-600 dark:text-purple-400">$0</p>
+                        </div>
+                        <div id="impact-priority-card" class="card text-center border-t-4 border-gray-300">
+                            <p id="t-impact-priority-label" class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">優先級</p>
+                            <p id="impact-priority-display" class="text-xl font-black">—</p>
+                        </div>
+                    </div>
+                    <!-- Mitigation Recommendations -->
+                    <div class="card bg-white dark:bg-gray-800">
+                        <h4 id="t-impact-mitigation-title" class="font-bold text-gray-700 dark:text-gray-200 mb-3 text-sm">📋 建議處置行動</h4>
+                        <div id="impact-mitigation-list" class="space-y-2 text-sm"></div>
+                    </div>
+                </div>
+
                 <!-- Summary Export Button -->
                 <div class="card bg-white dark:bg-gray-800">
                     <div class="flex flex-wrap items-center justify-between gap-4">
@@ -538,7 +589,10 @@
                             <h4 id="t-sched-summary-title" class="font-bold text-gray-800 dark:text-gray-100 mb-1">📋 排程摘要報告</h4>
                             <p id="t-sched-summary-desc" class="text-sm text-gray-500 dark:text-gray-400">一鍵產出各 Phase 狀態與風險說明，可直接貼入週報</p>
                         </div>
-                        <button onclick="exportScheduleSummary()" class="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2.5 rounded-lg font-bold shadow-md transition text-sm flex items-center"><span id="t-sched-export-btn">📤 產出排程摘要</span></button>
+                        <div class="flex items-center gap-2">
+                            <button onclick="exportScheduleSummary()" class="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2.5 rounded-lg font-bold shadow-md transition text-sm flex items-center"><span id="t-sched-export-btn">📤 產出排程摘要</span></button>
+                            <button id="sched-copy-btn" onclick="copyScheduleSummary()" class="text-xs px-4 py-2.5 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-teal-500 hover:text-white transition-colors font-bold border border-gray-300 dark:border-gray-600"><span id="t-sched-copy-btn">📋 複製</span></button>
+                        </div>
                     </div>
                     <div id="sched-summary-output" class="hidden mt-4 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 text-sm font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap border border-gray-200 dark:border-gray-700"></div>
                 </div>
@@ -1159,6 +1213,9 @@
                     }
                 }
             }
+            // Business Impact
+            const impact = calcBusinessImpact(totalDelayWeeks);
+            updateBusinessImpactUI(impact, totalDelayWeeks);
         }
 
         function exportScheduleSummary() {
@@ -1174,9 +1231,100 @@
                 const delay = parseInt(document.getElementById('sched-delay-' + p.id)?.value || 0) || 0;
                 lines.push(isEn ? `${p.label}: Base ${p.baseWeeks}w + Delay ${delay}w` : `${p.label}：基準 ${p.baseWeeks}w + 延誤 ${delay}w`);
             });
+            // Business Impact block
+            const totalDelayWeeksForExport = schedPhases.reduce((s, p) => s + (parseInt(document.getElementById('sched-delay-' + p.id)?.value || 0) || 0), 0);
+            if (totalDelayWeeksForExport > 0) {
+                const impact = calcBusinessImpact(totalDelayWeeksForExport);
+                lines.push('', isEn ? '--- Business Impact ---' : '--- 商業衝擊估算 ---');
+                lines.push(isEn ? `Revenue at Risk: $${Math.round(impact.revenueAtRisk).toLocaleString()}` : `合約風險金額：$${Math.round(impact.revenueAtRisk).toLocaleString()}`);
+                lines.push(isEn ? `Contract Penalty: $${Math.round(impact.penalty).toLocaleString()}` : `合約違約金：$${Math.round(impact.penalty).toLocaleString()}`);
+                lines.push(isEn ? `Opportunity Cost: $${Math.round(impact.oppCost).toLocaleString()}` : `機會成本：$${Math.round(impact.oppCost).toLocaleString()}`);
+                lines.push(isEn ? `Priority: ${impact.priority}` : `優先級：${impact.priority}`);
+                lines.push('', isEn ? 'Recommended Actions:' : '建議處置行動：');
+                impact.mitigations.forEach((m, i) => lines.push(`  ${i + 1}. ${m}`));
+            }
             lines.push('', isEn ? `Generated: ${new Date().toLocaleString('en-US')}` : `產出時間：${new Date().toLocaleString('zh-TW')}`);
             const output = document.getElementById('sched-summary-output');
             if (output) { output.textContent = lines.join('\n'); output.classList.remove('hidden'); }
+        }
+
+        function calcBusinessImpact(totalDelayWeeks) {
+            const revenuePerUnit = parseFloat(document.getElementById('impact-revenue-per-unit')?.value) || 15000;
+            const units          = parseFloat(document.getElementById('impact-units')?.value) || 100;
+            const penaltyPerDay  = parseFloat(document.getElementById('impact-penalty-day')?.value) || 5000;
+            const oppCostPerWeek = parseFloat(document.getElementById('impact-oppcost-week')?.value) || 50000;
+            const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
+            const delayDays     = totalDelayWeeks * 7;
+            const revenueAtRisk = revenuePerUnit * units;
+            const penalty       = penaltyPerDay * delayDays;
+            const oppCost       = oppCostPerWeek * totalDelayWeeks;
+            let priority, priorityColor, mitigations;
+            if (totalDelayWeeks === 0) {
+                priority = isEn ? '🟢 On Track' : '🟢 無延誤';
+                priorityColor = 'green';
+                mitigations = [];
+            } else if (totalDelayWeeks <= 2) {
+                priority = isEn ? '🟡 Monitor' : '🟡 需監控';
+                priorityColor = 'yellow';
+                mitigations = isEn
+                    ? ['Continue weekly tracking — delay within buffer', 'Confirm supplier ETAs, no escalation needed yet']
+                    : ['維持週追蹤頻率，目前在緩衝範圍內', '確認 Supplier 交期，暫不需升級'];
+            } else if (totalDelayWeeks <= 6) {
+                priority = isEn ? '🟠 Escalate' : '🟠 需升級';
+                priorityColor = 'orange';
+                mitigations = isEn
+                    ? ['Escalate to Supply Chain Lead immediately', 'Evaluate parallel engineering for next phase', 'Notify customer with updated ETA + mitigation plan', 'Schedule emergency cross-functional sync']
+                    : ['立即升級給 Supply Chain Lead', '評估下一 Phase 是否能平行化工程', '通知客戶更新的 ETA 與緩解計畫', '排定緊急跨部門同步會議'];
+            } else {
+                priority = isEn ? '🔴 Critical' : '🔴 緊急行動';
+                priorityColor = 'red';
+                mitigations = isEn
+                    ? ['CRITICAL: Initiate emergency pull-in task force', 'VP-level escalation required within 24 hours', 'Negotiate contract penalty clauses with legal/sales', 'Consider air freight for critical components', 'Daily war room until risk resolved']
+                    : ['緊急：啟動 Pull-in Task Force', '24 小時內升級至 VP 層級', '與法務/業務協商違約金條款', '評估關鍵零件空運', '每日 War Room 直到風險解除'];
+            }
+            return { revenueAtRisk, penalty, oppCost, priority, priorityColor, mitigations };
+        }
+
+        function updateBusinessImpactUI(impact, totalDelayWeeks) {
+            const section = document.getElementById('impact-result-section');
+            if (!section) return;
+            if (totalDelayWeeks === 0) { section.classList.add('hidden'); return; }
+            section.classList.remove('hidden');
+            const fmt = v => '$' + Math.round(v).toLocaleString();
+            document.getElementById('impact-revenue-display').textContent = fmt(impact.revenueAtRisk);
+            document.getElementById('impact-penalty-display').textContent  = fmt(impact.penalty);
+            document.getElementById('impact-oppcost-display').textContent  = fmt(impact.oppCost);
+            document.getElementById('impact-priority-display').textContent = impact.priority;
+            const pCard = document.getElementById('impact-priority-card');
+            const colorMap = {
+                green:  'card text-center border-t-4 border-green-400 bg-green-50 dark:bg-green-900/20',
+                yellow: 'card text-center border-t-4 border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20',
+                orange: 'card text-center border-t-4 border-orange-500 bg-orange-50 dark:bg-orange-900/20',
+                red:    'card text-center border-t-4 border-red-500 bg-red-50 dark:bg-red-900/20'
+            };
+            if (pCard) pCard.className = colorMap[impact.priorityColor] || colorMap.green;
+            const list = document.getElementById('impact-mitigation-list');
+            if (list) {
+                list.innerHTML = impact.mitigations.map((m, i) =>
+                    `<div class="flex items-start gap-2"><span class="text-teal-500 font-bold flex-shrink-0">${i + 1}.</span><span class="text-gray-700 dark:text-gray-300">${m}</span></div>`
+                ).join('');
+            }
+        }
+
+        function copyScheduleSummary() {
+            const text = document.getElementById('sched-summary-output')?.textContent;
+            if (!text || !text.trim()) return;
+            const btn = document.getElementById('sched-copy-btn');
+            const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
+            navigator.clipboard.writeText(text).then(() => {
+                if (btn) {
+                    btn.innerHTML = isEn ? '✅ Copied!' : '✅ 已複製！';
+                    setTimeout(() => { btn.innerHTML = `<span id="t-sched-copy-btn">${isEn ? '📋 Copy' : '📋 複製'}</span>`; }, 2000);
+                }
+            }).catch(() => {
+                const el = document.getElementById('sched-summary-output');
+                if (el) { const range = document.createRange(); range.selectNode(el); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); }
+            });
         }
         // ===== END SCHEDULE SIMULATOR =====
 
