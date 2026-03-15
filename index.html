@@ -44,10 +44,9 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end pb-2 gap-4">
                 <div class="flex flex-wrap space-x-4 md:space-x-8 gap-y-2">
                     <button id="btn-tab-about" onclick="switchTab('about')" class="tab-active pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-about">👤 關於我 (About Me)</span></button>
-                    <button id="btn-tab-tco" onclick="switchTab('tco')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-tco">📊 AI 伺服器 TCO 評估儀表板</span></button>
-                    <button id="btn-tab-mindset" onclick="switchTab('mindset')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-mindset">🧠 產品企劃：專案管理思維對照</span></button>
-                    <button id="btn-tab-npi" onclick="switchTab('npi')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-npi">🏭 NPI 流程卡點</span></button>
-                    <button id="btn-tab-material" onclick="switchTab('material')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-material">📦 備料追蹤</span></button>
+                    <button id="btn-tab-tco" onclick="switchTab('tco')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-tco">📊 AI 伺服器 TCO 分析</span></button>
+                    <button id="btn-tab-npi" onclick="switchTab('npi')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-npi">🏭 NPI 管理中心</span></button>
+                    <button id="btn-tab-ops" onclick="switchTab('ops')" class="tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200"><span id="t-tab-ops">📦 運營 &amp; 思維</span></button>
                 </div>
                 <div class="flex items-center space-x-3 mb-2">
                     <div class="text-sm font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 px-3 py-1.5 rounded-full shadow-sm mr-2 hidden md:block"><span id="t-author">製作者：莊仕祺 (Bryan)</span></div>
@@ -283,68 +282,17 @@
 
         </div>
 
-        <div id="wrapper-mindset" class="hidden">
-            <div class="flex flex-col gap-6">
-                <div class="card bg-gradient-to-r from-blue-900 to-gray-800 dark:from-blue-950 dark:to-black text-white text-center py-8 relative overflow-hidden shadow-xl border-b-4 border-blue-500">
-                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')]"></div>
-                    <div class="relative z-10 px-4">
-                        <h2 id="t-hero-title" class="text-2xl md:text-3xl font-black mb-3 tracking-tight">專案管理的核心：載體不同，邏輯一致</h2>
-                        <p id="t-hero-sub" class="text-blue-200 max-w-3xl mx-auto font-medium text-sm md:text-base tracking-wide">「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 Product Planning 流程加速的引擎。」</p>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    
-                    <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 border-t-4 border-t-blue-500 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col">
-                        <div class="flex items-center mb-4"><span id="t-c1-tag" class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-bold px-2.5 py-1 rounded shadow-sm">1. 產品藍圖與生命週期</span></div>
-                        <div class="mb-4">
-                            <h3 id="t-c1-old-h" class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">【過去】軟體產品開發</h3>
-                            <p id="t-c1-old-v" class="text-lg font-black text-gray-800 dark:text-gray-100">Sprint 迭代 / Release</p>
-                            <p id="t-c1-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">定義需求並透過敏捷衝刺，確保軟體功能如期交付上線。</p>
-                        </div>
-                        <div class="flex justify-center my-2 text-gray-300 dark:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg></div>
-                        <div class="mt-auto">
-                            <h3 id="t-c1-new-h" class="text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wider mb-1">【現在】雲端伺服器企劃</h3>
-                            <p id="t-c1-new-v" class="text-lg font-black text-gray-800 dark:text-gray-100">Roadmap ➔ NPI ➔ MP</p>
-                            <p id="t-c1-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">擬定符合市場需求的產品規格發展，並與 RD 合作掌控 NPI 研發時程。</p>
-                        </div>
-                    </div>
-
-                    <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 border-t-4 border-t-indigo-500 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col">
-                        <div class="flex items-center mb-4"><span id="t-c2-tag" class="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 text-xs font-bold px-2.5 py-1 rounded shadow-sm">2. 跨職能溝通與利害關係人</span></div>
-                        <div class="mb-4">
-                            <h3 id="t-c2-old-h" class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">【過去】軟體跨部門協作</h3>
-                            <p id="t-c2-old-v" class="text-lg font-black text-gray-800 dark:text-gray-100">UI/UX ➔ Frontend ➔ Backend</p>
-                            <p id="t-c2-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">對齊設計師與工程師的認知，確保軟體介面與系統邏輯一致。</p>
-                        </div>
-                        <div class="flex justify-center my-2 text-gray-300 dark:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg></div>
-                        <div class="mt-auto">
-                            <h3 id="t-c2-new-h" class="text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider mb-1">【現在】硬體系統整合</h3>
-                            <p id="t-c2-new-v" class="text-lg font-black text-gray-800 dark:text-gray-100">EE / ME / Thermal / 工廠</p>
-                            <p id="t-c2-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">在複雜的硬體限制下，居中協調電子、機構、散熱與工廠端，冷靜且強勢地推動 Issue 收斂。</p>
-                        </div>
-                    </div>
-
-                    <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 border-t-4 border-t-purple-500 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col">
-                        <div class="flex items-center mb-4"><span id="t-c3-tag" class="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 text-xs font-bold px-2.5 py-1 rounded shadow-sm">3. 資源調度與交付控管</span></div>
-                        <div class="mb-4">
-                            <h3 id="t-c3-old-h" class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">【過去】軟體人力池調度</h3>
-                            <p id="t-c3-old-v" class="text-lg font-black text-gray-800 dark:text-gray-100">Resource Pool 分配</p>
-                            <p id="t-c3-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">依據開發目標，動態分配前後端開發人員與測試資源以滿足上線時程。</p>
-                        </div>
-                        <div class="flex justify-center my-2 text-gray-300 dark:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg></div>
-                        <div class="mt-auto">
-                            <h3 id="t-c3-new-h" class="text-purple-600 dark:text-purple-400 text-xs font-bold uppercase tracking-wider mb-1">【現在】全球產能與模組化調配</h3>
-                            <p id="t-c3-new-v" class="text-lg font-black text-gray-800 dark:text-gray-100">模組開發 / 海內外產能配置</p>
-                            <p id="t-c3-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">擔任模組化開發負責人。在海內外運營端皆有需求下，於共用資源池中精準安排產能，確保雙邊如期交付。</p>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
         <div id="wrapper-npi" class="hidden">
+
+            <!-- NPI Hub Sub-Navigation -->
+            <div class="mb-6 border-b border-gray-200 dark:border-gray-700 flex items-center gap-1">
+                <button id="npi-sub-btn-checkpoint" onclick="switchNpiSection('checkpoint')" class="pb-2 mr-6 text-sm font-bold border-b-2 border-orange-500 text-orange-600 dark:text-orange-400 transition-colors duration-200"><span id="t-npi-sub-checkpoint">🔍 Phase Checkpoint</span></button>
+                <button id="npi-sub-btn-schedule" onclick="switchNpiSection('schedule')" class="pb-2 mr-6 text-sm font-bold border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"><span id="t-npi-sub-schedule">📅 排程 Pull-in 模擬器</span></button>
+                <button id="npi-sub-btn-raci" onclick="switchNpiSection('raci')" class="pb-2 mr-6 text-sm font-bold border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"><span id="t-npi-sub-raci">👥 RACI 協調矩陣</span></button>
+            </div>
+
+            <!-- Section A: Checkpoint (default) -->
+            <div id="npi-section-checkpoint">
             <div class="flex flex-col gap-6">
 
                 <!-- Header -->
@@ -483,7 +431,7 @@
                 </div>
 
                 <!-- Risk Heatmap -->
-                <div class="card bg-white dark:bg-gray-800">
+                <div class="card bg-white dark:bg-gray-800" id="npi-heatmap-card">
                     <h3 id="t-npi-heatmap-title" class="text-lg font-black text-gray-800 dark:text-gray-100 mb-1">📊 跨職能風險熱力圖</h3>
                     <p id="t-npi-heatmap-sub" class="text-sm text-gray-500 dark:text-gray-400 mb-5">各功能部門在不同 NPI 階段的風險集中度，PJM 需提前預判並介入協調</p>
                     <div class="overflow-x-auto">
@@ -539,10 +487,133 @@
                 </div>
 
             </div>
+            </div><!-- end npi-section-checkpoint -->
+
+            <!-- Section B: Schedule Pull-in Simulator -->
+            <div id="npi-section-schedule" class="hidden flex flex-col gap-6">
+
+                <div class="card bg-gradient-to-r from-teal-900 to-cyan-800 dark:from-teal-950 dark:to-cyan-950 text-white text-center py-8 relative overflow-hidden shadow-xl border-b-4 border-teal-400">
+                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')]"></div>
+                    <div class="relative z-10 px-4">
+                        <h2 class="text-2xl md:text-3xl font-black mb-3 tracking-tight">📅 NPI Schedule Pull-in Simulator</h2>
+                        <p id="t-sched-subtitle" class="text-teal-200 max-w-3xl mx-auto font-medium text-sm md:text-base tracking-wide">調整各階段延誤週數，即時模擬 Critical Path 影響與最快量產日期</p>
+                    </div>
+                </div>
+
+                <!-- Baseline MP Date Input -->
+                <div class="card bg-white dark:bg-gray-800">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <label id="t-sched-mp-label" class="text-sm font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap">🎯 目標量產日 (Target MP Date)</label>
+                        <input type="date" id="schedMpDate" onchange="recalcSchedule()" class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-bold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500 w-44">
+                        <span id="t-sched-hint" class="text-xs text-gray-400 dark:text-gray-500 italic">⚡ 拖動各 Phase 的「延誤週數」，即時看到 MP 日期的漣漪效應</span>
+                    </div>
+                </div>
+
+                <!-- Gantt Chart -->
+                <div class="card bg-white dark:bg-gray-800">
+                    <h3 id="t-sched-gantt-title" class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">NPI Gantt 時程模擬</h3>
+                    <div id="schedGanttTable" class="overflow-x-auto"></div>
+                </div>
+
+                <!-- Critical Path Result -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="card bg-white dark:bg-gray-800 text-center border-t-4 border-teal-500">
+                        <div id="t-sched-original-label" class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">原始 MP 日期</div>
+                        <div id="sched-original-mp" class="text-2xl font-black text-gray-800 dark:text-gray-100 font-mono">—</div>
+                    </div>
+                    <div class="card bg-white dark:bg-gray-800 text-center border-t-4 border-orange-500">
+                        <div id="t-sched-simulated-label" class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">模擬後 MP 日期</div>
+                        <div id="sched-simulated-mp" class="text-2xl font-black text-orange-600 dark:text-orange-400 font-mono">—</div>
+                    </div>
+                    <div class="card text-center border-t-4" id="sched-risk-card">
+                        <div class="text-xs font-bold uppercase tracking-wider mb-1" id="sched-risk-label">時程風險</div>
+                        <div id="sched-risk-days" class="text-2xl font-black font-mono">—</div>
+                    </div>
+                </div>
+
+                <!-- Summary Export Button -->
+                <div class="card bg-white dark:bg-gray-800">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <h4 id="t-sched-summary-title" class="font-bold text-gray-800 dark:text-gray-100 mb-1">📋 排程摘要報告</h4>
+                            <p id="t-sched-summary-desc" class="text-sm text-gray-500 dark:text-gray-400">一鍵產出各 Phase 狀態與風險說明，可直接貼入週報</p>
+                        </div>
+                        <button onclick="exportScheduleSummary()" class="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2.5 rounded-lg font-bold shadow-md transition text-sm flex items-center"><span id="t-sched-export-btn">📤 產出排程摘要</span></button>
+                    </div>
+                    <div id="sched-summary-output" class="hidden mt-4 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 text-sm font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap border border-gray-200 dark:border-gray-700"></div>
+                </div>
+
+            </div><!-- end npi-section-schedule -->
+
+            <!-- Section C: RACI Matrix -->
+            <div id="npi-section-raci" class="hidden flex flex-col gap-6">
+
+                <div class="card bg-gradient-to-r from-violet-900 to-purple-800 dark:from-violet-950 dark:to-purple-950 text-white text-center py-8 relative overflow-hidden shadow-xl border-b-4 border-violet-400">
+                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')]"></div>
+                    <div class="relative z-10 px-4">
+                        <h2 id="t-raci-hero-title" class="text-2xl md:text-3xl font-black mb-3 tracking-tight">👥 跨部門協調 RACI 矩陣</h2>
+                        <p id="t-raci-hero-sub" class="text-violet-200 max-w-3xl mx-auto font-medium text-sm md:text-base tracking-wide">切換不同情境，查看 PJM 在各 NPI 階段應如何協調跨部門行動</p>
+                    </div>
+                </div>
+
+                <!-- Scenario Selector -->
+                <div class="card bg-white dark:bg-gray-800">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span id="t-raci-scenario-label" class="text-sm font-bold text-gray-600 dark:text-gray-400 mr-2">情境切換：</span>
+                        <button id="raci-btn-normal" onclick="switchRaciScenario('normal')" class="px-4 py-2 rounded-lg text-sm font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 border-2 border-green-400 transition"><span id="t-raci-btn-normal">✅ 正常進行</span></button>
+                        <button id="raci-btn-delay" onclick="switchRaciScenario('delay')" class="px-4 py-2 rounded-lg text-sm font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-2 border-transparent hover:border-orange-300 transition"><span id="t-raci-btn-delay">⚠️ Supplier 延遲</span></button>
+                        <button id="raci-btn-emergency" onclick="switchRaciScenario('emergency')" class="px-4 py-2 rounded-lg text-sm font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-2 border-transparent hover:border-red-300 transition"><span id="t-raci-btn-emergency">🚨 緊急加速 (Pull-in)</span></button>
+                    </div>
+                    <p id="raci-scenario-desc" class="text-sm text-gray-500 dark:text-gray-400 mt-3">標準 NPI 流程，各部門按計畫推進，PJM 維持例行追蹤節奏。</p>
+                </div>
+
+                <!-- RACI Table -->
+                <div class="card bg-white dark:bg-gray-800">
+                    <h3 id="t-raci-matrix-title" class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">各部門責任矩陣</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[640px] text-sm border-collapse">
+                            <thead>
+                                <tr class="border-b-2 border-gray-200 dark:border-gray-700">
+                                    <th class="text-left text-xs font-bold text-gray-500 dark:text-gray-400 pb-3 pr-4 w-32"><span id="t-raci-th-dept">部門 / 階段</span></th>
+                                    <th class="text-center text-xs font-bold pb-3 text-orange-600 dark:text-orange-400">RFQ</th>
+                                    <th class="text-center text-xs font-bold pb-3 text-yellow-600 dark:text-yellow-400">DVT</th>
+                                    <th class="text-center text-xs font-bold pb-3 text-green-600 dark:text-green-400">EVT</th>
+                                    <th class="text-center text-xs font-bold pb-3 text-blue-600 dark:text-blue-400">PVT</th>
+                                    <th class="text-center text-xs font-bold pb-3 text-indigo-600 dark:text-indigo-400">MP</th>
+                                </tr>
+                            </thead>
+                            <tbody id="raciTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4 flex flex-wrap gap-3 text-xs">
+                        <span class="inline-flex items-center gap-1"><span class="w-6 h-6 rounded bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 font-black flex items-center justify-center">R</span> <span id="t-raci-legend-r">Responsible — 執行者</span></span>
+                        <span class="inline-flex items-center gap-1"><span class="w-6 h-6 rounded bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 font-black flex items-center justify-center">A</span> <span id="t-raci-legend-a">Accountable — 最終負責</span></span>
+                        <span class="inline-flex items-center gap-1"><span class="w-6 h-6 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-black flex items-center justify-center">C</span> <span id="t-raci-legend-c">Consulted — 被諮詢</span></span>
+                        <span class="inline-flex items-center gap-1"><span class="w-6 h-6 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-black flex items-center justify-center">I</span> <span id="t-raci-legend-i">Informed — 被告知</span></span>
+                    </div>
+                </div>
+
+                <!-- Escalation Panel -->
+                <div id="raci-escalation-panel" class="hidden card bg-white dark:bg-gray-800 border-l-8 border-orange-400">
+                    <h3 id="raci-escalation-title" class="text-lg font-black text-gray-800 dark:text-gray-100 mb-4">⚡ PJM Escalation 行動清單</h3>
+                    <div id="raci-escalation-steps" class="flex flex-col gap-3"></div>
+                </div>
+
+            </div><!-- end npi-section-raci -->
+
         </div>
 
-    <!-- ===== MATERIAL READINESS DASHBOARD ===== -->
-    <div id="wrapper-material" class="hidden">
+    <!-- ===== OPS & PM THINKING TAB ===== -->
+    <div id="wrapper-ops" class="hidden">
+
+        <!-- Ops Sub-Navigation -->
+        <div class="mb-6 border-b border-gray-200 dark:border-gray-700 flex items-center gap-1">
+            <button id="ops-sub-btn-material" onclick="switchOpsSection('material')" class="pb-2 mr-6 text-sm font-bold border-b-2 border-teal-500 text-teal-600 dark:text-teal-400 transition-colors duration-200"><span id="t-ops-sub-material">📦 備料追蹤</span></button>
+            <button id="ops-sub-btn-mindset" onclick="switchOpsSection('mindset')" class="pb-2 mr-6 text-sm font-bold border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"><span id="t-ops-sub-mindset">🧠 PM 思維框架</span></button>
+        </div>
+
+        <!-- Material Section -->
+        <div id="ops-section-material">
         <div class="flex flex-col gap-6">
 
             <!-- Header -->
@@ -601,8 +672,67 @@
             </div>
 
         </div>
+        </div><!-- end ops-section-material -->
+
+        <!-- Mindset Section -->
+        <div id="ops-section-mindset" class="hidden">
+            <div class="flex flex-col gap-6">
+                <div class="card bg-gradient-to-r from-blue-900 to-gray-800 dark:from-blue-950 dark:to-black text-white text-center py-8 relative overflow-hidden shadow-xl border-b-4 border-blue-500">
+                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')]"></div>
+                    <div class="relative z-10 px-4">
+                        <h2 id="t-hero-title" class="text-2xl md:text-3xl font-black mb-3 tracking-tight">專案管理的核心：載體不同，邏輯一致</h2>
+                        <p id="t-hero-sub" class="text-blue-200 max-w-3xl mx-auto font-medium text-sm md:text-base tracking-wide">「將過去帶領團隊、推動複雜系統落地的軟體敏捷思維，轉化為驅動 AI 伺服器硬體 Product Planning 流程加速的引擎。」</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 border-t-4 border-t-blue-500 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col">
+                        <div class="flex items-center mb-4"><span id="t-c1-tag" class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-bold px-2.5 py-1 rounded shadow-sm">1. 產品藍圖與生命週期</span></div>
+                        <div class="mb-4">
+                            <h3 id="t-c1-old-h" class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">【過去】軟體產品開發</h3>
+                            <p id="t-c1-old-v" class="text-lg font-black text-gray-800 dark:text-gray-100">Sprint 迭代 / Release</p>
+                            <p id="t-c1-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">定義需求並透過敏捷衝刺，確保軟體功能如期交付上線。</p>
+                        </div>
+                        <div class="flex justify-center my-2 text-gray-300 dark:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg></div>
+                        <div class="mt-auto">
+                            <h3 id="t-c1-new-h" class="text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wider mb-1">【現在】雲端伺服器企劃</h3>
+                            <p id="t-c1-new-v" class="text-lg font-black text-gray-800 dark:text-gray-100">Roadmap ➔ NPI ➔ MP</p>
+                            <p id="t-c1-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">擬定符合市場需求的產品規格發展，並與 RD 合作掌控 NPI 研發時程。</p>
+                        </div>
+                    </div>
+                    <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 border-t-4 border-t-indigo-500 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col">
+                        <div class="flex items-center mb-4"><span id="t-c2-tag" class="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 text-xs font-bold px-2.5 py-1 rounded shadow-sm">2. 跨職能溝通與利害關係人</span></div>
+                        <div class="mb-4">
+                            <h3 id="t-c2-old-h" class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">【過去】軟體跨部門協作</h3>
+                            <p id="t-c2-old-v" class="text-lg font-black text-gray-800 dark:text-gray-100">UI/UX ➔ Frontend ➔ Backend</p>
+                            <p id="t-c2-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">對齊設計師與工程師的認知，確保軟體介面與系統邏輯一致。</p>
+                        </div>
+                        <div class="flex justify-center my-2 text-gray-300 dark:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg></div>
+                        <div class="mt-auto">
+                            <h3 id="t-c2-new-h" class="text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider mb-1">【現在】硬體系統整合</h3>
+                            <p id="t-c2-new-v" class="text-lg font-black text-gray-800 dark:text-gray-100">EE / ME / Thermal / 工廠</p>
+                            <p id="t-c2-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">在複雜的硬體限制下，居中協調電子、機構、散熱與工廠端，冷靜且強勢地推動 Issue 收斂。</p>
+                        </div>
+                    </div>
+                    <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 border-t-4 border-t-purple-500 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex flex-col">
+                        <div class="flex items-center mb-4"><span id="t-c3-tag" class="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 text-xs font-bold px-2.5 py-1 rounded shadow-sm">3. 資源調度與交付控管</span></div>
+                        <div class="mb-4">
+                            <h3 id="t-c3-old-h" class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">【過去】軟體人力池調度</h3>
+                            <p id="t-c3-old-v" class="text-lg font-black text-gray-800 dark:text-gray-100">Resource Pool 分配</p>
+                            <p id="t-c3-old-d" class="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">依據開發目標，動態分配前後端開發人員與測試資源以滿足上線時程。</p>
+                        </div>
+                        <div class="flex justify-center my-2 text-gray-300 dark:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg></div>
+                        <div class="mt-auto">
+                            <h3 id="t-c3-new-h" class="text-purple-600 dark:text-purple-400 text-xs font-bold uppercase tracking-wider mb-1">【現在】全球產能與模組化調配</h3>
+                            <p id="t-c3-new-v" class="text-lg font-black text-gray-800 dark:text-gray-100">模組開發 / 海內外產能配置</p>
+                            <p id="t-c3-new-d" class="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">擔任模組化開發負責人。在海內外運營端皆有需求下，於共用資源池中精準安排產能，確保雙邊如期交付。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- end ops-section-mindset -->
+
     </div>
-    <!-- ===== END MATERIAL READINESS DASHBOARD ===== -->
+    <!-- ===== END OPS & PM THINKING TAB ===== -->
 
     <div id="exportPromptModal" class="fixed inset-0 bg-black/60 z-[120] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md border dark:border-gray-700 overflow-hidden transform transition-transform">
@@ -737,6 +867,14 @@
             if(typeof calculateTCO === "function") calculateTCO();
             if(typeof forceRegenerateReport === "function") forceRegenerateReport();
             if(typeof updateMaterialTable === "function") updateMaterialTable();
+            // Re-render dynamically generated RACI and Gantt with new language
+            const activeRaciBtn = document.querySelector('#raci-btn-normal.border-green-400, #raci-btn-delay.border-orange-400, #raci-btn-emergency.border-red-400');
+            if (activeRaciBtn) {
+                const activeScenario = activeRaciBtn.id.replace('raci-btn-', '');
+                if(typeof switchRaciScenario === "function") switchRaciScenario(activeScenario);
+            }
+            if(typeof renderScheduleGantt === "function") renderScheduleGantt();
+            if(typeof recalcSchedule === "function") recalcSchedule();
         }
 
         function toggleTheme() {
@@ -762,27 +900,58 @@
         }
 
         function switchTab(tabName) {
-            const tabs = ['about', 'tco', 'mindset', 'npi', 'material'];
+            const tabs = ['about', 'tco', 'npi', 'ops'];
             const exportBtn = document.getElementById('btn-export-pdf'); const copyBtn = document.getElementById('btn-copy-link');
             tabs.forEach(t => {
                 const btn = document.getElementById('btn-tab-' + t); const wrapper = document.getElementById('wrapper-' + t);
-                if (t === tabName) { btn.className = 'tab-active pb-2 text-sm md:text-lg transition-colors duration-200'; wrapper.classList.remove('hidden'); wrapper.classList.add('block'); } 
+                if (!btn || !wrapper) return;
+                if (t === tabName) { btn.className = 'tab-active pb-2 text-sm md:text-lg transition-colors duration-200'; wrapper.classList.remove('hidden'); wrapper.classList.add('block'); }
                 else { btn.className = 'tab-inactive pb-2 text-sm md:text-lg transition-colors duration-200'; wrapper.classList.remove('block'); wrapper.classList.add('hidden'); }
             });
-            
+
             if (tabName === 'tco') {
                 exportBtn.classList.remove('hidden'); copyBtn.classList.remove('hidden');
                 if (typeof calculateTCO === "function") setTimeout(() => calculateTCO(), 50);
-
-                // 🚀 TCO 頁籤專屬觸發邏輯：載入後延遲 0.6 秒觸發導覽
                 if (window.innerWidth >= 1024 && !localStorage.getItem('bryan_tour_completed')) {
                     setTimeout(() => startTour(), 600);
                 }
             } else {
                 exportBtn.classList.add('hidden'); copyBtn.classList.add('hidden');
             }
-            if (tabName === 'npi') { selectNpiPhase('rfq'); }
-            if (tabName === 'material') { updateMaterialTable(); }
+            if (tabName === 'npi') { switchNpiSection('checkpoint'); }
+            if (tabName === 'ops') { switchOpsSection('material'); updateMaterialTable(); }
+        }
+
+        function switchNpiSection(sectionName) {
+            const sections = ['checkpoint', 'schedule', 'raci'];
+            sections.forEach(s => {
+                const el = document.getElementById('npi-section-' + s);
+                const btn = document.getElementById('npi-sub-btn-' + s);
+                if (!el || !btn) return;
+                if (s === sectionName) {
+                    el.classList.remove('hidden');
+                    btn.className = 'pb-2 mr-6 text-sm font-bold border-b-2 border-orange-500 text-orange-600 dark:text-orange-400 transition-colors duration-200';
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = 'pb-2 mr-6 text-sm font-bold border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200';
+                }
+            });
+        }
+
+        function switchOpsSection(sectionName) {
+            const sections = ['material', 'mindset'];
+            sections.forEach(s => {
+                const el = document.getElementById('ops-section-' + s);
+                const btn = document.getElementById('ops-sub-btn-' + s);
+                if (!el || !btn) return;
+                if (s === sectionName) {
+                    el.classList.remove('hidden');
+                    btn.className = 'pb-2 mr-6 text-sm font-bold border-b-2 border-teal-500 text-teal-600 dark:text-teal-400 transition-colors duration-200';
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = 'pb-2 mr-6 text-sm font-bold border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200';
+                }
+            });
         }
         
         function closeModal() { document.getElementById('drilldownModal').classList.add('hidden'); }
@@ -887,6 +1056,276 @@
         }
         // ===== END MATERIAL READINESS DASHBOARD =====
 
+        // ===== SCHEDULE PULL-IN SIMULATOR =====
+        const schedPhases = [
+            { id: 'rfq', label: 'RFQ / 規劃', baseWeeks: 24, color: 'bg-orange-400', textColor: 'text-orange-600 dark:text-orange-400' },
+            { id: 'dvt', label: 'DVT',         baseWeeks: 16, color: 'bg-yellow-500', textColor: 'text-yellow-600 dark:text-yellow-400' },
+            { id: 'evt', label: 'EVT',         baseWeeks: 12, color: 'bg-green-500',  textColor: 'text-green-600 dark:text-green-400' },
+            { id: 'pvt', label: 'PVT',         baseWeeks: 12, color: 'bg-blue-500',   textColor: 'text-blue-600 dark:text-blue-400' },
+        ];
+
+        function initScheduleSimulator() {
+            const d = new Date();
+            d.setMonth(d.getMonth() + 15);
+            document.getElementById('schedMpDate').value = formatDate(d);
+            renderScheduleGantt();
+            recalcSchedule();
+        }
+
+        function renderScheduleGantt() {
+            const totalBaseWeeks = schedPhases.reduce((s, p) => s + p.baseWeeks, 0);
+            const table = document.getElementById('schedGanttTable');
+            if (!table) return;
+            table.innerHTML = `<table class="w-full text-sm">
+                <thead><tr class="border-b border-gray-200 dark:border-gray-700">
+                    <th class="text-left text-xs font-bold text-gray-500 dark:text-gray-400 pb-2 pr-4 w-28">Phase</th>
+                    <th class="text-center text-xs font-bold text-gray-500 dark:text-gray-400 pb-2 pr-3 w-24">${(typeof currentLang !== 'undefined' && currentLang === 'en') ? 'Base Weeks' : '基準週數'}</th>
+                    <th class="text-center text-xs font-bold text-gray-500 dark:text-gray-400 pb-2 pr-3 w-28">${(typeof currentLang !== 'undefined' && currentLang === 'en') ? 'Delay Weeks (+)' : '延誤週數 (+)'}</th>
+                    <th class="text-left text-xs font-bold text-gray-500 dark:text-gray-400 pb-2">${(typeof currentLang !== 'undefined' && currentLang === 'en') ? 'Timeline' : '時程視覺化'}</th>
+                </tr></thead>
+                <tbody>${schedPhases.map((p, i) => `
+                <tr class="border-b border-gray-50 dark:border-gray-800">
+                    <td class="py-3 pr-4 font-bold ${p.textColor}">${p.label}</td>
+                    <td class="py-3 pr-3 text-center text-gray-700 dark:text-gray-300 font-mono">${p.baseWeeks}w</td>
+                    <td class="py-3 pr-3 text-center">
+                        <input id="sched-delay-${p.id}" type="number" min="0" max="20" value="0"
+                            oninput="recalcSchedule()"
+                            class="w-16 text-center border border-gray-300 dark:border-gray-600 rounded px-1 py-0.5 text-sm font-bold bg-white dark:bg-gray-700 text-red-600 dark:text-red-400 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                    </td>
+                    <td class="py-3">
+                        <div class="flex items-center gap-1">
+                            <div id="sched-bar-base-${p.id}" class="${p.color} h-5 rounded-l transition-all duration-300 opacity-80" style="width:${Math.round(p.baseWeeks/totalBaseWeeks*200)}px; min-width:4px"></div>
+                            <div id="sched-bar-delay-${p.id}" class="bg-red-400 h-5 rounded-r transition-all duration-300 hidden" style="width:0px"></div>
+                        </div>
+                    </td>
+                </tr>`).join('')}</tbody>
+            </table>`;
+        }
+
+        function recalcSchedule() {
+            const mpStr = document.getElementById('schedMpDate').value;
+            if (!mpStr) return;
+            const totalBaseWeeks = schedPhases.reduce((s, p) => s + p.baseWeeks, 0);
+            let totalDelayWeeks = 0;
+
+            schedPhases.forEach(p => {
+                const delayEl = document.getElementById('sched-delay-' + p.id);
+                const delay = parseInt(delayEl?.value || 0) || 0;
+                totalDelayWeeks += delay;
+                const baseBar = document.getElementById('sched-bar-base-' + p.id);
+                const delayBar = document.getElementById('sched-bar-delay-' + p.id);
+                if (delayBar) {
+                    if (delay > 0) {
+                        const baseWidth = Math.round(p.baseWeeks / totalBaseWeeks * 200);
+                        const delayWidth = Math.round(delay / totalBaseWeeks * 200);
+                        baseBar.style.borderRadius = delay > 0 ? '0.25rem 0 0 0.25rem' : '0.25rem';
+                        delayBar.style.width = delayWidth + 'px';
+                        delayBar.classList.remove('hidden');
+                    } else {
+                        baseBar.style.borderRadius = '0.25rem';
+                        delayBar.classList.add('hidden');
+                    }
+                }
+            });
+
+            const mp = new Date(mpStr);
+            const origMp = new Date(mp);
+            origMp.setDate(origMp.getDate() - totalBaseWeeks * 7);
+            const simMp = new Date(origMp);
+            simMp.setDate(simMp.getDate() + totalDelayWeeks * 7);
+
+            const origEl = document.getElementById('sched-original-mp');
+            const simEl = document.getElementById('sched-simulated-mp');
+            const riskEl = document.getElementById('sched-risk-days');
+            const riskCard = document.getElementById('sched-risk-card');
+            const riskLabel = document.getElementById('sched-risk-label');
+            if (origEl) origEl.textContent = formatDate(origMp);
+            if (simEl) simEl.textContent = formatDate(simMp);
+            if (riskEl) {
+                const riskDays = totalDelayWeeks * 7;
+                const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
+                riskEl.textContent = riskDays === 0 ? (isEn ? '✅ No Risk' : '✅ 無風險') : '+' + riskDays + (isEn ? ' days' : ' 天');
+                if (riskCard && riskLabel) {
+                    if (riskDays === 0) {
+                        riskCard.className = 'card text-center border-t-4 border-green-500 bg-green-50 dark:bg-green-900/20';
+                        riskEl.className = 'text-2xl font-black font-mono text-green-600 dark:text-green-400';
+                        riskLabel.className = 'text-xs font-bold text-green-500 dark:text-green-400 uppercase tracking-wider mb-1';
+                        riskLabel.textContent = isEn ? 'Schedule Status' : '時程狀態';
+                    } else {
+                        riskCard.className = 'card text-center border-t-4 border-red-500 bg-red-50 dark:bg-red-900/20';
+                        riskEl.className = 'text-2xl font-black font-mono text-red-600 dark:text-red-400';
+                        riskLabel.className = 'text-xs font-bold text-red-500 dark:text-red-400 uppercase tracking-wider mb-1';
+                        riskLabel.textContent = isEn ? 'Delay Risk' : '延遲風險';
+                    }
+                }
+            }
+        }
+
+        function exportScheduleSummary() {
+            const mpStr = document.getElementById('schedMpDate').value;
+            const origEl = document.getElementById('sched-original-mp');
+            const simEl = document.getElementById('sched-simulated-mp');
+            const riskEl = document.getElementById('sched-risk-days');
+            const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
+            let lines = isEn
+                ? ['=== NPI Schedule Summary Report ===', `Target MP Date: ${mpStr || 'Not set'}`, `Original MP Estimate: ${origEl?.textContent || '—'}`, `Simulated MP Date: ${simEl?.textContent || '—'}`, `Schedule Risk: ${riskEl?.textContent || '—'}`, '', '--- Phase Delay Details ---']
+                : ['=== NPI 排程摘要報告 ===', `目標 MP 日期：${mpStr || '未設定'}`, `原始 MP 推算：${origEl?.textContent || '—'}`, `模擬 MP 日期：${simEl?.textContent || '—'}`, `時程風險：${riskEl?.textContent || '—'}`, '', '--- Phase 延誤明細 ---'];
+            schedPhases.forEach(p => {
+                const delay = parseInt(document.getElementById('sched-delay-' + p.id)?.value || 0) || 0;
+                lines.push(isEn ? `${p.label}: Base ${p.baseWeeks}w + Delay ${delay}w` : `${p.label}：基準 ${p.baseWeeks}w + 延誤 ${delay}w`);
+            });
+            lines.push('', isEn ? `Generated: ${new Date().toLocaleString('en-US')}` : `產出時間：${new Date().toLocaleString('zh-TW')}`);
+            const output = document.getElementById('sched-summary-output');
+            if (output) { output.textContent = lines.join('\n'); output.classList.remove('hidden'); }
+        }
+        // ===== END SCHEDULE SIMULATOR =====
+
+        // ===== RACI MATRIX =====
+        const raciConfig = {
+            departments: [
+                { key: 'pjm',    label: 'PJM (你)',      labelEn: 'PJM (You)' },
+                { key: 'ee',     label: 'EE / RD',       labelEn: 'EE / RD' },
+                { key: 'me',     label: 'ME / Thermal',  labelEn: 'ME / Thermal' },
+                { key: 'supply', label: 'Supply Chain',  labelEn: 'Supply Chain' },
+                { key: 'factory',label: 'Factory',       labelEn: 'Factory' },
+                { key: 'sales',  label: 'Sales / PM',    labelEn: 'Sales / PM' },
+            ],
+            scenarios: {
+                normal: {
+                    desc: { zh: '標準 NPI 流程，各部門按計畫推進，PJM 維持例行追蹤節奏。', en: 'Standard NPI flow — all teams on track, PJM maintains routine coordination cadence.' },
+                    matrix: {
+                        pjm:    ['A','A','A','A','A'],
+                        ee:     ['R','R','R','C','I'],
+                        me:     ['C','R','R','C','I'],
+                        supply: ['C','R','C','R','R'],
+                        factory:['I','I','C','R','R'],
+                        sales:  ['R','C','I','I','C'],
+                    },
+                    escalation: null,
+                },
+                delay: {
+                    desc: { zh: '關鍵零件（如 GPU/HBM）交期延遲 8 週，PJM 需啟動異常應對機制。', en: 'Critical component (e.g. GPU/HBM) lead time delayed by 8 weeks — PJM activates exception protocol.' },
+                    matrix: {
+                        pjm:    ['A','A','A','A','A'],
+                        ee:     ['R','R','R','C','I'],
+                        me:     ['C','R','R','C','I'],
+                        supply: ['R','R','R','R','R'],
+                        factory:['I','I','C','R','R'],
+                        sales:  ['R','C','I','I','C'],
+                    },
+                    escalation: [
+                        { step: 1, actor: 'Supply Chain', actorEn: 'Supply Chain', action: '確認延遲範圍與新交期，向 PJM 發出 Change Notice', actionEn: 'Confirm delay scope & new ETA, issue Change Notice to PJM' },
+                        { step: 2, actor: 'PJM',          actorEn: 'PJM',          action: '召開緊急 Impact Review，重新計算 Critical Path 與 MP 延期天數', actionEn: 'Host emergency Impact Review, recalculate Critical Path & MP slip days' },
+                        { step: 3, actor: 'PJM + EE',     actorEn: 'PJM + EE',     action: '評估是否可用替代料（Alternate Part）縮短時程', actionEn: 'Evaluate alternate parts to shorten timeline' },
+                        { step: 4, actor: 'PJM',          actorEn: 'PJM',          action: '向客戶 Sales 提出 Schedule Change Notice，協商新 MP 日期', actionEn: 'Issue Schedule Change Notice to Sales, negotiate new MP date' },
+                        { step: 5, actor: 'PJM + Supply', actorEn: 'PJM + Supply', action: '建立週報機制，每週追蹤零件到貨狀態', actionEn: 'Establish weekly report cadence to track component arrival status' },
+                    ],
+                },
+                emergency: {
+                    desc: { zh: '客戶要求提前量產日 4 週（Schedule Pull-in），PJM 主導加速計畫。', en: 'Customer requests 4-week MP pull-in — PJM leads acceleration plan.' },
+                    matrix: {
+                        pjm:    ['A','A','A','A','A'],
+                        ee:     ['R','R','R','C','I'],
+                        me:     ['C','R','R','C','I'],
+                        supply: ['C','R','C','R','R'],
+                        factory:['I','I','C','R','R'],
+                        sales:  ['A','C','I','I','C'],
+                    },
+                    escalation: [
+                        { step: 1, actor: 'Sales / PM',       actorEn: 'Sales / PM',       action: '向 PJM 提出 Pull-in 請求，說明客戶商業壓力', actionEn: 'Submit Pull-in request to PJM, explain customer business pressure' },
+                        { step: 2, actor: 'PJM',              actorEn: 'PJM',              action: '分析 Critical Path，識別可壓縮的 Phase 與對應資源需求', actionEn: 'Analyze Critical Path, identify compressible phases and resource needs' },
+                        { step: 3, actor: 'PJM + EE + ME',    actorEn: 'PJM + EE + ME',    action: 'DVT/EVT 部分重疊執行（Parallel Engineering），評估技術風險', actionEn: 'Overlap DVT/EVT execution (Parallel Engineering), assess technical risk' },
+                        { step: 4, actor: 'PJM + Supply',     actorEn: 'PJM + Supply',     action: '對 Long Lead Time 零件下達緊急訂單（Premium Freight 授權）', actionEn: 'Place emergency orders for long lead-time parts (Premium Freight authorized)' },
+                        { step: 5, actor: 'PJM',              actorEn: 'PJM',              action: '建立加速計畫追蹤看板，每日 Standup 確認進度', actionEn: 'Set up acceleration tracker board, daily standup for progress check' },
+                    ],
+                },
+            },
+        };
+
+        const raciCellStyle = {
+            'R': 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300',
+            'A': 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300',
+            'C': 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
+            'I': 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400',
+        };
+
+        const phaseLabels = ['RFQ', 'DVT', 'EVT', 'PVT', 'MP'];
+
+        function switchRaciScenario(scenario) {
+            ['normal','delay','emergency'].forEach(s => {
+                const btn = document.getElementById('raci-btn-' + s);
+                if (!btn) return;
+                if (s === scenario) {
+                    btn.className = s === 'normal'
+                        ? 'px-4 py-2 rounded-lg text-sm font-bold bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 border-2 border-green-400 transition'
+                        : s === 'delay'
+                        ? 'px-4 py-2 rounded-lg text-sm font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 border-2 border-orange-400 transition'
+                        : 'px-4 py-2 rounded-lg text-sm font-bold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 border-2 border-red-400 transition';
+                } else {
+                    btn.className = 'px-4 py-2 rounded-lg text-sm font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-2 border-transparent hover:border-gray-300 transition';
+                }
+            });
+
+            const cfg = raciConfig.scenarios[scenario];
+            const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
+            const descEl = document.getElementById('raci-scenario-desc');
+            if (descEl) descEl.textContent = isEn ? cfg.desc.en : cfg.desc.zh;
+
+            const tbody = document.getElementById('raciTableBody');
+            if (tbody) {
+                tbody.innerHTML = raciConfig.departments.map(dept => {
+                    const cells = phaseLabels.map((ph, i) => {
+                        const val = cfg.matrix[dept.key][i];
+                        return `<td class="text-center py-3"><span class="inline-block w-8 h-8 rounded flex items-center justify-center font-black text-sm ${raciCellStyle[val] || ''}">${val}</span></td>`;
+                    }).join('');
+                    const isPjm = dept.key === 'pjm';
+                    const deptName = isEn ? (dept.labelEn || dept.label) : dept.label;
+                    return `<tr class="border-b border-gray-100 dark:border-gray-800 ${isPjm ? 'bg-indigo-50/50 dark:bg-indigo-900/10' : ''}">
+                        <td class="py-3 pr-4 text-sm font-bold ${isPjm ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300'}">${deptName}${isPjm ? ' ★' : ''}</td>
+                        ${cells}
+                    </tr>`;
+                }).join('');
+            }
+
+            const escPanel = document.getElementById('raci-escalation-panel');
+            const escSteps = document.getElementById('raci-escalation-steps');
+            const escTitle = document.getElementById('raci-escalation-title');
+            if (escPanel && escSteps) {
+                if (cfg.escalation) {
+                    escPanel.classList.remove('hidden');
+                    if (escTitle) {
+                        if (isEn) {
+                            escTitle.textContent = scenario === 'delay'
+                                ? '⚡ Supplier Delay — PJM Escalation Action List'
+                                : '🚀 Emergency Pull-in — PJM Acceleration Action List';
+                        } else {
+                            escTitle.textContent = scenario === 'delay'
+                                ? '⚡ Supplier 延遲 — PJM Escalation 行動清單'
+                                : '🚀 緊急加速 — PJM Pull-in 行動清單';
+                        }
+                    }
+                    escPanel.className = scenario === 'delay'
+                        ? 'card bg-white dark:bg-gray-800 border-l-8 border-orange-400'
+                        : 'card bg-white dark:bg-gray-800 border-l-8 border-red-400';
+                    escSteps.innerHTML = cfg.escalation.map(e => `
+                        <div class="flex items-start gap-3">
+                            <span class="shrink-0 w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-black text-xs flex items-center justify-center">${e.step}</span>
+                            <div>
+                                <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 mr-1">[${isEn ? (e.actorEn || e.actor) : e.actor}]</span>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">${isEn ? (e.actionEn || e.action) : e.action}</span>
+                            </div>
+                        </div>`).join('');
+                } else {
+                    escPanel.classList.add('hidden');
+                }
+            }
+        }
+
+        function initRaciMatrix() {
+            switchRaciScenario('normal');
+        }
+        // ===== END RACI MATRIX =====
+
         window.onload = function() {
             if(typeof dict !== 'undefined' && dict[currentLang]) {
                 for (const key in dict[currentLang]) {
@@ -901,11 +1340,13 @@
             if (typeof initScenarios === "function") { initScenarios(); }
             if (typeof loadStateFromURL === "function") { loadStateFromURL(); }
             initMaterialDashboard();
+            initScheduleSimulator();
+            initRaciMatrix();
 
             // 🚀 修正：加上 URL 前綴
             const urlParams = new URLSearchParams(window.location.search);
             const targetTab = urlParams.get('tab') || 'about';
-            if (['about', 'tco', 'mindset', 'npi', 'material'].includes(targetTab)) { switchTab(targetTab); }
+            if (['about', 'tco', 'npi', 'ops'].includes(targetTab)) { switchTab(targetTab); }
             if (typeof calculateTCO === "function") { calculateTCO(); }
             if (urlParams.get('report') === '1' && typeof generateSalesReport === "function") { setTimeout(() => generateSalesReport(), 150); }
         };

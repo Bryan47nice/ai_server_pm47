@@ -1,8 +1,48 @@
 const dict = {
     zh: {
         't-tab-about': '👤 關於我 (About Me)',
-        't-tab-tco': '📊 AI 伺服器 TCO 評估儀表板',
-        't-tab-mindset': '🧠 產品企劃：專案管理思維對照',
+        't-tab-tco': '📊 AI 伺服器 TCO 分析',
+        't-tab-npi': '🏭 NPI 管理中心',
+        't-tab-ops': '📦 運營 &amp; 思維',
+
+        // NPI sub-nav
+        't-npi-sub-checkpoint': '🔍 Phase Checkpoint',
+        't-npi-sub-schedule': '📅 排程 Pull-in 模擬器',
+        't-npi-sub-raci': '👥 RACI 協調矩陣',
+
+        // Ops sub-nav
+        't-ops-sub-material': '📦 備料追蹤',
+        't-ops-sub-mindset': '🧠 PM 思維框架',
+
+        // Schedule Simulator
+        't-sched-subtitle': '調整各階段延誤週數，即時模擬 Critical Path 影響與最快量產日期',
+        't-sched-mp-label': '🎯 目標量產日 (Target MP Date)',
+        't-sched-hint': '⚡ 調整各 Phase 的「延誤週數」，即時看到 MP 日期的漣漪效應',
+        't-sched-gantt-title': 'NPI Gantt 時程模擬',
+        't-sched-col-base': '基準週數',
+        't-sched-col-delay': '延誤週數 (+)',
+        't-sched-col-bar': '時程視覺化',
+        't-sched-original-label': '原始 MP 日期',
+        't-sched-simulated-label': '模擬後 MP 日期',
+        't-sched-risk-label-default': '時程風險',
+        't-sched-summary-title': '📋 排程摘要報告',
+        't-sched-summary-desc': '一鍵產出各 Phase 狀態與風險說明，可直接貼入週報',
+        't-sched-export-btn': '📤 產出排程摘要',
+
+        // RACI Matrix
+        't-raci-hero-title': '👥 跨部門協調 RACI 矩陣',
+        't-raci-hero-sub': '切換不同情境，查看 PJM 在各 NPI 階段應如何協調跨部門行動',
+        't-raci-scenario-label': '情境切換：',
+        't-raci-btn-normal': '✅ 正常進行',
+        't-raci-btn-delay': '⚠️ Supplier 延遲',
+        't-raci-btn-emergency': '🚨 緊急加速 (Pull-in)',
+        't-raci-matrix-title': '各部門責任矩陣',
+        't-raci-th-dept': '部門 / 階段',
+        't-raci-legend-r': 'Responsible — 執行者',
+        't-raci-legend-a': 'Accountable — 最終負責',
+        't-raci-legend-c': 'Consulted — 被諮詢',
+        't-raci-legend-i': 'Informed — 被告知',
+
         't-author': '製作者：莊仕祺 (Bryan)',
         't-copy-link': '複製連結',
         't-export': '匯出 PDF',
@@ -107,7 +147,6 @@ const dict = {
         't-c3-new-v': '模組開發 / 海內外產能配置',
         't-c3-new-d': '擔任模組化開發負責人。在海內外運營端皆有需求下，於共用資源池中精準安排產能，確保雙邊如期交付。',
 
-        't-tab-npi': '🏭 NPI 流程卡點',
         't-npi-title': '🏭 AI Server NPI 流程卡點 — PJM 視角',
         't-npi-subtitle': '從 RFQ 到量產，識別每個階段的高風險卡點，確保 NPI 時程準時落地。',
         't-npi-timeline-title': 'NPI 里程碑時間軸 — 點擊各階段查看 PJM 卡點分析',
@@ -193,7 +232,6 @@ const dict = {
         't-npi-mp-bn-3': 'Field Issue 爆發，需緊急啟動 8D Problem-solving 流程應對客訴',
         't-npi-mp-risk': 'Ramp 延遲直接縮小與競品的時間差，市佔搶佔速度受損，商業損失難以量化',
 
-        't-tab-material': '📦 備料追蹤',
         't-material-title': '📦 AI Server 備料狀態追蹤',
         't-material-subtitle': '輸入目標量產日期，即時計算各關鍵零件的最晚下單日與備料風險',
         't-material-mp-label': '🎯 目標量產日 (MP Date)',
@@ -230,8 +268,48 @@ const dict = {
     },
     en: {
         't-tab-about': '👤 About Me',
-        't-tab-tco': '📊 AI Server TCO Dashboard',
-        't-tab-mindset': '🧠 PM Mindset',
+        't-tab-tco': '📊 AI Server TCO Analysis',
+        't-tab-npi': '🏭 NPI Management Hub',
+        't-tab-ops': '📦 Ops &amp; Thinking',
+
+        // NPI sub-nav
+        't-npi-sub-checkpoint': '🔍 Phase Checkpoint',
+        't-npi-sub-schedule': '📅 Schedule Pull-in Simulator',
+        't-npi-sub-raci': '👥 RACI Matrix',
+
+        // Ops sub-nav
+        't-ops-sub-material': '📦 Material Tracker',
+        't-ops-sub-mindset': '🧠 PM Framework',
+
+        // Schedule Simulator
+        't-sched-subtitle': 'Adjust phase delay weeks to simulate Critical Path impact and earliest MP date',
+        't-sched-mp-label': '🎯 Target MP Date',
+        't-sched-hint': '⚡ Adjust each Phase\'s delay weeks to see ripple effect on MP date',
+        't-sched-gantt-title': 'NPI Gantt Schedule Simulation',
+        't-sched-col-base': 'Base Weeks',
+        't-sched-col-delay': 'Delay Weeks (+)',
+        't-sched-col-bar': 'Timeline',
+        't-sched-original-label': 'Original MP Date',
+        't-sched-simulated-label': 'Simulated MP Date',
+        't-sched-risk-label-default': 'Schedule Risk',
+        't-sched-summary-title': '📋 Schedule Summary Report',
+        't-sched-summary-desc': 'One-click export Phase status & risk summary — paste directly into weekly report',
+        't-sched-export-btn': '📤 Export Summary',
+
+        // RACI Matrix
+        't-raci-hero-title': '👥 Cross-Functional RACI Matrix',
+        't-raci-hero-sub': 'Switch scenarios to view PJM coordination across NPI phases',
+        't-raci-scenario-label': 'Scenario:',
+        't-raci-btn-normal': '✅ Normal Flow',
+        't-raci-btn-delay': '⚠️ Supplier Delay',
+        't-raci-btn-emergency': '🚨 Emergency Pull-in',
+        't-raci-matrix-title': 'RACI Responsibility Matrix',
+        't-raci-th-dept': 'Dept / Phase',
+        't-raci-legend-r': 'Responsible — Executor',
+        't-raci-legend-a': 'Accountable — Final Owner',
+        't-raci-legend-c': 'Consulted',
+        't-raci-legend-i': 'Informed',
+
         't-author': 'Created by: Bryan Jhuang',
         't-copy-link': 'Copy Link',
         't-export': 'Export PDF',
@@ -336,7 +414,6 @@ const dict = {
         't-c3-new-v': 'Modular Dev / Global Capacity',
         't-c3-new-d': 'Lead modular development. Effectively manage shared resources and arrange capacity to meet both domestic and overseas operational demands for on-time delivery.',
 
-        't-tab-npi': '🏭 NPI Checkpoint Map',
         't-npi-title': '🏭 AI Server NPI Checkpoint Map — PJM View',
         't-npi-subtitle': 'From RFQ to Mass Production — identify high-risk checkpoints at each NPI stage.',
         't-npi-timeline-title': 'NPI Milestone Timeline — Click any phase to view PJM checkpoint analysis',
@@ -422,7 +499,6 @@ const dict = {
         't-npi-mp-bn-3': 'Field issue escalation triggers emergency 8D Problem-solving process for customer complaints',
         't-npi-mp-risk': 'Ramp delay narrows the time-to-market gap against competitors — market share capture speed is directly impacted',
 
-        't-tab-material': '📦 Material Tracker',
         't-material-title': '📦 AI Server Material Readiness Tracker',
         't-material-subtitle': 'Enter your target MP date to instantly calculate latest order dates and procurement risk for all key components',
         't-material-mp-label': '🎯 Target MP Date',
