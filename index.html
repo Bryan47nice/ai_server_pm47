@@ -1698,11 +1698,51 @@
             panel.classList.remove('hidden');
             if (mode === 'hold') {
                 if (title) title.textContent = isEn ? '🚨 Escalation Path' : '🚨 升級路徑';
-                list.innerHTML = gate.holdEscalation[isEn ? 'en' : 'zh'].map((item, i) =>
+                const ownerHoldActionMap = {
+                    supply:  { zh: '緊急確認交期，啟動備案供應商評估',              en: 'Urgently confirm ETA, initiate backup supplier evaluation' },
+                    ee:      { zh: '提出緊急修正計畫，3 工作日內更新',              en: 'Submit urgent correction plan, update within 3 business days' },
+                    me:      { zh: '加速完成測試並提交驗收報告（含根因分析）',      en: 'Expedite validation and submit report with root cause analysis' },
+                    factory: { zh: '提出良率改善計畫（含根因分析）並每日回報進度', en: 'Submit yield improvement plan with root cause, daily status updates' },
+                    pjm:     { zh: '向 Program Director 升級並啟動風險應對計畫',   en: 'Escalate to Program Director and activate risk mitigation plan' },
+                    sales:   { zh: '立即同步客戶，評估合約延誤影響',                en: 'Immediately sync with customer and assess contract delay impact' }
+                };
+                const ownerDisplayMap = { pjm: 'PJM', ee: 'EE/RD', me: 'ME/Thermal', supply: 'Supply Chain', factory: 'Factory', sales: 'Sales/PM' };
+                const pjmHeader = isEn
+                    ? 'PJM to convene urgent cross-functional Gate Review, define Hold scope and escalation path'
+                    : 'PJM 召集緊急跨部門 Gate Review，確認 Hold 範圍與升級路徑';
+                const failingItems = gate.criteria.filter(c => {
+                    const slider = document.getElementById('gate-slider-' + c.id);
+                    return parseInt(slider ? slider.value : c.default) < 80;
+                });
+                const rows = [
+                    // Fixed PJM coordination header — always shown
                     `<div class="flex items-start gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                        <span class="text-red-500 font-bold flex-shrink-0">${i + 1}.</span>
-                        <span class="text-gray-700 dark:text-gray-300 text-sm">${item}</span>
-                    </div>`).join('');
+                        <span class="text-red-500 font-bold flex-shrink-0">1.</span>
+                        <span class="text-gray-700 dark:text-gray-300 text-sm">${pjmHeader}</span>
+                    </div>`,
+                    // Dynamic rows: only criteria that are actually failing (< 80%)
+                    ...failingItems.map((c, i) => {
+                        const slider = document.getElementById('gate-slider-' + c.id);
+                        const val = parseInt(slider ? slider.value : c.default);
+                        const action = ownerHoldActionMap[c.owner] || { zh: '請立即跟進', en: 'Immediate follow-up required' };
+                        const oLabel = isEn ? c.ownerEn : (ownerDisplayMap[c.owner] || c.owner);
+                        return `<div class="flex items-start gap-2">
+                            <span class="text-red-500 font-bold flex-shrink-0 pt-3 pl-1">${i + 2}.</span>
+                            <div class="flex-1 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-bold text-sm text-gray-800 dark:text-gray-100">${isEn ? c.label.en : c.label.zh}</span>
+                                    <span class="text-xs font-black text-red-600 dark:text-red-400">${val}%</span>
+                                </div>
+                                <div class="text-xs text-gray-600 dark:text-gray-400">
+                                    <span class="font-bold text-red-600 dark:text-red-400">${oLabel}：</span>${isEn ? action.en : action.zh}
+                                </div>
+                            </div>
+                        </div>`;
+                    }),
+                    // Fallback if no criteria < 80 (edge case)
+                    ...(failingItems.length === 0 ? [`<p class="text-sm text-gray-500 px-1">${isEn ? 'Contact PJM to verify scoring source.' : '請聯繫 PJM 確認評分來源。'}</p>`] : [])
+                ];
+                list.innerHTML = rows.join('');
             } else {
                 if (title) title.textContent = isEn ? '📋 Action Items (Criteria Below 80%)' : '📋 Action Items（完成度 < 80% 的項目）';
                 const ownerActionMap = {
