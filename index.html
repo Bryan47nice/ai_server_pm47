@@ -676,15 +676,15 @@
                 <div class="card bg-white dark:bg-gray-800">
                     <p id="t-gate-select-label" class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">選擇評審階段</p>
                     <div class="flex gap-2 flex-wrap">
-                        <button id="gate-btn-dvt" onclick="switchGate('dvt')" class="px-4 py-2 rounded-lg text-sm font-bold bg-yellow-500 text-white shadow transition">DVT Gate</button>
-                        <button id="gate-btn-evt" onclick="switchGate('evt')" class="px-4 py-2 rounded-lg text-sm font-bold bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:opacity-80 shadow transition">EVT Gate</button>
+                        <button id="gate-btn-evt" onclick="switchGate('evt')" class="px-4 py-2 rounded-lg text-sm font-bold bg-green-500 text-white shadow transition">EVT Gate</button>
+                        <button id="gate-btn-dvt" onclick="switchGate('dvt')" class="px-4 py-2 rounded-lg text-sm font-bold bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:opacity-80 shadow transition">DVT Gate</button>
                         <button id="gate-btn-pvt" onclick="switchGate('pvt')" class="px-4 py-2 rounded-lg text-sm font-bold bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:opacity-80 shadow transition">PVT Gate</button>
                         <button id="gate-btn-mp"  onclick="switchGate('mp')"  class="px-4 py-2 rounded-lg text-sm font-bold bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:opacity-80 shadow transition">MP Gate</button>
                     </div>
                 </div>
 
                 <!-- Hidden state tracker -->
-                <input type="hidden" id="_currentGateId" value="dvt">
+                <input type="hidden" id="_currentGateId" value="evt">
 
                 <!-- Criteria Sliders (JS-rendered) -->
                 <div id="gate-criteria-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -1763,11 +1763,11 @@
 
         // ===== PHASE GATE GO/NO-GO SIMULATOR =====
         const gateConfig = {
-            dvt: {
-                color: 'yellow',
+            evt: {
+                color: 'green',
                 criteria: [
                     { id: 'dvt_sample',   label: { zh: '工程樣品到位率',                en: 'Engineering Sample Arrival' },      weight: 25, owner: 'supply',  ownerEn: 'Supply Chain', default: 80 },
-                    { id: 'dvt_bom',      label: { zh: 'BOM 凍結完成度',                en: 'BOM Freeze Completion' },           weight: 20, owner: 'ee',      ownerEn: 'EE / RD',      default: 90 },
+                    { id: 'dvt_bom',      label: { zh: 'Power On 成功率',               en: 'Power On Success Rate' },           weight: 20, owner: 'ee',      ownerEn: 'EE / RD',      default: 90 },
                     { id: 'dvt_test',     label: { zh: '測試覆蓋率',                    en: 'Test Coverage Rate' },              weight: 25, owner: 'ee',      ownerEn: 'EE / RD',      default: 75 },
                     { id: 'dvt_supplier', label: { zh: 'Supplier Qualification 完成率', en: 'Supplier Qualification Rate' },     weight: 30, owner: 'supply',  ownerEn: 'Supply Chain', default: 70 },
                 ],
@@ -1776,17 +1776,17 @@
                     en: ['PJM to convene cross-functional Gate Review, clarify Hold reasons', 'EE Lead to submit correction plan (within 2 weeks)', 'Supply Chain to confirm supplier alternatives or acceleration plan']
                 }
             },
-            evt: {
-                color: 'green',
+            dvt: {
+                color: 'yellow',
                 criteria: [
-                    { id: 'evt_dvt_closure', label: { zh: 'DVT 問題關閉率',     en: 'DVT Issue Closure Rate' },    weight: 30, owner: 'ee',     ownerEn: 'EE / RD',      default: 85 },
-                    { id: 'evt_thermal',     label: { zh: '熱測試驗收率',        en: 'Thermal Validation Rate' },   weight: 25, owner: 'me',     ownerEn: 'ME / Thermal', default: 78 },
-                    { id: 'evt_firmware',    label: { zh: 'Firmware 穩定度',     en: 'Firmware Stability' },        weight: 25, owner: 'ee',     ownerEn: 'EE / RD',      default: 80 },
-                    { id: 'evt_yield',       label: { zh: 'Supplier 良率達標率', en: 'Supplier Yield Rate' },       weight: 20, owner: 'supply', ownerEn: 'Supply Chain', default: 72 },
+                    { id: 'evt_dvt_closure', label: { zh: 'EVT 問題關閉率',     en: 'EVT Issue Closure Rate' },        weight: 30, owner: 'ee',     ownerEn: 'EE / RD',      default: 85 },
+                    { id: 'evt_thermal',     label: { zh: '散熱極限測試通過率',  en: 'Thermal Stress Test Pass Rate' }, weight: 25, owner: 'me',     ownerEn: 'ME / Thermal', default: 78 },
+                    { id: 'evt_firmware',    label: { zh: 'BOM 凍結完成度',      en: 'BOM Freeze Completion' },         weight: 25, owner: 'ee',     ownerEn: 'EE / RD',      default: 80 },
+                    { id: 'evt_yield',       label: { zh: 'Supplier 良率達標率', en: 'Supplier Yield Rate' },           weight: 20, owner: 'supply', ownerEn: 'Supply Chain', default: 72 },
                 ],
                 holdEscalation: {
-                    zh: ['EE / RD 提出 DVT 殘留問題修正計畫', 'ME/Thermal Lead 確認熱驗收測試重啟時間', 'PJM 向 Program Director 升級並調整整體時程'],
-                    en: ['EE/RD to submit DVT residual issue correction plan', 'ME/Thermal Lead to confirm thermal retest timeline', 'PJM to escalate to Program Director and revise overall schedule']
+                    zh: ['EE / RD 提出 EVT 殘留問題修正計畫', 'ME/Thermal Lead 確認散熱極限測試重啟時間', 'PJM 向 Program Director 升級並調整整體時程'],
+                    en: ['EE/RD to submit EVT residual issue correction plan', 'ME/Thermal Lead to confirm thermal stress retest timeline', 'PJM to escalate to Program Director and revise overall schedule']
                 }
             },
             pvt: {
@@ -2002,7 +2002,7 @@
         }
 
         function initGateReview() {
-            switchGate('dvt');
+            switchGate('evt');
         }
         // ===== END PHASE GATE SIMULATOR =====
 
