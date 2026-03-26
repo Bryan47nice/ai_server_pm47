@@ -150,7 +150,7 @@
                     <div class="relative">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
-                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"><span id="t-servers-per-rack">單機櫃伺服器數量</span></label>
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"><span id="t-servers-per-rack">單機櫃伺服器數量</span><button onclick="toggleRackInfo(event)" class="ml-1.5 w-4 h-4 rounded-full bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300 text-[10px] font-black leading-none flex items-center justify-center hover:bg-indigo-400 hover:text-white dark:hover:bg-indigo-500 transition-colors shrink-0" aria-label="說明">i</button></label>
                             </div>
                             <input type="number" id="rackValInput" value="32" min="10" max="72" class="w-16 px-2 py-0.5 text-blue-600 dark:text-blue-400 font-bold border rounded-md dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 text-center" onchange="updateSliderFromInput(); calculateTCO()">
                         </div>
@@ -158,6 +158,9 @@
                         <div class="flex justify-between items-center mt-1">
                             <p class="text-xs text-gray-500 dark:text-gray-400"><span id="t-power-per-rack">單櫃功耗:</span> <span id="kwPerRack" class="font-bold text-red-500 dark:text-red-400">32</span> kW</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded"><span id="t-total-racks">總機櫃:</span> <span id="totalRacksDisplay" class="font-bold text-gray-800 dark:text-gray-200">4</span> Racks</p>
+                        </div>
+                        <div id="rackInfoPopover" class="hidden absolute left-0 top-8 z-50 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-xl p-4 text-sm text-gray-700 dark:text-gray-200 leading-relaxed">
+                            <p id="t-rack-info-tooltip">上限 72 對應 NVIDIA GB200 NVL72 架構——單一機櫃可容納最多 72 顆 GPU，為目前市場密度最高的商用配置。一般資料中心建議值為 10～42 台。</p>
                         </div>
                     </div>
                     <h2 id="t-adv-settings" class="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mt-4">進階環境設定 (Advanced)</h2>
@@ -1139,6 +1142,14 @@
         }
         
         function closeModal() { document.getElementById('drilldownModal').classList.add('hidden'); }
+
+        function toggleRackInfo(e) {
+            e.stopPropagation();
+            document.getElementById('rackInfoPopover').classList.toggle('hidden');
+        }
+        document.addEventListener('click', () => {
+            document.getElementById('rackInfoPopover')?.classList.add('hidden');
+        });
 
         // ===== MATERIAL READINESS DASHBOARD =====
         let materialParts = [
