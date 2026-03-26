@@ -1071,7 +1071,7 @@
         }
 
         function selectNpiPhase(phase) {
-            const phases = ['rfq', 'dvt', 'evt', 'pvt', 'mp'];
+            const phases = ['rfq', 'evt', 'dvt', 'pvt', 'mp'];
             phases.forEach(p => {
                 const panel = document.getElementById('npi-panel-' + p);
                 const dot = document.getElementById('npi-dot-' + p);
@@ -1397,8 +1397,8 @@
         // ===== SCHEDULE PULL-IN SIMULATOR =====
         const schedPhases = [
             { id: 'rfq', label: 'RFQ / 規劃', baseWeeks: 24, color: 'bg-orange-400', textColor: 'text-orange-600 dark:text-orange-400' },
-            { id: 'dvt', label: 'DVT',         baseWeeks: 16, color: 'bg-yellow-500', textColor: 'text-yellow-600 dark:text-yellow-400' },
-            { id: 'evt', label: 'EVT',         baseWeeks: 12, color: 'bg-green-500',  textColor: 'text-green-600 dark:text-green-400' },
+            { id: 'evt', label: 'EVT',         baseWeeks: 16, color: 'bg-green-500',  textColor: 'text-green-600 dark:text-green-400' },
+            { id: 'dvt', label: 'DVT',         baseWeeks: 12, color: 'bg-yellow-500', textColor: 'text-yellow-600 dark:text-yellow-400' },
             { id: 'pvt', label: 'PVT',         baseWeeks: 12, color: 'bg-blue-500',   textColor: 'text-blue-600 dark:text-blue-400' },
         ];
 
