@@ -835,8 +835,8 @@
                         <div>
                             <label class="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">需到貨階段 Phase</label>
                             <select id="new-part-phase" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-400">
-                                <option value="DVT">DVT (M-12)</option>
-                                <option value="EVT" selected>EVT (M-8)</option>
+                                <option value="EVT">EVT (M-12)</option>
+                                <option value="DVT" selected>DVT (M-8)</option>
                                 <option value="PVT">PVT (M-5)</option>
                             </select>
                         </div>
@@ -1153,13 +1153,13 @@
 
         // ===== MATERIAL READINESS DASHBOARD =====
         let materialParts = [
-            { part: 'GPU Module (H100/B200)', partZh: 'GPU 模組 (H100/B200)', category: 'Compute',    categoryZh: '運算',   leadTime: 20, phase: 'DVT', phaseOffset: 12, isCustom: false },
-            { part: 'HBM Memory',             partZh: 'HBM 記憶體',           category: 'Compute',    categoryZh: '運算',   leadTime: 24, phase: 'DVT', phaseOffset: 12, isCustom: false },
-            { part: 'PCB / PCBA',             partZh: 'PCB / PCBA 電路板',    category: 'PCB',        categoryZh: '電路板', leadTime: 12, phase: 'DVT', phaseOffset: 12, isCustom: false },
-            { part: 'Liquid Cooling CDU',     partZh: '液冷散熱模組 CDU',     category: 'Thermal',    categoryZh: '散熱',   leadTime: 18, phase: 'EVT', phaseOffset: 8,  isCustom: false },
-            { part: 'Power Supply Unit',      partZh: '電源供應器 PSU',       category: 'Power',      categoryZh: '電源',   leadTime: 16, phase: 'EVT', phaseOffset: 8,  isCustom: false },
-            { part: 'Network Switch',         partZh: '網路交換器',           category: 'Network',    categoryZh: '網路',   leadTime: 14, phase: 'EVT', phaseOffset: 8,  isCustom: false },
-            { part: 'SSD Storage',            partZh: 'SSD 儲存裝置',         category: 'Storage',    categoryZh: '儲存',   leadTime: 10, phase: 'EVT', phaseOffset: 8,  isCustom: false },
+            { part: 'GPU Module (H100/B200)', partZh: 'GPU 模組 (H100/B200)', category: 'Compute',    categoryZh: '運算',   leadTime: 20, phase: 'EVT', phaseOffset: 12, isCustom: false },
+            { part: 'HBM Memory',             partZh: 'HBM 記憶體',           category: 'Compute',    categoryZh: '運算',   leadTime: 24, phase: 'EVT', phaseOffset: 12, isCustom: false },
+            { part: 'PCB / PCBA',             partZh: 'PCB / PCBA 電路板',    category: 'PCB',        categoryZh: '電路板', leadTime: 12, phase: 'EVT', phaseOffset: 12, isCustom: false },
+            { part: 'Liquid Cooling CDU',     partZh: '液冷散熱模組 CDU',     category: 'Thermal',    categoryZh: '散熱',   leadTime: 18, phase: 'DVT', phaseOffset: 8,  isCustom: false },
+            { part: 'Power Supply Unit',      partZh: '電源供應器 PSU',       category: 'Power',      categoryZh: '電源',   leadTime: 16, phase: 'DVT', phaseOffset: 8,  isCustom: false },
+            { part: 'Network Switch',         partZh: '網路交換器',           category: 'Network',    categoryZh: '網路',   leadTime: 14, phase: 'DVT', phaseOffset: 8,  isCustom: false },
+            { part: 'SSD Storage',            partZh: 'SSD 儲存裝置',         category: 'Storage',    categoryZh: '儲存',   leadTime: 10, phase: 'DVT', phaseOffset: 8,  isCustom: false },
             { part: 'Cable Assembly',         partZh: '線材組件',             category: 'Mechanical', categoryZh: '機構',   leadTime: 8,  phase: 'PVT', phaseOffset: 5,  isCustom: false },
         ];
         let activeMaterialFilter = 'all';
@@ -1332,7 +1332,7 @@
             const categoryZh = catSelect === 'Custom' ? (customCatInput || '自訂') : (categoryZhMap[catSelect] || catSelect);
             const leadTime = parseInt(document.getElementById('new-part-leadtime')?.value) || 12;
             const phase = document.getElementById('new-part-phase')?.value || 'EVT';
-            const phaseOffset = { DVT: 12, EVT: 8, PVT: 5 }[phase] || 8;
+            const phaseOffset = { EVT: 12, DVT: 8, PVT: 5 }[phase] || 8;
             materialParts.push({ part: nameEn, partZh: nameZh, category, categoryZh, leadTime, phase, phaseOffset, isCustom: true });
             // Reset form fields
             ['new-part-zh', 'new-part-en', 'new-part-custom-cat'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
@@ -1684,7 +1684,7 @@
             'I': 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400',
         };
 
-        const phaseLabels = ['RFQ', 'DVT', 'EVT', 'PVT', 'MP'];
+        const phaseLabels = ['RFQ', 'EVT', 'DVT', 'PVT', 'MP'];
 
         function switchRaciScenario(scenario) {
             ['normal','delay','emergency'].forEach(s => {
